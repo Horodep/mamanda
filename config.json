@@ -1,0 +1,24 @@
+{
+   "_comment": "This is an example file. Here should be your data.",
+   
+	"discordApiKey" : "0000000",
+	"BotName"       : "Gladd you here",
+
+	"d2apiKey"      : "0000000",
+
+	"channels"      :{
+		"admintext"     : "000000000000000000",
+		"suggestions"   : "000000000000000000",
+		"deleted"       : "000000000000000000",
+		"sandbox"       : "000000000000000000",
+		
+		"gamenews"      : "000000000000000000",
+		"clannews"      : "000000000000000000",
+		
+		"entrance"      : "000000000000000000",
+		"flood"         : "000000000000000000",
+		"statistics"    : "000000000000000000",
+		"raids"         : "000000000000000000",
+		"lfg"           : "000000000000000000"
+	}
+}
