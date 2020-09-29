@@ -4,12 +4,12 @@ const config = require("./config.json");
 exports.main = function (message) {
 	try {
 		if (message.content.substring(0, 1) == '!') {
-			const comm = ['сбор','mymt','cap','invitefriend','medals','region','roles','setroles',
+			const comm = ['сбор','mymt','cap','invitefriend','medals','region','roles',
 							'rl','triumph','triumphs','horohelp','help'];
 			const gmcomm = ['testreset', 'xur','reset','membertime','copy','raidadd','raidkick',
 							'size','ck','clankick','ckp','clankickpub', 'csr','nicknames','q','qq',
 							'n','gmhelp','pvpdrop', 'pmspam', 'forum', 'forumtime', 'setmaxtriumphs', 
-							'watermelon', 'message', 'sync', 'checksync', 'tp'];
+							'watermelon', 'message', 'sync', 'checksync'];
 			const pmcomm = ['oauth2','code'];
 			const freecomm = ['pinghorobot','rand','clown']; 
 			
@@ -25,7 +25,7 @@ exports.main = function (message) {
 			}else if(pmcomm.includes(args[0])){
 				if(message.channel.type != "text"){
 					switch(args[0]) {
-						case 'oauth2':		message.channel.send("https://www.bungie.net/ru/OAuth/Authorize?response_type=code&client_id=26315&state=12345"); 							break;
+						case 'oauth2':		message.channel.send("https://www.bungie.net/ru/OAuth/Authorize?response_type=code&client_id="+config.d2clientId+"&state=12345"); 							break;
 						case 'code':		reset.newToken(message, args[1]); 					break;
 					}
 				}

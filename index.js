@@ -42,14 +42,14 @@ client.on('guildMemberAdd', member => {
 var message = require('./message');
 client.on("message", function(_message) => message.main(_message));
 
+var messageDelete = require('./messageDelete');
+client.on("messageDelete", (message) => messageDelete.main(message));
+
 var messageReactionAdd = require('./messageReactionAdd');
 client.on('messageReactionAdd', (reaction, user) => messageReactionAdd.main(reaction, user));
 
 var messageReactionRemove = require('./messageReactionRemove');
 client.on('messageReactionRemove', (reaction, user) => messageReactionRemove.main(reaction, user));
-
-var messageDelete = require('./messageDelete');
-client.on("messageDelete", (message) => messageDelete.main(message));
 
 client.on('raw', async event => {
 	try{

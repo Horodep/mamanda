@@ -7,15 +7,8 @@ exports.message = function (message) {
 		gm = guild.roles.find(role => role.id == config.roles.gm);
 		if(gm.position <= message.member.highestRole.position){
 			switch(args[0]) {
-				case 'tp':
-					//if (args.length != 1) 
-					break;
-				case 'checksync':
-					checksync.checksync(message.channel);
-					break;
-				case 'sync':
-					roles.roles_bytag(message.channel, args.length > 1 ? args[1] : message.member.id, true);
-					break;
+				case 'checksync':	checksync.checksync(message.channel);					break;
+				case 'sync':		roles.roles_bytag(message.channel, args.length > 1 ? args[1] : message.member.id, true);					break;
 				case 'message':
 					channel = client.channels.get(args[1]);
 					var message = args.filter((_,i) => i > 1).join(" ");
@@ -43,8 +36,7 @@ exports.message = function (message) {
 					}
 					pm_spam();
 					break;
-				case 'watermelon':
-					watermelon.watermelon(message.channel, args.length > 1 ? args[1] : message.member.id);
+				case 'watermelon':		watermelon.watermelon(message.channel, args.length > 1 ? args[1] : message.member.id);
 					break;
 				case 'setmaxtriumphs':
 					if(args.length > 1){
@@ -89,10 +81,6 @@ exports.message = function (message) {
 					giverole();
 					break;
 				case 'testreset':
-					//message.channel.send(
-					//	"Reset by Kyber3000\n"+
-					//	"http://kyber3000.com/reset\n"+
-					//	"http://kyber3000.com/raids");
 					var yyyy = date.getFullYear();
 					var dd = date.getDate();
 					if(dd<10) { dd='0'+dd; }
@@ -119,9 +107,7 @@ exports.message = function (message) {
 				case 'membertime':
 					clantime.membertime(message, (args.length > 1 ? args[1].replace(/\D/g,'') : message.member.id), (args.length > 2 ? args[2] : 7), true);
 					break;
-				case 'copy':
-					raid.copy(client);
-					break;
+				case 'copy':					raid.copy(client);					break;
 				case 'raidadd':
 					if(args.length > 2){
 						var chan = client.channels.get("626432384643891220");
@@ -148,44 +134,16 @@ exports.message = function (message) {
 						message.channel.send('Указаны не все параметры');
 					};
 					break;
-				case 'size':
-					count.count(message);
-					break;
+				case 'size':			count.count(message);														break;
 				case 'ck':
-				case 'clankick':
-					clantime.clantime(message, (args.length > 1 ? args[1] : 7), 'full');
-					break;
+				case 'clankick':		clantime.clantime(message, (args.length > 1 ? args[1] : 7), 'full');		break;
 				case 'ckp':
-				case 'clankickpub':
-					clantime.clantime(message, (args.length > 1 ? args[1] : 7), 'pub');
-					break;
-				case 'csr':
-					roles.set_clan_roles(message.channel);
-					break;
-				case 'nicknames':
-					dclan.dclan(message, true, message.channel);
-					break;
-				case 'q':
-					var q_list = [];
-					message.guild.roles.find(role => role.name == "Очередь").members.forEach(function(member) {
-						var sec = Date.now() - member.joinedTimestamp;
-						q_list.push("`" + Math.round(sec/(1000*60*60*24)) + "d` " + "<@"+member.user.id+">");
-					});
-					q_list.sort();
-					message.channel.send(q_list.join('\n'));
-					break;
-				case 'qq':
-					qq.qq(message, client);
-					break;
-				case 'n':
-					var q_list = [];
-					message.guild.roles.find(role => role.name == "Восставший").members.forEach(function(member) {
-						var sec = Date.now() - member.joinedTimestamp;
-						q_list.push("`" + Math.round(sec/(1000*60*60*24)) + "d` " + "<@"+member.user.id+">");
-					});
-					q_list.sort();
-					message.channel.send(q_list.join('\n'));
-					break;
+				case 'clankickpub':		clantime.clantime(message, (args.length > 1 ? args[1] : 7), 'pub');			break;
+				case 'csr':				roles.set_clan_roles(message.channel);										break;
+				case 'nicknames':		dclan.dclan(message, true, message.channel);								break;
+				case 'q':				query.q(message);															break;
+				case 'qq':				query.qq(message);															break;
+				case 'n':				query.n(message);															break;
 				case 'pvpdrop':
 					var t1 = message.guild.roles.find(role => role.name == "💠 Левая рука Шакса");
 					t1.members.forEach(function(member) {

@@ -21,27 +21,27 @@ exports.main = function (reaction, user) {
 			case "Хочу Петраран (ПЖ без смертей)":
 				var petrarun = member.guild.roles.find(role => role.name === "Хочу Петраран");
 				console.log(user.username + " wants petrarun.");
-				member.addRole(petrarun);
+				member.roles.add(petrarun);
 				break;
 			case "Хочу Алмаз (ИП без смертей)":
 				var diamond = member.guild.roles.find(role => role.name === "Хочу Алмаз");
 				console.log(user.username + " wants diamond.");
-				member.addRole(diamond);
+				member.roles.add(diamond);
 				break;
 			case "Хочу Корону (КС без смертей)":
 				var crown = member.guild.roles.find(role => role.name === "Хочу Корону");
 				console.log(user.username + " wants crown.");
-				member.addRole(crown);
+				member.roles.add(crown);
 				break;
 			case "Хочу Совершенство (СС без смертей)":
 				var garden = member.guild.roles.find(role => role.name === "Хочу Совершенство");
 				console.log(user.username + " wants garden.");
-				member.addRole(garden);
+				member.roles.add(garden);
 				break;
 			case "Хочу Ниобу (лаборатория ниоба)":
 				var nioba = member.guild.roles.find(role => role.name === "Хочу Ниобу");
 				console.log(user.username + " wants nioba.");
-				member.addRole(nioba);
+				member.roles.add(nioba);
 				break;
 			case "":
 				if(!user.bot &&
