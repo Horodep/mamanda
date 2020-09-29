@@ -1,19 +1,21 @@
 const Discord = require("discord.js");
+const config = require("./config.json");
 
 exports.main = function (reaction, user) {
-	if(reaction.message.member.user.id == 149245139389251584){
+	console.log(user.username + " set reaction.");
+	
+	if(reaction.message.member.user.id == config.users.boss){
 		if(reaction.message.content.startsWith("Хочу быть ГМ-ом")){
-			var gmchannel = client.channels.get("515542566695862285");
-			gmchannel.send("<@"+user.id+"> хочет стать ГМ-ом.");
+			var suggestions = client.channels.cache.get(config.channels.suggestions);
+			suggestions.send("<@"+user.id+"> хочет стать ГМ-ом.");
 		}else
 		if(reaction.message.content.startsWith("Хочу быть Наставником")){
-			var gmchannel = client.channels.get("515542566695862285");
-			gmchannel.send("<@"+user.id+"> хочет стать Наставником.");
+			var suggestions = client.channels.cache.get(config.channels.suggestions);
+			suggestions.send("<@"+user.id+"> хочет стать Наставником.");
 		}
 	}
 	
-	if(reaction.message.channel.type == "text" && reaction.message.member.user.id == 543342030768832524){
-		console.log(`${user.username} set reaction.`);
+	if(reaction.message.channel.type == "text" && reaction.message.member.user.id == config.users.bot){
 		var member = reaction.message.member.guild.members.find(mmbr => mmbr.user.id === user.id);
 		switch(reaction.message.content){
 			case "Хочу Петраран (ПЖ без смертей)":

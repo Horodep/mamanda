@@ -1,7 +1,8 @@
 const Discord = require("discord.js");
+const config = require("./config.json");
 
 exports.main = function (reaction, user) {
-	if(reaction.message.channel.type == "text" && reaction.message.member.user.id == 543342030768832524){
+	if(reaction.message.channel.type == "text" && reaction.message.member.user.id == config.users.bot){
 		console.log(`${user.username} removed reaction.`);
 		var member = reaction.message.member.guild.members.find(mmbr => mmbr.user.id === user.id);
 		switch(reaction.message.content){
