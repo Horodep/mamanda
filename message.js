@@ -41,4 +41,4 @@ exports.main = function (message) {
 	} catch(e) {
 		require('./catcherror').catcherror(e);
 	}
-});
+};

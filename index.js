@@ -40,7 +40,7 @@ client.on('guildMemberAdd', member => {
 });
 
 var message = require('./message');
-client.on("message", function(_message) => message.main(_message));
+client.on("message", (_message) => message.main(_message));
 
 var messageDelete = require('./messageDelete');
 client.on("messageDelete", (message) => messageDelete.main(message));
