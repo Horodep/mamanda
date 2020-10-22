@@ -1,41 +1,16 @@
 const Discord = require("discord.js");
 const config = require("./config.json");
 
-
 const client = new Discord.Client();
 client.login(config.discordApiKey);
 
 
 client.on('ready', () => {
-	console.log('Ready to master!'); 
-	
-	var date = new Date();
-	var startDate = new Date();
-	lastDate = new Date();
-	
-	var repeateAction = function(){ 
-		date = new Date(); 
-		
-		if(date - lastDate < 58000 && date - startDate > 60000){
-			console.log(date, "hardreset", date - startDate, date - lastDate);
-			channel_sandbox = client.channels.cache.get(config.channels.sandbox);
-			channel_sandbox.send((date - lastDate) + " миллисекунд");
-			setTimeout(function(){
-				var shiza = client.find();
-			}, 150);
-		}else if(date.getMinutes() === 0 && date.getHours() === 5 && date - startDate > 60000){
-			console.log(date, "destroy", date - startDate, date - lastDate);
-			client.destroy().then(() => client.login(keys.discordApiKey()));
-		}else{
-			setTimeout(repeateAction, 1000*60); 
-		}
-		lastDate = date;
-	} 
-	repeateAction();
+	console.log('Ready to master!');
 });
 
 client.on('guildMemberAdd', member => {
-	member.addRole(member.guild.roles.find(role => role.name === "Очередь"));
+	member.roles.add(member.guild.roles.cache.find(role => role.name === "Очередь"));
 	console.log('NEW MEMBER ' + member.displayName); 
 });
 
