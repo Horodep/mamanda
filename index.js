@@ -4,7 +4,6 @@ const config = require("./config.json");
 const client = new Discord.Client();
 client.login(config.discordApiKey);
 
-
 client.on('ready', () => {
 	console.log('Ready to master!');
 });
