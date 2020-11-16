@@ -1,7 +1,7 @@
-const Discord = require("discord.js");
-const config = require("./config.json");
+import Discord from "discord.js";
+import config from "./config.json";
 
-exports.bruteforce = function (){
+export function bruteforce (){
 	console.log("Check in Penumbra;");
 	var clan = new XMLHttpRequest();
 	clan.open("GET", "https://www.bungie.net/Platform/GroupV2/3055823/Members/", true);

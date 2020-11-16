@@ -1,7 +1,7 @@
-const Discord = require("discord.js");
-const config = require("./config.json");
+import Discord from "discord.js";
+import { channels } from "./config.json";
 
-exports.n = function q(message){
+export function n(message){
 	var q_list = [];
 	message.guild.roles.find(role => role.name == "Восставший").members.forEach(function(member) {
 		var sec = Date.now() - member.joinedTimestamp;
@@ -10,7 +10,7 @@ exports.n = function q(message){
 	q_list.sort();
 	message.channel.send(q_list.join('\n'));
 }
-exports.q = function q(message){
+export function q(message){
 	var q_list = [];
 	message.guild.roles.find(role => role.name == "Очередь").members.forEach(function(member) {
 		var sec = Date.now() - member.joinedTimestamp;
@@ -19,7 +19,7 @@ exports.q = function q(message){
 	q_list.sort();
 	message.channel.send(q_list.join('\n'));
 }
-exports.qq = function qq(message){
+export function qq(message){
 	var counters = [];
 	var reacts = [];
 	message.guild.roles.find(role => role.name == "Очередь").members
@@ -28,7 +28,7 @@ exports.qq = function qq(message){
 		var sec = Date.now() - member.joinedTimestamp;
 		var messageText = "Заявка от <@"+member.user.id+"> (дней на сервере: " + Math.round(sec/(1000*60*60*24)) + "):";
 		
-		var newby_channel = message.client.channels.cashe.get(config.channels.entrance);
+		var newby_channel = message.client.channels.cashe.get(channels.entrance);
 		counters[member.id] = 0;
 		newby_channel.fetchMessages({ limit: 100 }).then(messages => {
 			messages
