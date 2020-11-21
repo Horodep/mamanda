@@ -1,111 +1,37 @@
-var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 const Discord = require("discord.js");
-const keys = require('./keys');
-var numeral = require('numeral');
+import config from "./config.json";
+var Clan = require("./clan.js");
 var iconv = require('iconv-lite');
-var d2apiKey = keys.d2apiKey();
 
-const mysql = require('mysql');
-var pool = mysql.createPool({
-	connectionLimit : 10,
-	host     : '127.0.0.1',
-	user     : 'horodep',
-	password : 'sql12345',
-	database : 'auroras',
-	charset  : 'utf8'
-});
-
-
-var bot_msg;
-var minlight = 1041;
 
 exports.roles_bytag = function(channel, battleTag, sync) {
-	if(battleTag.startsWith("id:")){
-		var steam_id = battleTag.replace(/\D/g,'');
-		var discord_id = null;
-		console.log(discord_id);
-		var d_member = null;
-		
-		roles(channel, 3, steam_id, null, "-", false);
-		
-	}else{
-		var discord_id = battleTag.replace(/\D/g,'');
-		console.log(discord_id);
-		var d_member = channel.guild.members.find(member => member.user.id == discord_id);
-		
-		if(d_member == null){
-			channel.send('Дискорд пользователь не найден.');
-			return;
-		}
-		
-		console.log("Check in Penumbra;");
-		var clan = new XMLHttpRequest();
-		clan.open("GET", "https://www.bungie.net/Platform/GroupV2/3055823/Members/", true);
-		clan.setRequestHeader("X-API-Key", d2apiKey);
-		clan.onreadystatechange = function(){
-			if(this.readyState === 4 && this.status === 200){
-				var json = JSON.parse(this.responseText);
+
+	if (sync == true) CreateSync(channel, discord_id, found_member.destinyUserInfo.membershipType, found_member.destinyUserInfo.membershipId, found_member.destinyUserInfo.LastSeenDisplayName);
+
+	if(found_member == null){
+		console.log("Check in Database;");
+		pool.getConnection(function(err, connection) {
+			if (err) throw err; // not connected!
 			
-				var found_member = null;
-				var members = json.Response.results;
-				members.forEach(function(member) { 
-					if(d_member.displayName.startsWith(member.destinyUserInfo.LastSeenDisplayName + " ") || d_member.displayName == member.destinyUserInfo.LastSeenDisplayName){
-						found_member = member;
+			var query2 = connection.query('SELECT * FROM members WHERE id = ?',  discord_id, function(err, results, fields) {
+				if (err) throw err;
+				else {
+					if(results.length > 0){
+						results.forEach(function (line){
+							if (line.membershipId == null) channel.send('Пользователь не найден.');
+							else roles(channel, line.membershipType, line.membershipId, d_member.displayName, null);
+						});
+					}else{
+						channel.send('Пользователь не найден.');
 					}
-				});
-				
-				if(found_member != null){
-					console.log(found_member.destinyUserInfo.LastSeenDisplayName);
-					if (sync == true) CreateSync(channel, discord_id, found_member.destinyUserInfo.membershipType, found_member.destinyUserInfo.membershipId, found_member.destinyUserInfo.LastSeenDisplayName);
-					roles(channel, found_member.destinyUserInfo.membershipType, found_member.destinyUserInfo.membershipId, found_member.destinyUserInfo.LastSeenDisplayName, "3055823");
-				}else{
-					console.log("Check in Antumbra;");
-					var clan1 = new XMLHttpRequest();
-					clan1.open("GET", "https://www.bungie.net/Platform/GroupV2/3858144/Members/", true);
-					clan1.setRequestHeader("X-API-Key", d2apiKey);
-					clan1.onreadystatechange = function(){
-						if(this.readyState === 4 && this.status === 200){
-							var json = JSON.parse(this.responseText);
-						
-							var members1 = json.Response.results;
-							members1.forEach(function(member) { 
-								if(d_member.displayName.startsWith(member.destinyUserInfo.LastSeenDisplayName + " ") || d_member.displayName == member.destinyUserInfo.LastSeenDisplayName){
-									found_member = member;
-								}
-							});
-							
-							if(found_member == null){
-								console.log("Check in Database;");
-								pool.getConnection(function(err, connection) {
-									if (err) throw err; // not connected!
-									
-									var query2 = connection.query('SELECT * FROM members WHERE id = ?',  discord_id, function(err, results, fields) {
-										if (err) throw err;
-										else {
-											if(results.length > 0){
-												results.forEach(function (line){
-													if (line.membershipId == null) channel.send('Пользователь не найден.');
-													else roles(channel, line.membershipType, line.membershipId, d_member.displayName, null);
-												});
-											}else{
-												channel.send('Пользователь не найден.');
-											}
-											connection.release();
-										}
-									});
-								});								
-							}else{
-								console.log(found_member.destinyUserInfo.LastSeenDisplayName);
-								if (sync == true) CreateSync(channel, discord_id, found_member.destinyUserInfo.membershipType, found_member.destinyUserInfo.membershipId, found_member.destinyUserInfo.LastSeenDisplayName);
-								roles(channel, found_member.destinyUserInfo.membershipType, found_member.destinyUserInfo.membershipId, found_member.destinyUserInfo.LastSeenDisplayName, "3858144");
-							}
-						}
-					}
-					clan1.send();
+					connection.release();
 				}
-			}
-		}
-		clan.send();
+			});
+		});								
+	}else{
+		console.log(found_member.destinyUserInfo.LastSeenDisplayName);
+		if (sync == true) CreateSync(channel, discord_id, found_member.destinyUserInfo.membershipType, found_member.destinyUserInfo.membershipId, found_member.destinyUserInfo.LastSeenDisplayName);
+		roles(channel, found_member.destinyUserInfo.membershipType, found_member.destinyUserInfo.membershipId, found_member.destinyUserInfo.LastSeenDisplayName, "3858144");
 	}
 }				
 
@@ -204,163 +130,140 @@ function CreateSync(channel, discord_id, membershipType, membershipId, LastSeenD
 	});
 }
 
-function roles(channel, membershipType, membershipId, displayName, clanid, doNotMessage) {
-	var fulldata = new XMLHttpRequest();
-	fulldata.open("GET", "https://www.bungie.net/Platform/Destiny2/"+membershipType+"/Profile/"+membershipId+"/?components=Profiles,Characters,CharacterProgressions,PresentationNodes,Records,Collectibles", true);
-	fulldata.setRequestHeader("X-API-Key", d2apiKey);
-	fulldata.onreadystatechange = function(){
-		if(this.readyState === 4 && this.status === 200){
-			var jsondata = JSON.parse(this.responseText);
-						
-			if(typeof(jsondata.Response.profileRecords.data) == 'undefined'){
-				console.log(displayName + ' '.repeat(48-displayName.length), "NO DATA");
-				if(!doNotMessage) channel.send('Данные профиля не были получены. Профиль закрыт настройками приватности.\n'+
-											   'Настройки приватности: https://www.bungie.net/ru/Profile/Settings/?category=Privacy');
-			}else{
-				if (displayName == null) displayName = jsondata.Response.profile.data.userInfo.displayName;
-				
-				console.log(displayName + ' '.repeat(40-displayName.length), "start roles");
-				var d_member = channel.guild.members.find(member => member.displayName.startsWith(displayName + " "));
-				if (d_member == null) d_member = channel.guild.members.find(member => member.displayName == displayName);
-				
-				var characterIds = jsondata.Response.profile.data.characterIds;
-				var characters = jsondata.Response.characters.data;
-				
-				var titan = -1;
-				var hunter = -1;
-				var warlock = -1;
-				
-				characterIds.forEach(function(characterId){
-					switch(characters[characterId].classType){
-						case 0:
-							titan = characters[characterId].light;
-							break;
-						case 1:
-							hunter = characters[characterId].light;
-							break;
-						case 2:
-							warlock = characters[characterId].light;
-							break;
-					}
-				});
-				
-				if(titan == -1 && hunter == -1 && warlock == -1) return;
-
-				//				ROLES
-				var characterPresentationNodes = [];
-				for (var characterID in jsondata.Response.characterPresentationNodes.data) characterPresentationNodes.push([characterID, jsondata.Response.characterPresentationNodes.data[characterID]]);
-				
-				var characterRecords = [];
-				for (var characterID in jsondata.Response.characterRecords.data) characterRecords.push([characterID, jsondata.Response.characterRecords.data[characterID]]);
-				
-				var characterProgressions = [];
-				for (var characterID in jsondata.Response.characterProgressions.data) characterProgressions.push([characterID, jsondata.Response.characterProgressions.data[characterID]]);
-				
-				var characterCollectibles = [];
-				for (var characterID in jsondata.Response.characterProgressions.data) characterCollectibles.push([characterID, jsondata.Response.characterCollectibles.data[characterID]]);
-				
-				var data = {
-					raids:{}, 
-					locations:{}, 
-					triumphs:{}, 
-					seals:{}, 
-					crucible:{}, 
-					legacy_seals:{}, 
-					legacy_triumphs:{}, 
-					season:{}, 
-					extra:{}
-				};
-				
-				data.raids.lw  = get_node_data(jsondata, 1525933460, "ПЖ");
-				data.raids.gos = get_node_data(jsondata,  615240848, "CC");
-				data.raids.dsc = get_node_data(jsondata, 1726708384, "СГК");
-				data.raids.day1 = get_day_one(jsondata, characterCollectibles);
-				data.locations.dc   = get_node_data(jsondata, 3483405511, "Город Грез");
-				data.locations.moon = get_node_data(jsondata, 1473265108, "Луна");
-				data.locations.euro = get_node_data(jsondata, 2647590440, "Европа");
-				data.triumphs.t10k = get_profile_records(jsondata, "activeScore", 10000, "");
-				data.triumphs.t15k = get_profile_records(jsondata, "activeScore", 15000, "");
-				data.triumphs.t20k = get_profile_records(jsondata, "activeScore", 20000, "");
-				data.seals.cursebreaker = get_character_node_data(characterPresentationNodes, 560097044, "Гроза");
-				data.seals.harbinger = get_node_data(jsondata, 379405979, "Посланник");
-				data.seals.splintered = get_node_data(jsondata, 79180995, "Раскол");
-				data.seals.dredgen = get_node_data(jsondata, 3665267419, "Дреджен");
-				data.seals.conqueror = get_any_of_data(characterPresentationNodes, [3212358005, 1376640684], "Завоеватель");
-				data.crucible.glory2100 = get_character_progression_data(characterProgressions, 2000925172, 2100, "Ранкед");
-				data.crucible.glory3500 = get_character_progression_data(characterProgressions, 2000925172, 3500, "Ранкед");
-				data.crucible.glory5450 = get_character_progression_data(characterProgressions, 2000925172, 5450, "Ранкед");
-				data.crucible.flawless = get_any_of_data(characterPresentationNodes, [3251218484, 2086100423, 1276693937], "Безупречный");
-				data.legacy_seals.lore = get_character_node_data(characterPresentationNodes, 3680676656, "Летописец");
-				data.legacy_seals.blacksmith = get_character_node_data(characterPresentationNodes, 450166688, "Кузнец");
-				data.legacy_seals.reconeer = get_character_node_data(characterPresentationNodes, 2978379966, "Вершитель");
-				data.legacy_seals.shadow = get_character_node_data(characterPresentationNodes, 717225803, "Тень");
-				data.legacy_triumphs.t80k = get_profile_records(jsondata, "legacyScore", 80000, "");
-				data.legacy_triumphs.t100k = get_profile_records(jsondata, "legacyScore", 100000, "");
-				data.legacy_triumphs.t120k = get_profile_records(jsondata, "legacyScore", 120000, "");
-				data.season.seal = get_character_node_data(characterPresentationNodes, 1321008463, "Смотритель");
-				data.season.triumphs = get_season_triumphs(jsondata, characterPresentationNodes, 2255100699, 
-					[91071118,1951157616,4186991151,3518211070,975308347,25634498], "Триумфы");
-				data.extra.poi = get_poi(jsondata);
-				data.extra.solo = get_all_nodes(jsondata, [3841336511, 3899996566]);
-				data.extra.soloflawless = get_all_nodes(jsondata, [3950599483, 3205009787]);
-				
-				if(!doNotMessage){
-					console.log(data);
-					const embed = new Discord.RichEmbed()
-						  .setAuthor(displayName + " 💠" + sumMedals(d_member, data) + "💠")
-						  .setColor(0x00AE86)
-						  .setFooter("ПВП медали выдают гм-ы; ранжирование ролей: 7/16/24 • id: "+d_member.user.id, "https://cdn.discordapp.com/avatars/543342030768832524/7da47eaca948d9874b66fc5884ca2d00.png")
-						  .addField("Рейды",    form_field(data.raids), true)
-						  .addField("Печати",   form_field(data.seals), true)
-						  .addField("Наследные печати", form_field(data.legacy_seals), true)
-						  .addField("Планеты",  form_field(data.locations), true)
-						  .addField("Триумфы",  form_field(data.triumphs), true)
-						  .addField("Наследные триумфы", form_field(data.legacy_triumphs), true)
-						  .addField("Горнило",  form_field(data.crucible), true)
-						  .addField("Сезон 12", form_field(data.season), true)
-						  .addField('\u200B', '\u200B', true)
-					embed.addField("Ссылки", "[Raid Report](https://raid.report/pc/"+membershipId+")"
-											+" | [Braytech](https://beta.braytech.org/"+membershipType+"/"+membershipId+"/"+characterIds[0]+"/)"
-											+" | [D2 Checklist](https://www.d2checklist.com/"+membershipType+"/"+membershipId+"/triumphs)"
-											+" | [Destiny Tracker](https://destinytracker.com/destiny-2/profile/steam/"+membershipId+"/overview)")
-					channel.send({embed});
-				}
-				setRoles(d_member, { "titan": titan, "hunter": hunter, "warlock": warlock }, data, clanid, displayName);
-			}
-		}
+export function Roles(channel, discordMention){
+	console.log(discordMention);
+	var discordId = discordMention.replace(/\D/g,'');
+	var discordMember = channel.guild.members.find(member => member.user.id == discordId);
+	if(discordMember == null){
+		channel.send('Дискорд пользователь не найден.');
+		return;
 	}
-	fulldata.send();
+
+	var member = Clan.FindMemberByFullName(discordMember.displayName);
+	var profileData = member.profile.data;
+	var rolesData = GetRolesData(profileData.userInfo.membershipType, profileData.userInfo.membershipId);
+	
+	console.log(rolesData);
+	SendMessage(channel, profileData, rolesData);
+	SetRoles(discordMember, rolesData.charactersLight, rolesData.medals, clanid, profileData.displayName);
 }
 
-function check_role(discord_member, position, dontHasRole, medal, medalNext, title){
-	if(dontHasRole){
-		if(medal == true) {
-			if(medalNext == true){
-				//console.log("don't do any with "+title);
-			}else{
-				discord_member.addRole(discord_member.guild.roles.find(role => role.position == position));
-				//console.log("add role "+title);
-			}
-		}else{
-			//console.log("don't do any with "+title);
-		}
+function SendMessage(channel, profileData, rolesData){
+	if(rolesData.medals == null) {
+		channel.send('Данные профиля не были получены. Профиль закрыт настройками приватности.\n'+
+					 'Настройки приватности: https://www.bungie.net/ru/Profile/Settings/?category=Privacy');
 	}else{
-		if(medal == false || medalNext == true) {
-			//console.log("remove role "+title);
-			discord_member.removeRole(discord_member.guild.roles.find(role => role.position == position));
-			
-		}
-		//else console.log("don't do any with "+title);
+		const embed = new Discord.RichEmbed()
+			.setAuthor(profileData.userInfo.displayName + " 💠" + sumMedals(discordMember, rolesData.medals) + "💠")
+			.setColor(0x00AE86)
+			.setFooter("ПВП медали выдают гм-ы; ранжирование ролей: 7/16/24 • id: "+discordId, "https://cdn.discordapp.com/avatars/543342030768832524/7da47eaca948d9874b66fc5884ca2d00.png")
+			.addField("Рейды",    			form_field(rolesData.medals.raids), true)
+			.addField("Печати",   			form_field(rolesData.medals.seals), true)
+			.addField("Наследные печати", 	form_field(rolesData.medals.legacy_seals), true)
+			.addField("Планеты",  			form_field(rolesData.medals.locations), true)
+			.addField("Триумфы",  			form_field(rolesData.medals.triumphs), true)
+			.addField("Наследные триумфы", 	form_field(rolesData.medals.legacy_triumphs), true)
+			.addField("Горнило",  			form_field(rolesData.medals.crucible), true)
+			.addField("Сезон 12",			form_field(rolesData.medals.season), true)
+			.addField('\u200B', '\u200B', true)
+	        .addField("Ссылки", "[Raid Report](https://raid.report/pc/"+profileData.userInfo.membershipId+")"
+							+" | [Braytech](https://beta.braytech.org/"+profileData.userInfo.membershipType+"/"+profileData.userInfo.membershipId+"/"+profileData.characterIds[0]+"/)"
+							+" | [D2 Checklist](https://www.d2checklist.com/"+profileData.userInfo.membershipType+"/"+profileData.userInfo.membershipId+"/triumphs)"
+							+" | [Destiny Tracker](https://destinytracker.com/destiny-2/profile/steam/"+profileData.userInfo.membershipId+"/overview)")
+		channel.send({embed});
 	}
 }
-
-function setRoles(discord_member, charactersLight, medals, clanid, displayName){
-	try{
-		if(discord_member == null){
-			console.log(displayName + ' '.repeat(40-displayName.length), "DISCORD MEMBER NOT FOUND");
-			return;
+function GetRolesData(membershipType, membershipId) {
+	var jsondata = clan.getFullMemberData(membershipType, membershipId);
+	if(typeof(jsondata.Response.profileRecords.data) == 'undefined') return null;
+	
+	var charactersLight = {
+		titan: -1,
+		hunter: -1,
+		warlock: -1
+	};
+	var data = {
+		raids:{}, 
+		locations:{}, 
+		triumphs:{}, 
+		seals:{}, 
+		crucible:{}, 
+		legacy_seals:{}, 
+		legacy_triumphs:{}, 
+		season:{}, 
+		extra:{}
+	};
+	var characterIds = jsondata.Response.profile.data.characterIds;
+	var characters = jsondata.Response.characters.data;
+	characterIds.forEach(function(characterId){
+		switch(characters[characterId].classType){
+			case 0:
+				charactersLight.titan = characters[characterId].light;
+				break;
+			case 1:
+				charactersLight.hunter = characters[characterId].light;
+				break;
+			case 2:
+				charactersLight.warlock = characters[characterId].light;
+				break;
 		}
-		console.log(displayName + ' '.repeat(40-displayName.length), "set roles");
+	});
+	
+	if(charactersLight.titan == -1 && charactersLight.titan == -1 && charactersLight.titan == -1) return {charactersLight: charactersLight, medals: null};
+
+	//				ROLES
+	var characterPresentationNodes = [];
+	for (var characterID in jsondata.Response.characterPresentationNodes.data) characterPresentationNodes.push([characterID, jsondata.Response.characterPresentationNodes.data[characterID]]);
+	
+	var characterRecords = [];
+	for (var characterID in jsondata.Response.characterRecords.data) characterRecords.push([characterID, jsondata.Response.characterRecords.data[characterID]]);
+	
+	var characterProgressions = [];
+	for (var characterID in jsondata.Response.characterProgressions.data) characterProgressions.push([characterID, jsondata.Response.characterProgressions.data[characterID]]);
+	
+	var characterCollectibles = [];
+	for (var characterID in jsondata.Response.characterProgressions.data) characterCollectibles.push([characterID, jsondata.Response.characterCollectibles.data[characterID]]);
+	
+	data.raids.lw  = get_node_data(jsondata, 1525933460, "ПЖ");
+	data.raids.gos = get_node_data(jsondata,  615240848, "CC");
+	data.raids.dsc = get_node_data(jsondata, 1726708384, "СГК");
+	data.raids.day1 = get_day_one(jsondata, characterCollectibles);
+	data.locations.dc   = get_node_data(jsondata, 3483405511, "Город Грез");
+	data.locations.moon = get_node_data(jsondata, 1473265108, "Луна");
+	data.locations.euro = get_node_data(jsondata, 2647590440, "Европа");
+	data.triumphs.t10k = get_profile_records(jsondata, "activeScore", 10000, "");
+	data.triumphs.t15k = get_profile_records(jsondata, "activeScore", 15000, "");
+	data.triumphs.t20k = get_profile_records(jsondata, "activeScore", 20000, "");
+	data.seals.cursebreaker = get_character_node_data(characterPresentationNodes, 560097044, "Гроза");
+	data.seals.harbinger = get_node_data(jsondata, 379405979, "Посланник");
+	data.seals.splintered = get_node_data(jsondata, 79180995, "Раскол");
+	data.seals.dredgen = get_node_data(jsondata, 3665267419, "Дреджен");
+	data.seals.conqueror = get_any_of_data(characterPresentationNodes, [3212358005, 1376640684], "Завоеватель");
+	data.crucible.glory2100 = get_character_progression_data(characterProgressions, 2000925172, 2100, "Ранкед");
+	data.crucible.glory3500 = get_character_progression_data(characterProgressions, 2000925172, 3500, "Ранкед");
+	data.crucible.glory5450 = get_character_progression_data(characterProgressions, 2000925172, 5450, "Ранкед");
+	data.crucible.flawless = get_any_of_data(characterPresentationNodes, [3251218484, 2086100423, 1276693937], "Безупречный");
+	data.legacy_seals.lore = get_character_node_data(characterPresentationNodes, 3680676656, "Летописец");
+	data.legacy_seals.blacksmith = get_character_node_data(characterPresentationNodes, 450166688, "Кузнец");
+	data.legacy_seals.reconeer = get_character_node_data(characterPresentationNodes, 2978379966, "Вершитель");
+	data.legacy_seals.shadow = get_character_node_data(characterPresentationNodes, 717225803, "Тень");
+	data.legacy_triumphs.t80k = get_profile_records(jsondata, "legacyScore", 80000, "");
+	data.legacy_triumphs.t100k = get_profile_records(jsondata, "legacyScore", 100000, "");
+	data.legacy_triumphs.t120k = get_profile_records(jsondata, "legacyScore", 120000, "");
+	data.season.seal = get_character_node_data(characterPresentationNodes, 1321008463, "Смотритель");
+	data.season.triumphs = get_season_triumphs(jsondata, characterPresentationNodes, 2255100699, 
+		[91071118,1951157616,4186991151,3518211070,975308347,25634498], "Триумфы");
+	data.extra.poi = get_poi(jsondata);
+	data.extra.solo = get_all_nodes(jsondata, [3841336511, 3899996566]);
+	data.extra.soloflawless = get_all_nodes(jsondata, [3950599483, 3205009787]);
+	
+	return {charactersLight: charactersLight, medals: data};
+}
+
+function SetRoles(discord_member, charactersLight, medals, clanid, displayName){
+	LogRolesGranting(displayName, discord_member != null, medals);
+	try{
+		if(discord_member == null) return;
 		var roles = get_roles_definition(discord_member.guild);
 		 
 		checkAndProcessRole(discord_member, roles.clan, true, false, "set clan header");
@@ -372,10 +275,10 @@ function setRoles(discord_member, charactersLight, medals, clanid, displayName){
 		checkAndProcessRole(discord_member, roles.titan, charactersLight.titan >= minlight, false, "process titan");
 		checkAndProcessRole(discord_member, roles.medals, true, false, "set medals header");
 		checkAndProcessRole(discord_member, roles.footer, true, false, "set footer");
-		checkAndProcessRole(discord_member, roles.poi, medals.extra.poi.state, false, "process poi");
 		
 		if (discord_member.roles.find(role => role.name.includes("frozen")) != null) return;
-		
+		if (medals == null) return;
+
 		checkAndProcessRole(discord_member, roles.day1, medals.raids.day1.state, false, "day 1");
 		checkAndProcessRoleBlock(discord_member, roles.top_raids, 3, medals.raids);
 		checkAndProcessRoleBlock(discord_member, roles.top_seals, 5, medals.seals);
@@ -386,6 +289,7 @@ function setRoles(discord_member, charactersLight, medals, clanid, displayName){
 		checkAndProcessRoleBlock(discord_member, roles.top_season, 2, medals.season);
 		checkAndProcessRole(discord_member, roles.solo, medals.extra.solo.state, medals.extra.soloflawless.state, "solo");
 		checkAndProcessRole(discord_member, roles.soloflawless, medals.extra.soloflawless.state, false, "soloflawless");
+		checkAndProcessRole(discord_member, roles.poi, medals.extra.poi.state, false, "process poi");
 
 		if (discord_member.roles.find(role => role.name.includes("Келл")) != null) return;
 		if (discord_member.roles.find(role => role.name.includes("Инквизиция")) != null) return;
@@ -400,6 +304,15 @@ function setRoles(discord_member, charactersLight, medals, clanid, displayName){
 		checkAndProcessRole	(discord_member, roles.role_t5, sum > 23, false, "Легенда");
 	}catch(e){
 		console.log(displayName + ' Ошибка ' + e.name + ":" + e.message + "\n<@149245139389251584> \n" + e.stack);
+	}
+}
+function LogRolesGranting(displayName, isDiscordMemberFound, medals){
+	if(medals == null){
+		console.log(displayName + ' '.repeat(48-displayName.length), "NO DATA");
+	}else if(isDiscordMemberFound == false){
+		console.log(displayName + ' '.repeat(40-displayName.length), "DISCORD MEMBER NOT FOUND");
+	}else{
+		console.log(displayName + ' '.repeat(40-displayName.length), "set roles and it's details");
 	}
 }
 

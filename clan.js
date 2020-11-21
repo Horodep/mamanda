@@ -1,19 +1,49 @@
 import Discord from "discord.js";
 import config from "./config.json";
+import AccessToken from "./auth.js";
 
-function httpRequest(url){
+async function httpRequest(url, setAuth){
 	var request = new XMLHttpRequest();
-	request.open("GET", "https://www.bungie.net/Platform/GroupV2/3858144/Members/", true);
+	request.open("GET", url, true);
+	if (setAuth == true) request.setRequestHeader("Authorization", "Bearer "+AccessToken.access_token);
 	request.setRequestHeader("X-API-Key", config.d2apiKey);
 	request.onreadystatechange = function(){
 		if(this.readyState === 4 && this.status === 200){
-			var json = JSON.parse(this.responseText);
+			return JSON.parse(this.responseText);
 		}
 	}
 	request.send();
 }
 
+function getClanMembers(clanId){
+	return httpRequest(`https://www.bungie.net/Platform/GroupV2/${clanId}/Members/`);
+}
 
+function getFullMemberData(membershipType, membershipId){
+	return httpRequest(`https://www.bungie.net/Platform/Destiny2/${membershipType}/Profile/${membershipId}/?components=Profiles,Characters,CharacterProgressions,PresentationNodes,Records,Collectibles`)
+}
+
+function getAllMembers(){
+	var members = [];
+	Array.prototype.push.apply(members, getClanMembers(config.clan1));
+	Array.prototype.push.apply(members, getClanMembers(config.clan2));
+	return members;
+}
+
+export function FindMemberByFullName(fullName) {
+	var members = getAllMembers();
+	members.forEach(function(member) { 
+		if(fullName.startsWith(member.destinyUserInfo.LastSeenDisplayName + " ") || 
+		   fullName == member.destinyUserInfo.LastSeenDisplayName){
+			return member;
+		}
+	});
+}
+
+export function ClanTime(message) {
+	var members = getAllMembers();
+	//.....
+}
 export function bruteforce (){
 	console.log("Check in Penumbra;");
 	var clan = new XMLHttpRequest();
