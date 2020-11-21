@@ -1,6 +1,19 @@
 import Discord from "discord.js";
 import config from "./config.json";
 
+function httpRequest(url){
+	var request = new XMLHttpRequest();
+	request.open("GET", "https://www.bungie.net/Platform/GroupV2/3858144/Members/", true);
+	request.setRequestHeader("X-API-Key", config.d2apiKey);
+	request.onreadystatechange = function(){
+		if(this.readyState === 4 && this.status === 200){
+			var json = JSON.parse(this.responseText);
+		}
+	}
+	request.send();
+}
+
+
 export function bruteforce (){
 	console.log("Check in Penumbra;");
 	var clan = new XMLHttpRequest();
