@@ -205,7 +205,6 @@ function CreateSync(channel, discord_id, membershipType, membershipId, LastSeenD
 }
 
 function roles(channel, membershipType, membershipId, displayName, clanid, doNotMessage) {
-	var bot_msg = "";
 	var fulldata = new XMLHttpRequest();
 	fulldata.open("GET", "https://www.bungie.net/Platform/Destiny2/"+membershipType+"/Profile/"+membershipId+"/?components=Profiles,Characters,CharacterProgressions,PresentationNodes,Records,Collectibles", true);
 	fulldata.setRequestHeader("X-API-Key", d2apiKey);
@@ -219,6 +218,10 @@ function roles(channel, membershipType, membershipId, displayName, clanid, doNot
 											   'Настройки приватности: https://www.bungie.net/ru/Profile/Settings/?category=Privacy');
 			}else{
 				if (displayName == null) displayName = jsondata.Response.profile.data.userInfo.displayName;
+				
+				console.log(displayName + ' '.repeat(40-displayName.length), "start roles");
+				var d_member = channel.guild.members.find(member => member.displayName.startsWith(displayName + " "));
+				if (d_member == null) d_member = channel.guild.members.find(member => member.displayName == displayName);
 				
 				var characterIds = jsondata.Response.profile.data.characterIds;
 				var characters = jsondata.Response.characters.data;
@@ -241,6 +244,8 @@ function roles(channel, membershipType, membershipId, displayName, clanid, doNot
 					}
 				});
 				
+				if(titan == -1 && hunter == -1 && warlock == -1) return;
+
 				//				ROLES
 				var characterPresentationNodes = [];
 				for (var characterID in jsondata.Response.characterPresentationNodes.data) characterPresentationNodes.push([characterID, jsondata.Response.characterPresentationNodes.data[characterID]]);
@@ -254,365 +259,73 @@ function roles(channel, membershipType, membershipId, displayName, clanid, doNot
 				var characterCollectibles = [];
 				for (var characterID in jsondata.Response.characterProgressions.data) characterCollectibles.push([characterID, jsondata.Response.characterCollectibles.data[characterID]]);
 				
-				var data = {};
-						
-				//day1
-				try{
-					//day1_bool = jsondata.Response.profileRecords.data.records[1558682422].state == 67 ||
-					//			jsondata.Response.profileRecords.data.records[97558110].state == 67;
-					//day1 = (day1_bool ? "🔶 " : "🔷 ") +
-					//		(jsondata.Response.profileRecords.data.records[1558682422].state == 67 ? "КС за 24 " : "") + 
-					//		(jsondata.Response.profileRecords.data.records[97558110].state == 67 ? "СС за 24 " : "") + 
-					//		(day1_bool ? "" : "не получено");
-				}catch(e){	console.log('Error ' + e.name + ":" + e.message + "\n" + e.stack);}	
-				//raid
-				/*try{
-					rait1_bool = jsondata.Response.profilePresentationNodes.data.nodes[4170729318].objective.progress >= 
-									 jsondata.Response.profilePresentationNodes.data.nodes[4170729318].objective.completionValue &&
-									 jsondata.Response.profileCollectibles.data.collectibles[3125541834].state%2 != 1 &&
-									 jsondata.Response.profileCollectibles.data.collectibles[3125541835].state%2 != 1 &&
-									 jsondata.Response.profileCollectibles.data.collectibles[3125541832].state%2 != 1 &&
-									 jsondata.Response.profileCollectibles.data.collectibles[3125541833].state%2 != 1;
-					rait1 = (rait1_bool ? "🔶 " : "🔷 ") + "Левиафан: " + 
-							(jsondata.Response.profilePresentationNodes.data.nodes[4170729318].objective.progress + 
-							(jsondata.Response.profileCollectibles.data.collectibles[3125541834].state%2 == 1 ? 0 : 1) + 
-							(jsondata.Response.profileCollectibles.data.collectibles[3125541835].state%2 == 1 ? 0 : 1) + 
-							(jsondata.Response.profileCollectibles.data.collectibles[3125541832].state%2 == 1 ? 0 : 1) + 
-							(jsondata.Response.profileCollectibles.data.collectibles[3125541833].state%2 == 1 ? 0 : 1)) + "/10";
-				}catch(e){	console.log('Error ' + e.name + ":" + e.message + "\n" + e.stack);}*/
-				try{
-					data.raids.lw={
-						state: 
-							jsondata.Response.profilePresentationNodes.data.nodes[1500485992].objective.progress >= 
-							jsondata.Response.profilePresentationNodes.data.nodes[1500485992].objective.completionValue,
-						text:
-							"ПЖ: " + 
-							jsondata.Response.profilePresentationNodes.data.nodes[1500485992].objective.progress + "/" +
-							jsondata.Response.profilePresentationNodes.data.nodes[1500485992].objective.completionValue
-					};
-				}catch(e){	console.log('Error ' + e.name + ":" + e.message + "\n" + e.stack);}
-				try{
-					rait3_bool = jsondata.Response.profilePresentationNodes.data.nodes[4214538151].objective.progress >= 
-								 jsondata.Response.profilePresentationNodes.data.nodes[4214538151].objective.completionValue;
-					rait3 = (rait3_bool ? "🔶 " : "🔷 ") + "ИП: " + 
-							jsondata.Response.profilePresentationNodes.data.nodes[4214538151].objective.progress + "/" +
-							jsondata.Response.profilePresentationNodes.data.nodes[4214538151].objective.completionValue;
-				}catch(e){	console.log('Error ' + e.name + ":" + e.message + "\n" + e.stack);}
-				try{
-					rait4_bool = jsondata.Response.profilePresentationNodes.data.nodes[1891105980].objective.progress >= 
-								 jsondata.Response.profilePresentationNodes.data.nodes[1891105980].objective.completionValue;
-					rait4 = (rait4_bool ? "🔶 " : "🔷 ") + "КС: " + 
-							jsondata.Response.profilePresentationNodes.data.nodes[1891105980].objective.progress + "/" +
-							jsondata.Response.profilePresentationNodes.data.nodes[1891105980].objective.completionValue;
-				}catch(e){	console.log('Error ' + e.name + ":" + e.message + "\n" + e.stack);}
-				try{
-					rait5_bool = jsondata.Response.profilePresentationNodes.data.nodes[1314921749].objective.progress >= 
-								 jsondata.Response.profilePresentationNodes.data.nodes[1314921749].objective.completionValue;
-					rait5 = (rait5_bool ? "🔶 " : "🔷 ") + "СС: " + 
-							jsondata.Response.profilePresentationNodes.data.nodes[1314921749].objective.progress + "/" +
-							jsondata.Response.profilePresentationNodes.data.nodes[1314921749].objective.completionValue;
-				}catch(e){	console.log('Error ' + e.name + ":" + e.message + "\n" + e.stack);}
-
-				try{
-					poi = ((jsondata.Response.profileRecords.data.records[3420353827].state == 67 ||
-							 jsondata.Response.profileRecords.data.records[940998165].state  == 67 ? 1 : 0) + 
-							(jsondata.Response.profileRecords.data.records[2602370549].state == 67 ||
-							 jsondata.Response.profileRecords.data.records[3861076347].state == 67 ? 1 : 0) + 
-							(jsondata.Response.profileRecords.data.records[1742345588].state == 67 ||
-							 jsondata.Response.profileRecords.data.records[2923250426].state == 67 ? 1 : 0) + 
-							(jsondata.Response.profileRecords.data.records[2195455623].state == 67 ? 1 : 0) + 
-							(jsondata.Response.profileRecords.data.records[4060320345].state == 67 ? 1 : 0) + 
-							(jsondata.Response.profileRecords.data.records[1558682421].state == 67 ? 1 : 0) + 
-							(jsondata.Response.profileRecords.data.records[1120290476].state == 67 ? 1 : 0)) < 7;
-				}catch(e){	console.log('Error ' + e.name + ":" + e.message + "\n" + e.stack);}
-				//gambit
-				try{
-					gamt1_bool = jsondata.Response.profileRecords.data.records[3798931976].state == 67;
-					gamt1_bool = jsondata.Response.profileRecords.data.records[3798931976].objectives[0].progress == 
-								 jsondata.Response.profileRecords.data.records[3798931976].objectives[0].completionValue ? 1 : 0;
-					gamt1 = (gamt1_bool ? "🔶 " : "🔷 ") +
-								"Дреджен: " + jsondata.Response.profileRecords.data.records[3798931976].objectives[0].progress 
-										 + "/" + jsondata.Response.profileRecords.data.records[3798931976].objectives[0].completionValue;
-					//gamt1 = (gamt1_bool ? "🔶 " : "🔷 ") + 
-					//"Дреджен: " + (jsondata.Response.profileRecords.data.records[3798931976].state == 67 ? "1/1" : "0/1");
-				}catch(e){	console.log('Error ' + e.name + ":" + e.message + "\n" + e.stack);}
-				try{
-					gamt2_bool = jsondata.Response.profileRecords.data.records[1313291220].state == 67;
-					gamt2_bool = jsondata.Response.profileRecords.data.records[1313291220].objectives[0].progress == 
-								 jsondata.Response.profileRecords.data.records[1313291220].objectives[0].completionValue ? 1 : 0;
-					gamt2 = (gamt2_bool ? "🔶 " : "🔷 ") +
-								"Вершитель: " + jsondata.Response.profileRecords.data.records[1313291220].objectives[0].progress 
-										 + "/" + jsondata.Response.profileRecords.data.records[1313291220].objectives[0].completionValue;
-					//gamt2 = (gamt1_bool && gamt2_bool ? "🔶 " : "🔷 ") +
-					//"Вершитель: " + (jsondata.Response.profileRecords.data.records[1313291220].state == 67 ? "1/1" : "0/1");
-				}catch(e){	console.log('Error ' + e.name + ":" + e.message + "\n" + e.stack);}
-				try{
-					gamt3_bool = jsondata.Response.profilePresentationNodes.data.nodes[2600659924].objective.progress >= 
-								 jsondata.Response.profilePresentationNodes.data.nodes[2600659924].objective.completionValue;
-					gamt3 = (gamt1_bool && gamt2_bool && gamt3_bool ? "🔶 " : "🔷 ") + 
-					"Гамбит: " + jsondata.Response.profilePresentationNodes.data.nodes[2600659924].objective.progress + "/" + 
-									 jsondata.Response.profilePresentationNodes.data.nodes[2600659924].objective.completionValue;
-				}catch(e){	console.log('Error ' + e.name + ":" + e.message + "\n" + e.stack);}
-				//PVP
-				try{
-					pvpt1_bool = characterProgressions[0][1].progressions[2000925172].currentProgress >= 2100;
-					pvpt1 = (pvpt1_bool ? "🔶 " : "🔷 ") +
-					"Ранкед: " + characterProgressions[0][1].progressions[2000925172].currentProgress + "/2100";
-				}catch(e){	console.log('Error ' + e.name + ":" + e.message + "\n" + e.stack);}
-				try{
-					pvpt2_bool = characterProgressions[0][1].progressions[2000925172].currentProgress >= 3500;
-					pvpt2 = (pvpt2_bool ? "🔶 " : "🔷 ") +
-					"Ранкед: " + characterProgressions[0][1].progressions[2000925172].currentProgress + "/3500";
-					//2679551909
-				}catch(e){	console.log('Error ' + e.name + ":" + e.message + "\n" + e.stack);}
-				try{
-					pvpt3_bool = characterProgressions[0][1].progressions[2000925172].currentProgress >= 5450;
-					pvpt3 = (pvpt3_bool ? "🔶 " : "🔷 ") +
-					"Ранкед: " + characterProgressions[0][1].progressions[2000925172].currentProgress + "/5450";
-				}catch(e){	console.log('Error ' + e.name + ":" + e.message + "\n" + e.stack);}
-				try{
-					pvpt4_bool = jsondata.Response.profileRecords.data.records[3369119720].state == 67 >= 5400;
-					pvpt4 = (pvpt4_bool ? "🔶 " : "🔷 ") +
-					"Непокоренный: " + (jsondata.Response.profileRecords.data.records[3369119720].state == 67 ? "1" : "0") + "/1";
-				}catch(e){	console.log('Error ' + e.name + ":" + e.message + "\n" + e.stack);}
-				try{
-					pvpt5_bool = jsondata.Response.profilePresentationNodes.data.nodes[1603584640].objective.progress >= 
-								 jsondata.Response.profilePresentationNodes.data.nodes[1603584640].objective.completionValue;
-					pvpt5 = (pvpt5_bool ? "🔶 " : "🔷 ") +
-					"Горнило: " + jsondata.Response.profilePresentationNodes.data.nodes[1603584640].objective.progress + "/" + 
-											 jsondata.Response.profilePresentationNodes.data.nodes[1603584640].objective.completionValue;
-				}catch(e){	console.log('Error ' + e.name + ":" + e.message + "\n" + e.stack);}
-				try{
-					pvpt6_bool = jsondata.Response.profilePresentationNodes.data.nodes[2418157809].progressValue >= 
-								 jsondata.Response.profilePresentationNodes.data.nodes[2418157809].completionValue;
-					pvpt6 = (pvpt6_bool ? "🔶 " : "🔷 ") +
-					"Flawless: " + jsondata.Response.profilePresentationNodes.data.nodes[2418157809].progressValue + "/" + 
-											 jsondata.Response.profilePresentationNodes.data.nodes[2418157809].completionValue;
-				}catch(e){	console.log('Error ' + e.name + ":" + e.message + "\n" + e.stack);}
-				//PVE
-				try{
-					trit1_bool = jsondata.Response.profileRecords.data.score >= 95000;
-					trit1 = (trit1_bool ? "🔶 " : "🔷 ") 
-								+ jsondata.Response.profileRecords.data.score + "/95k";
-				}catch(e){	console.log('Error ' + e.name + ":" + e.message + "\n" + e.stack);}
-				try{
-					trit2_bool = jsondata.Response.profileRecords.data.score >= 105000;
-					trit2 = (trit2_bool ? "🔶 " : "🔷 ") 
-								+ jsondata.Response.profileRecords.data.score + "/105k";
-				}catch(e){	console.log('Error ' + e.name + ":" + e.message + "\n" + e.stack);}
-				try{
-					trit3_bool = jsondata.Response.profileRecords.data.score >= 115000;
-					trit3 = (trit3_bool ? "🔶 " : "🔷 ") 
-								+ jsondata.Response.profileRecords.data.score + "/115k";
-				}catch(e){	console.log('Error ' + e.name + ":" + e.message + "\n" + e.stack);}
-				try{
-					var maxS6card = jsondata.Response.profilePresentationNodes.data.nodes[272447096].progressValue;
-					if (jsondata.Response.profilePresentationNodes.data.nodes[397176300].progressValue > maxS6card) maxS6card = jsondata.Response.profilePresentationNodes.data.nodes[397176300].progressValue;
-					if (jsondata.Response.profilePresentationNodes.data.nodes[7761993].progressValue > maxS6card) maxS6card = jsondata.Response.profilePresentationNodes.data.nodes[7761993].progressValue;
-					
-					trit4_bool = maxS6card == 25;
-					trit4 = (trit4_bool ? "🔶 " : "🔷 ") + "Кузница: " + maxS6card + "/25";
-				}catch(e){	console.log('Error ' + e.name + ":" + e.message + "\n" + e.stack);}
-				try{
-					trit5_bool = jsondata.Response.profilePresentationNodes.data.nodes[286969093].progressValue 
-										>= jsondata.Response.profilePresentationNodes.data.nodes[286969093].completionValue;
-					trit5 = (trit5_bool ? "🔶 " : "🔷 ") 
-								+ "Город Грез: " + jsondata.Response.profilePresentationNodes.data.nodes[286969093].progressValue 
-										+ "/" + jsondata.Response.profilePresentationNodes.data.nodes[286969093].completionValue;
-				}catch(e){	console.log('Error ' + e.name + ":" + e.message + "\n" + e.stack);}
-				try{
-					trit6_bool = jsondata.Response.profilePresentationNodes.data.nodes[1117466231].progressValue 
-										>= jsondata.Response.profilePresentationNodes.data.nodes[1117466231].completionValue;
-					trit6 = (trit6_bool ? "🔶 " : "🔷 ") 
-								+ "Паноптикум: "+ jsondata.Response.profilePresentationNodes.data.nodes[1117466231].progressValue 
-										+ "/" + jsondata.Response.profilePresentationNodes.data.nodes[1117466231].completionValue;
-				}catch(e){	console.log('Error ' + e.name + ":" + e.message + "\n" + e.stack);}
-				try{
-					trit7_bool = jsondata.Response.profilePresentationNodes.data.nodes[4017869588].progressValue 
-										>= jsondata.Response.profilePresentationNodes.data.nodes[4017869588].completionValue;
-					trit7 = (trit7_bool ? "🔶 " : "🔷 ") 
-								+ "Луна: "+ jsondata.Response.profilePresentationNodes.data.nodes[4017869588].progressValue 
-										+ "/" + jsondata.Response.profilePresentationNodes.data.nodes[4017869588].completionValue ;
-				}catch(e){	console.log('Error ' + e.name + ":" + e.message + "\n" + e.stack);}
-				try{
-					trit8_bool = (jsondata.Response.profilePresentationNodes.data.nodes[1916634524].progressValue + ((jsondata.Response.profileRecords.data.records[1721328830].state == 67) ? 0 : 1))
-										>= jsondata.Response.profilePresentationNodes.data.nodes[1916634524].completionValue;
-					trit8 = (trit8_bool ? "🔶 " : "🔷 ") 
-								+ "Налеты: " + jsondata.Response.profilePresentationNodes.data.nodes[1916634524].progressValue
-										+ "/" + jsondata.Response.profilePresentationNodes.data.nodes[1916634524].completionValue;
-				}catch(e){	console.log('Error ' + e.name + ":" + e.message + "\n" + e.stack);}
+				var data = {
+					raids:{}, 
+					locations:{}, 
+					triumphs:{}, 
+					seals:{}, 
+					crucible:{}, 
+					legacy_seals:{}, 
+					legacy_triumphs:{}, 
+					season:{}, 
+					extra:{}
+				};
 				
-				try{
-					solothrone1 = jsondata.Response.profileRecords.data.records[851701008].state == 67;
-					solothrone2 = jsondata.Response.profileRecords.data.records[1290451257].state == 67;
-				}catch(e){	console.log('Error ' + e.name + ":" + e.message + "\n" + e.stack);}
+				data.raids.lw  = get_node_data(jsondata, 1525933460, "ПЖ");
+				data.raids.gos = get_node_data(jsondata,  615240848, "CC");
+				data.raids.dsc = get_node_data(jsondata, 1726708384, "СГК");
+				data.raids.day1 = get_day_one(jsondata, characterCollectibles);
+				data.locations.dc   = get_node_data(jsondata, 3483405511, "Город Грез");
+				data.locations.moon = get_node_data(jsondata, 1473265108, "Луна");
+				data.locations.euro = get_node_data(jsondata, 2647590440, "Европа");
+				data.triumphs.t10k = get_profile_records(jsondata, "activeScore", 10000, "");
+				data.triumphs.t15k = get_profile_records(jsondata, "activeScore", 15000, "");
+				data.triumphs.t20k = get_profile_records(jsondata, "activeScore", 20000, "");
+				data.seals.cursebreaker = get_character_node_data(characterPresentationNodes, 560097044, "Гроза");
+				data.seals.harbinger = get_node_data(jsondata, 379405979, "Посланник");
+				data.seals.splintered = get_node_data(jsondata, 79180995, "Раскол");
+				data.seals.dredgen = get_node_data(jsondata, 3665267419, "Дреджен");
+				data.seals.conqueror = get_any_of_data(characterPresentationNodes, [3212358005, 1376640684], "Завоеватель");
+				data.crucible.glory2100 = get_character_progression_data(characterProgressions, 2000925172, 2100, "Ранкед");
+				data.crucible.glory3500 = get_character_progression_data(characterProgressions, 2000925172, 3500, "Ранкед");
+				data.crucible.glory5450 = get_character_progression_data(characterProgressions, 2000925172, 5450, "Ранкед");
+				data.crucible.flawless = get_any_of_data(characterPresentationNodes, [3251218484, 2086100423, 1276693937], "Безупречный");
+				data.legacy_seals.lore = get_character_node_data(characterPresentationNodes, 3680676656, "Летописец");
+				data.legacy_seals.blacksmith = get_character_node_data(characterPresentationNodes, 450166688, "Кузнец");
+				data.legacy_seals.reconeer = get_character_node_data(characterPresentationNodes, 2978379966, "Вершитель");
+				data.legacy_seals.shadow = get_character_node_data(characterPresentationNodes, 717225803, "Тень");
+				data.legacy_triumphs.t80k = get_profile_records(jsondata, "legacyScore", 80000, "");
+				data.legacy_triumphs.t100k = get_profile_records(jsondata, "legacyScore", 100000, "");
+				data.legacy_triumphs.t120k = get_profile_records(jsondata, "legacyScore", 120000, "");
+				data.season.seal = get_character_node_data(characterPresentationNodes, 1321008463, "Смотритель");
+				data.season.triumphs = get_season_triumphs(jsondata, characterPresentationNodes, 2255100699, 
+					[91071118,1951157616,4186991151,3518211070,975308347,25634498], "Триумфы");
+				data.extra.poi = get_poi(jsondata);
+				data.extra.solo = get_all_nodes(jsondata, [3841336511, 3899996566]);
+				data.extra.soloflawless = get_all_nodes(jsondata, [3950599483, 3205009787]);
 				
-				//LORE
-				try{
-					lort1_bool = jsondata.Response.profileRecords.data.records[2757681677].state == 67 ? 1 : 0;
-					lort1_bool = jsondata.Response.profileRecords.data.records[2757681677].objectives[0].progress == 
-								 jsondata.Response.profileRecords.data.records[2757681677].objectives[0].completionValue ? 1 : 0;
-					lort1 = (lort1_bool ? "🔶 " : "🔷 ") +
-								"Путник: " + jsondata.Response.profileRecords.data.records[2757681677].objectives[0].progress 
-								 + "/" + jsondata.Response.profileRecords.data.records[2757681677].objectives[0].completionValue;
-				}catch(e){	console.log('Error ' + e.name + ":" + e.message + "\n" + e.stack);}
-				try{
-					lort2_bool = jsondata.Response.profileRecords.data.records[1693645129].state == 67 ? 1 : 0;
-					lort2_bool = jsondata.Response.profileRecords.data.records[1693645129].objectives[0].progress == 
-								 jsondata.Response.profileRecords.data.records[1693645129].objectives[0].completionValue ? 1 : 0;
-					lort2 = (lort2_bool ? "🔶 " : "🔷 ") +
-								"Гроза: " + jsondata.Response.profileRecords.data.records[1693645129].objectives[0].progress 
-								 + "/" + jsondata.Response.profileRecords.data.records[1693645129].objectives[0].completionValue;
-				}catch(e){	console.log('Error ' + e.name + ":" + e.message + "\n" + e.stack);}
-				try{
-					lort3_bool = jsondata.Response.profilePresentationNodes.data.nodes[2209950401].state == 67 ? 1 : 0;
-					
-					lort3_bool = jsondata.Response.profilePresentationNodes.data.nodes[2209950401].progressValue == 
-								 jsondata.Response.profilePresentationNodes.data.nodes[2209950401].completionValue ? 1 : 0;
-					lort3 = (lort3_bool ? "🔶 " : "🔷 ") +
-								"Посланник: " + jsondata.Response.profilePresentationNodes.data.nodes[2209950401].progressValue 
-										 + "/" + jsondata.Response.profilePresentationNodes.data.nodes[2209950401].completionValue;
-				}catch(e){	console.log('Error ' + e.name + ":" + e.message + "\n" + e.stack);}
-				try{
-					//characterPresentationNodes[0][1].nodes[564676571].progressValue
-					lor =   characterPresentationNodes[0][1].nodes[1582800871].progressValue + 
-							characterPresentationNodes[0][1].nodes[3062577328].progressValue + 
-							characterPresentationNodes[0][1].nodes[1975975321].progressValue;
-					lort4_bool = lor >= 350;
-					lort4 = (lort4_bool ? "🔶 " : "🔷 ") +
-								"Лор: " + lor + "/350";
-				}catch(e){	console.log('Error ' + e.name + ":" + e.message + "\n" + e.stack);}
-				try{
-					lor =   characterPresentationNodes[0][1].nodes[1582800871].progressValue + 
-							characterPresentationNodes[0][1].nodes[3062577328].progressValue + 
-							characterPresentationNodes[0][1].nodes[1975975321].progressValue;
-					lort5_bool = lor >= 450;
-					lort5 = (lort5_bool ? "🔶 " : "🔷 ") +
-								"Лор: " + lor + "/450";
-				}catch(e){	console.log('Error ' + e.name + ":" + e.message + "\n" + e.stack);}
-				
-				//SEASONAL
-				try{
-					season8_t1_bool = jsondata.Response.profilePresentationNodes.data.nodes[3303651244].progressValue == 
-								 jsondata.Response.profilePresentationNodes.data.nodes[3303651244].completionValue ? 1 : 0;
-					season8_t2_bool = jsondata.Response.profilePresentationNodes.data.nodes[2802172173].progressValue == 23 ? 1 : 0;
-				}catch(e){	console.log('Error ' + e.name + ":" + e.message + "\n" + e.stack);}
-				try{
-					season9_t1_bool = jsondata.Response.profilePresentationNodes.data.nodes[3303651245].progressValue == 
-								 jsondata.Response.profilePresentationNodes.data.nodes[3303651245].completionValue ? 1 : 0;
-					season9_t2_bool = jsondata.Response.profilePresentationNodes.data.nodes[959627408].progressValue == 51 ? 1 : 0;
-				}catch(e){	console.log('Error ' + e.name + ":" + e.message + "\n" + e.stack);}
-				
-				season10_t2_bool = false;
-				try{
-					season10_t1_bool = jsondata.Response.profilePresentationNodes.data.nodes[2699827343].progressValue == 
-								 jsondata.Response.profilePresentationNodes.data.nodes[2699827343].completionValue ? 1 : 0;
-					season10_t1 = (season10_t1_bool ? "🔶 " : "🔷 ") +
-									"Всемогущий: " + jsondata.Response.profilePresentationNodes.data.nodes[2699827343].progressValue 
-										 + "/" + jsondata.Response.profilePresentationNodes.data.nodes[2699827343].completionValue;
-										 
-					season10_t2_bool = jsondata.Response.profilePresentationNodes.data.nodes[2998268400].progressValue >= 27 ? 1 : 0;
-					season10_t2 = (season10_t2_bool ? "🔶 " : "🔷 ") +
-								"Триумфы: " + jsondata.Response.profilePresentationNodes.data.nodes[2998268400].progressValue + "/27";
-				}catch(e){	console.log('Error ' + e.name + ":" + e.message + "\n" + e.stack);}
-				
-				try{
-					season11_t1_bool = jsondata.Response.profilePresentationNodes.data.nodes[2699827342].progressValue == 
-								 jsondata.Response.profilePresentationNodes.data.nodes[2699827342].completionValue ? 1 : 0;
-					season11_t2_bool = jsondata.Response.profilePresentationNodes.data.nodes[1852271144].progressValue == 
-								 (jsondata.Response.profilePresentationNodes.data.nodes[1852271144].completionValue - 
-								  ((jsondata.Response.profileRecords.data.records[1733601101].state == 67) ? 0 : 1) - 
-								  ((jsondata.Response.profileRecords.data.records[1615925500].state == 67) ? 0 : 1) - 
-								  ((jsondata.Response.profileRecords.data.records[3933956825].state == 67) ? 0 : 1) - 
-								  ((jsondata.Response.profileRecords.data.records[2398535304].state == 67) ? 0 : 1)) &&
-								 jsondata.Response.profilePresentationNodes.data.nodes[1852271144].completionValue > 0 ? 1 : 0;
-						
-					season11_t1 = (season11_t1_bool ? "🔶 " : "🔷 ") +
-									"Предвестник: " + jsondata.Response.profilePresentationNodes.data.nodes[2699827342].progressValue 
-										 + "/" + jsondata.Response.profilePresentationNodes.data.nodes[2699827342].completionValue;		 
-					season11_t2 = (season11_t2_bool ? "🔶 " : "🔷 ") +
-								"Триумфы: " + jsondata.Response.profilePresentationNodes.data.nodes[1852271144].progressValue + "/" + 
-								(jsondata.Response.profilePresentationNodes.data.nodes[1852271144].completionValue - 
-								  ((jsondata.Response.profileRecords.data.records[1733601101].state == 67) ? 0 : 1) - 
-								  ((jsondata.Response.profileRecords.data.records[1615925500].state == 67) ? 0 : 1) - 
-								  ((jsondata.Response.profileRecords.data.records[3933956825].state == 67) ? 0 : 1) - 
-								  ((jsondata.Response.profileRecords.data.records[2398535304].state == 67) ? 0 : 1));
-				}catch(e){	console.log('Error ' + e.name + ":" + e.message + "\n" + e.stack);}
-				
-				var d_member = channel.guild.members.find(member => member.displayName.startsWith(displayName + " "));
-				if (d_member == null) d_member = channel.guild.members.find(member => member.displayName == displayName);
-				
-				//❌️ 
 				if(!doNotMessage){
-					var medals_role = d_member.guild.roles.find(role => role.name.includes("медали"));
-					var top_position = medals_role.position;
-					
-					/*var sum = 
-						(rait1_bool?1:0) + (rait2_bool?1:0) + (rait3_bool?1:0) + (rait4_bool?1:0) + (rait5_bool?1:0) + (day1_bool?1:0) +
-						(lort1_bool?1:0) + (lort2_bool?1:0) + (lort3_bool?1:0) +
-						(trit4_bool?1:0) + (trit5_bool?1:0) + (trit6_bool?1:0) + (trit7_bool?1:0) + 
-						(lort4_bool?1:0) + (lort5_bool?1:0) + 
-						(trit1_bool?1:0) + (trit2_bool?1:0) + (trit3_bool?1:0) + 
-						(trit8_bool?1:0) + (pvpt5_bool?1:0) + (gamt3_bool?1:0) + 
-						(gamt1_bool?1:0) + (gamt2_bool?1:0) + 
-						(season10_t1_bool?1:0) + (season10_t2_bool?1:0) +
-						(season11_t1_bool?1:0) + (season11_t2_bool?1:0) +
-						(d_member.roles.find(role => role.position == (top_position - 22)) != null ? 3 : 0) + 
-						(d_member.roles.find(role => role.position == (top_position - 23)) != null ? 1 : 0) + 
-						(d_member.roles.find(role => role.position == (top_position - 24)) != null ? 2 : 0) +  
-						(d_member.roles.find(role => role.position == (top_position - 25)) != null ? 3 : 0) +
-						(d_member.roles.find(role => role.position == (top_position - 26)) != null ? 2 : 0) + 
-						(d_member.roles.find(role => role.position == (top_position - 27)) != null ? 3 : 0) +  
-						(d_member.roles.find(role => role.position == (top_position - 28)) != null ? 4 : 0);
-					*/
-					
+					console.log(data);
 					const embed = new Discord.RichEmbed()
-						  .setAuthor(displayName + " 💠" + 0 + "💠")
+						  .setAuthor(displayName + " 💠" + sumMedals(d_member, data) + "💠")
 						  .setColor(0x00AE86)
-						  .setFooter("ПВП медали выдают гм-ы; ранжирование ролей: 8/17/26 • id: "+d_member.user.id, "https://cdn.discordapp.com/avatars/543342030768832524/7da47eaca948d9874b66fc5884ca2d00.png")
-						  .addField("Рейды",   			data.raids.lw.state + ": " + data.raids.lw.text + "\n" + rait2 + "\n" + rait3 + "\n" + rait4 + "\n" + rait5 + "\n" + day1, true)
-						  .addField("Триумфы, лор", 	trit1 + "\n" + trit2 + "\n" + trit3 + "\n" + lort4 + "\n" + lort5, true)
-						  .addField("Пункты назначения",lort1 + "\n" + lort2 + "\n" + lort3 + "\n" + trit5 + "\n" + trit6 + "\n" + trit7 , true)
-						  .addField("Мастерство", 		trit8 + "\n" + pvpt5 + "\n" + gamt3, true)
-						  .addField("Горнило", 			pvpt1 + "\n" + pvpt2 + "\n" + pvpt3 + "\n" + pvpt6, true)
-						  .addField("Гамбит",  			gamt1 + "\n" + gamt2, true)
-						  .addField("Кузница",			trit4 + "\n" , true)
-						  .addField("Сезон 10", 			season10_t1 + "\n" + season10_t2, true)
-						  .addField("Сезон 11", 		season11_t1 + "\n" + season11_t2, true)
+						  .setFooter("ПВП медали выдают гм-ы; ранжирование ролей: 7/16/24 • id: "+d_member.user.id, "https://cdn.discordapp.com/avatars/543342030768832524/7da47eaca948d9874b66fc5884ca2d00.png")
+						  .addField("Рейды",    form_field(data.raids), true)
+						  .addField("Печати",   form_field(data.seals), true)
+						  .addField("Наследные печати", form_field(data.legacy_seals), true)
+						  .addField("Планеты",  form_field(data.locations), true)
+						  .addField("Триумфы",  form_field(data.triumphs), true)
+						  .addField("Наследные триумфы", form_field(data.legacy_triumphs), true)
+						  .addField("Горнило",  form_field(data.crucible), true)
+						  .addField("Сезон 12", form_field(data.season), true)
+						  .addField('\u200B', '\u200B', true)
 					embed.addField("Ссылки", "[Raid Report](https://raid.report/pc/"+membershipId+")"
 											+" | [Braytech](https://beta.braytech.org/"+membershipType+"/"+membershipId+"/"+characterIds[0]+"/)"
 											+" | [D2 Checklist](https://www.d2checklist.com/"+membershipType+"/"+membershipId+"/triumphs)"
 											+" | [Destiny Tracker](https://destinytracker.com/destiny-2/profile/steam/"+membershipId+"/overview)")
 					channel.send({embed});
-					
-					
-						" [(детальная статистика)](https://chrisfried.github.io/secret-scrublandeux/guardian/"+membershipType+"/"+membershipId+")"
 				}
-				return;
-				setRole(d_member, 
-				{
-					"titan": titan,
-					"hunter": hunter,
-					"warlock": warlock
-				},
-				{
-					raid: 		[rait1_bool, rait2_bool, rait3_bool, rait4_bool, rait5_bool],
-					day1: 		[day1_bool],
-					seals: 		[lort1_bool, lort2_bool, lort3_bool],
-					lore: 		[lort4_bool, lort5_bool],
-					triumphs: 	[trit1_bool, trit2_bool, trit3_bool],
-					places:		[trit4_bool, trit5_bool, trit6_bool, trit7_bool],
-					drozch: 	[trit8_bool, pvpt5_bool, gamt3_bool],
-					gornilo: 	[pvpt1_bool, pvpt2_bool, pvpt3_bool, pvpt4_bool, pvpt6_bool],
-					gambit: 	[gamt1_bool, gamt2_bool],
-					season8: 	[season8_t1_bool,  season8_t2_bool ],
-					season9: 	[season9_t1_bool,  season9_t2_bool ],
-					season10: 	[season10_t1_bool, season10_t2_bool],
-					season11: 	[season11_t1_bool, season11_t2_bool],
-					extra: 		[solothrone1, solothrone2, poi]
-				}, 
-				clanid, 
-				displayName);
+				setRoles(d_member, { "titan": titan, "hunter": hunter, "warlock": warlock }, data, clanid, displayName);
 			}
 		}
 	}
@@ -641,222 +354,293 @@ function check_role(discord_member, position, dontHasRole, medal, medalNext, tit
 	}
 }
 
-function setRole(discord_member, charactersLight, medals, clanid, displayName){
+function setRoles(discord_member, charactersLight, medals, clanid, displayName){
 	try{
-		if(discord_member != null){
-			var penumbra = discord_member.guild.roles.find(role => role.name === "Penumbra");
-			var antumbra = discord_member.guild.roles.find(role => role.name === "Antumbra");
-			var clan_role = discord_member.guild.roles.find(role => role.name.includes("состав"));
-			if (clanid == "3055823") {
-				if(discord_member.roles.find(role => role.name ===   clan_role.name) == null) discord_member.addRole(clan_role);
-				if(discord_member.roles.find(role => role.name === penumbra.name) == null) discord_member.addRole(penumbra);
-				if(discord_member.roles.find(role => role.name === antumbra.name) != null) discord_member.removeRole(antumbra);
-			}else if (clanid == "3858144"){
-				if(discord_member.roles.find(role => role.name ===   clan_role.name) == null) discord_member.addRole(clan_role);
-				if(discord_member.roles.find(role => role.name === antumbra.name) == null) discord_member.addRole(antumbra);
-				if(discord_member.roles.find(role => role.name === penumbra.name) != null) discord_member.removeRole(penumbra);
-			}
-			var header_role = discord_member.guild.roles.find(role => role.name.includes("персонажи"));
-			var t_role = discord_member.guild.roles.find(role => role.name === "Титан");
-			var h_role = discord_member.guild.roles.find(role => role.name === "Охотник");
-			var w_role = discord_member.guild.roles.find(role => role.name === "Варлок");
-			var medals_role = discord_member.guild.roles.find(role => role.name.includes("медали"));
-			var top_position = medals_role.position;
-			var footer_role = discord_member.guild.roles.find(role => role.name == "⁣                             ⁣");
-			var footer_position = footer_role.position;
-			if(discord_member.roles.find(role => role.name === header_role.name) == null) discord_member.addRole(header_role);
-			if(discord_member.roles.find(role => role.name === footer_role.name) == null) discord_member.addRole(footer_role);
-			if(discord_member.roles.find(role => role.name === medals_role.name) == null) discord_member.addRole(medals_role);
-			
-			var poi = discord_member.guild.roles.find(role => role.name == "person of interest");
-			check_role(discord_member, poi.position, discord_member.roles.find(role => role.position == poi.position) == null, medals.extra[2], false, "poi");
-			
-			var sum = 
-				(medals.raid[0]?1:0) + (medals.raid[1]?1:0) + (medals.raid[2]?1:0) + (medals.raid[3]?1:0) + (medals.raid[4]?1:0) + (medals.day1[0]?1:0) +
-				(medals.seals[0]?1:0) + (medals.seals[1]?1:0) + (medals.seals[2]?1:0) +
-				(medals.places[0]?1:0) + (medals.places[1]?1:0) + (medals.places[2]?1:0) + (medals.places[3]?1:0) + 
-				(medals.lore[0]?1:0) + (medals.lore[1]?1:0) + 
-				(medals.triumphs[0]?1:0) + (medals.triumphs[1]?1:0) + (medals.triumphs[2]?1:0) + 
-				(medals.drozch[0]?1:0) + (medals.drozch[1]?1:0) + (medals.drozch[2]?1:0) + 
-				(medals.gambit[0]?1:0) + (medals.gambit[1]?1:0) + 
-				(medals.season10[0]?1:0) + (medals.season10[1]?1:0) +
-				(medals.season11[0]?1:0) + (medals.season11[1]?1:0) +
-				(discord_member.roles.find(role => role.position == (top_position - 22)) != null ? 3 : 0) + 
-				(discord_member.roles.find(role => role.position == (top_position - 23)) != null ? 1 : 0) + 
-				(discord_member.roles.find(role => role.position == (top_position - 24)) != null ? 2 : 0) +  
-				(discord_member.roles.find(role => role.position == (top_position - 25)) != null ? 3 : 0) +
-				(discord_member.roles.find(role => role.position == (top_position - 26)) != null ? 2 : 0) + 
-				(discord_member.roles.find(role => role.position == (top_position - 27)) != null ? 3 : 0) +  
-				(discord_member.roles.find(role => role.position == (top_position - 28)) != null ? 4 : 0);
-			/*
-			var given_medals = 
-				(medals.raid[0]?1:0) + (medals.raid[1]?1:0) + (medals.raid[2]?1:0) + (medals.raid[3]?1:0) + (medals.raid[4]?1:0) + (medals.day1[0]?1:0) +
-				(medals.seals[0]?1:0) + (medals.seals[1]?1:0) + (medals.seals[2]?1:0) +
-				(medals.places[0]?1:0) + (medals.places[1]?1:0) + (medals.places[2]?1:0) + (medals.places[3]?1:0) + 
-				(medals.lore[0]?1:0) + (medals.lore[1]?1:0) + 
-				(medals.triumphs[0]?1:0) + (medals.triumphs[1]?1:0) + (medals.triumphs[2]?1:0) + 
-				(medals.drozch[0]?1:0) + (medals.drozch[1]?1:0) + (medals.drozch[3]?1:0) + 
-				(medals.gambit[0]?1:0) + (medals.gambit[1]?1:0) + 
-				(medals.season9[0]?1:0) + (medals.season9[1]?1:0) +
-				(medals.season10[0]?1:0) + (medals.season10[1]?1:0) +
-				(discord_member.roles.find(role => role.position == (top_position - 27)) != null ? 1 : 0) + 
-				(discord_member.roles.find(role => role.position == (top_position - 28)) != null ? 2 : 0) +  
-				(discord_member.roles.find(role => role.position == (top_position - 29)) != null ? 3 : 0) +
-				(discord_member.roles.find(role => role.position == (top_position - 30)) != null ? 2 : 0) + 
-				(discord_member.roles.find(role => role.position == (top_position - 31)) != null ? 3 : 0) +  
-				(discord_member.roles.find(role => role.position == (top_position - 32)) != null ? 4 : 0);
-			*/
-			//for(ei = 1; ei < (20+1); ei++){
-			//	var role = discord_member.guild.roles.find(role => role.position == (top_position - ei));
-			//	var count = (role.name.match(/💠/g)||[]).length;
-			//	given_medals += (discord_member.roles.find(role => role.position == (top_position - ei)) != null ? count : 0);
-			//}
-			console.log(displayName+ ' '.repeat((20-displayName.length > 0) ? 20-displayName.length : 0 ), 
-						" " + (sum < 10 ? (" " + sum) : sum),
-						"r:" + (medals.raid[0]?1:0) + (medals.raid[1]?1:0) + (medals.raid[2]?1:0) + (medals.raid[3]?1:0) + (medals.raid[4]?1:0) + (medals.day1[0]?1:0), 
-						"t:" + (medals.triumphs[0]?1:0) + (medals.triumphs[1]?1:0) + (medals.triumphs[2]?1:0) + (medals.lore[0]?1:0) + (medals.lore[1]?1:0), 
-						"s:" + (medals.seals[0]?1:0) + (medals.seals[1]?1:0) + (medals.seals[2]?1:0) + (medals.places[1]?1:0) + (medals.places[2]?1:0) + (medals.places[3]?1:0), 
-						"d:" + (medals.drozch[0]?1:0) + (medals.drozch[1]?1:0) + (medals.drozch[2]?1:0),
-						"p:" + 	(discord_member.roles.find(role => role.position == (top_position - 23)) != null ? "100-0" : 
-								(discord_member.roles.find(role => role.position == (top_position - 24)) != null ? "110-0" : 
-								(discord_member.roles.find(role => role.position == (top_position - 25)) != null ? "111-0" : 
-								(discord_member.roles.find(role => role.position == (top_position - 26)) != null ? "100-1" : 
-								(discord_member.roles.find(role => role.position == (top_position - 27)) != null ? "110-1" : 
-								(discord_member.roles.find(role => role.position == (top_position - 28)) != null ? "111-1" : "000-0")))))),
-						"g:" + (medals.gambit[0]?1:0) + (medals.gambit[1]?1:0), 
-						"k:" + (medals.places[0]?1:0), 
-						"s8:" + (medals.season8[0]?1:0) + (medals.season8[1]?1:0),
-						"s9:" + (medals.season9[0]?1:0) + (medals.season9[1]?1:0),
-						"s10:" + (medals.season10[0]?1:0) + (medals.season10[1]?1:0),
-						"t:" + (charactersLight.titan === -1 ? ' - ' : numeral(charactersLight.titan).format('0000')) + ' ' + 
-						"h:" + (charactersLight.hunter === -1 ? ' - ' : numeral(charactersLight.hunter).format('0000')) + ' ' + 
-						"w:" + (charactersLight.warlock === -1 ? ' - ' : numeral(charactersLight.warlock).format('0000'))); 
-			if(charactersLight.titan >= minlight   && discord_member.roles.find(role => role.name === t_role.name) == null) discord_member.addRole(t_role);
-			if(charactersLight.hunter >= minlight  && discord_member.roles.find(role => role.name === h_role.name) == null) discord_member.addRole(h_role);
-			if(charactersLight.warlock >= minlight && discord_member.roles.find(role => role.name === w_role.name) == null) discord_member.addRole(w_role);
-			if(charactersLight.titan < minlight   && discord_member.roles.find(role => role.name === t_role.name) != null) discord_member.removeRole(t_role);
-			if(charactersLight.hunter < minlight  && discord_member.roles.find(role => role.name === h_role.name) != null) discord_member.removeRole(h_role);
-			if(charactersLight.warlock < minlight && discord_member.roles.find(role => role.name === w_role.name) != null) discord_member.removeRole(w_role);
-			
-			return;
-			
-			if (discord_member.roles.find(role => role.name.includes("frozen")) != null) return;
-			
-			var raid_sum     = (medals.raid[0]?1:0) + (medals.raid[1]?1:0) + (medals.raid[2]?1:0) + (medals.raid[3]?1:0) + (medals.raid[4]?1:0);
-			var triumphs_sum = (medals.triumphs[0]?1:0) + (medals.triumphs[1]?1:0) + (medals.triumphs[2]?1:0) + (medals.lore[0]?1:0) + (medals.lore[1]?1:0);
-			var seals_sum    = (medals.seals[0]?1:0) + (medals.seals[1]?1:0) + (medals.seals[2]?1:0) + (medals.places[1]?1:0) + (medals.places[2]?1:0) + (medals.places[3]?1:0);
-			var drozch_sum   = (medals.drozch[0]?1:0) + (medals.drozch[1]?1:0) + (medals.drozch[2]?1:0);
-			
-			check_role(discord_member, top_position -  1, discord_member.roles.find(role => role.position == (top_position -  1)) == null, raid_sum > 0, raid_sum > 1, "t1");
-			check_role(discord_member, top_position -  2, discord_member.roles.find(role => role.position == (top_position -  2)) == null, raid_sum > 1, raid_sum > 2, "t2");
-			check_role(discord_member, top_position -  3, discord_member.roles.find(role => role.position == (top_position -  3)) == null, raid_sum > 2, raid_sum > 3, "t3");
-			check_role(discord_member, top_position -  4, discord_member.roles.find(role => role.position == (top_position -  4)) == null, raid_sum > 3, raid_sum > 4, "t4");
-			check_role(discord_member, top_position -  5, discord_member.roles.find(role => role.position == (top_position -  5)) == null, raid_sum > 4, raid_sum > 5, "t5");
-			
-			check_role(discord_member, top_position -  7, discord_member.roles.find(role => role.position == (top_position -  7)) == null, medals.day1[0], false, "day 1");
-			
-			check_role(discord_member, top_position -  8, discord_member.roles.find(role => role.position == (top_position -  8)) == null, triumphs_sum > 0, triumphs_sum > 1, "t1");
-			check_role(discord_member, top_position -  9, discord_member.roles.find(role => role.position == (top_position -  9)) == null, triumphs_sum > 1, triumphs_sum > 2, "t2");
-			check_role(discord_member, top_position - 10, discord_member.roles.find(role => role.position == (top_position - 10)) == null, triumphs_sum > 2, triumphs_sum > 3, "t3");
-			check_role(discord_member, top_position - 11, discord_member.roles.find(role => role.position == (top_position - 11)) == null, triumphs_sum > 3, triumphs_sum > 4, "t4");
-			check_role(discord_member, top_position - 12, discord_member.roles.find(role => role.position == (top_position - 12)) == null, triumphs_sum > 4, triumphs_sum > 5, "t5");
-			
-			check_role(discord_member, top_position - 13, discord_member.roles.find(role => role.position == (top_position - 13)) == null, seals_sum > 0, seals_sum > 1, "t1");
-			check_role(discord_member, top_position - 14, discord_member.roles.find(role => role.position == (top_position - 14)) == null, seals_sum > 1, seals_sum > 2, "t2");
-			check_role(discord_member, top_position - 15, discord_member.roles.find(role => role.position == (top_position - 15)) == null, seals_sum > 2, seals_sum > 3, "t3");
-			check_role(discord_member, top_position - 16, discord_member.roles.find(role => role.position == (top_position - 16)) == null, seals_sum > 3, seals_sum > 4, "t4");
-			check_role(discord_member, top_position - 17, discord_member.roles.find(role => role.position == (top_position - 17)) == null, seals_sum > 4, seals_sum > 5, "t5");
-			check_role(discord_member, top_position - 18, discord_member.roles.find(role => role.position == (top_position - 18)) == null, seals_sum > 5, seals_sum > 6, "t6");
-			
-			check_role(discord_member, top_position - 19, discord_member.roles.find(role => role.position == (top_position - 19)) == null, drozch_sum > 0, drozch_sum > 1, "t1");
-			check_role(discord_member, top_position - 20, discord_member.roles.find(role => role.position == (top_position - 20)) == null, drozch_sum > 1, drozch_sum > 2, "t2");
-			check_role(discord_member, top_position - 21, discord_member.roles.find(role => role.position == (top_position - 21)) == null, drozch_sum > 2, drozch_sum > 3, "t3");
-			
-			check_role(discord_member, top_position - 29, discord_member.roles.find(role => role.position == (top_position - 29)) == null, medals.extra[0], medals.extra[1], "solothrone1");
-			check_role(discord_member, top_position - 30, discord_member.roles.find(role => role.position == (top_position - 30)) == null, medals.extra[1], false, "solothrone2");
-			
-			check_role(discord_member, top_position - 31, discord_member.roles.find(role => role.position == (top_position - 31)) == null, medals.gambit[0], medals.gambit[1], "дреджен");
-			check_role(discord_member, top_position - 32, discord_member.roles.find(role => role.position == (top_position - 32)) == null, medals.gambit[1], false, "вершитель");
-			
-			check_role(discord_member, top_position - 33, discord_member.roles.find(role => role.position == (top_position - 33)) == null, medals.places[0], false, "кузнец");
-			
-			check_role(discord_member, top_position - 34, discord_member.roles.find(role => role.position == (top_position - 34)) == null, medals.season10[0] || medals.season10[1],  medals.season10[0] && medals.season10[1], "10");
-			check_role(discord_member, top_position - 35, discord_member.roles.find(role => role.position == (top_position - 35)) == null, medals.season10[0] && medals.season10[1], false, "10+");
-			
-			check_role(discord_member, top_position - 36, discord_member.roles.find(role => role.position == (top_position - 36)) == null, medals.season11[0] || medals.season11[1],  medals.season11[0] && medals.season11[1], "11");
-			check_role(discord_member, top_position - 37, discord_member.roles.find(role => role.position == (top_position - 37)) == null, medals.season11[0] && medals.season11[1], false, "11+");
-			
-			//OLD
-			check_role(discord_member, footer_position - 1, discord_member.roles.find(role => role.position == (footer_position - 1)) == null, medals.season8[0] || medals.season8[1], medals.season8[0] && medals.season8[1], "8");
-			check_role(discord_member, footer_position - 2, discord_member.roles.find(role => role.position == (footer_position - 2)) == null, medals.season8[0] && medals.season8[1], false, "8+");
-			
-			check_role(discord_member, footer_position - 3, discord_member.roles.find(role => role.position == (footer_position - 1)) == null, medals.season9[0] || medals.season9[1], medals.season9[0] && medals.season9[1], "9");
-			check_role(discord_member, footer_position - 4, discord_member.roles.find(role => role.position == (footer_position - 2)) == null, medals.season9[0] && medals.season9[1], false, "9+");
-			
-			/*
-			var shift = 23;
-			for(ei = 1; ei < 13; ei++){
-				if(sum - given_medals < 0){
-					if(discord_member.roles.find(role => role.position == (top_position - shift - ei)) != null) discord_member.removeRole(discord_member.guild.roles.find(role => role.position == (top_position - shift - ei)));
-				}else{
-					if(sum - given_medals == ei){
-						if(discord_member.roles.find(role => role.position == (top_position - shift - ei)) == null) discord_member.addRole(discord_member.guild.roles.find(role => role.position == (top_position - shift - ei)));
-					}else{
-						if(discord_member.roles.find(role => role.position == (top_position - shift - ei)) != null) discord_member.removeRole(discord_member.guild.roles.find(role => role.position == (top_position - shift - ei)));
-					}
-				}
-			}*/
-			
-			if (discord_member.roles.find(role => role.name.includes("Атлон")) != null ||
-				discord_member.roles.find(role => role.name.includes("Света")) != null ||
-				discord_member.roles.find(role => role.name.includes("Guardian is down")) != null ||
-				discord_member.roles.find(role => role.name.includes("Восставший")) != null ||
-				discord_member.roles.find(role => role.name.includes("Путник")) != null) return;
-			if(sum < 8){
-				if(discord_member.roles.find(role => role.name == "Страж") == null) {
-					discord_member.addRole(discord_member.guild.roles.find(role => role.name == "Страж"));
-					if(discord_member.roles.find(role => role.name == "Опытный Страж") != null)
-						discord_member.removeRole(discord_member.guild.roles.find(role => role.name == "Опытный Страж"));
-					if(discord_member.roles.find(role => role.name == "Страж ветеран") != null)
-						discord_member.removeRole(discord_member.guild.roles.find(role => role.name == "Страж ветеран"));
-					if(discord_member.roles.find(role => role.name == "Страж легенда") != null)
-						discord_member.removeRole(discord_member.guild.roles.find(role => role.name == "Страж легенда"));
-				}
-			}else if(sum < 17){
-				if(discord_member.roles.find(role => role.name == "Опытный Страж") == null) {
-					discord_member.addRole(discord_member.guild.roles.find(role => role.name == "Опытный Страж"));
-					if(discord_member.roles.find(role => role.name == "Страж") != null)
-						discord_member.removeRole(discord_member.guild.roles.find(role => role.name == "Страж"));
-					if(discord_member.roles.find(role => role.name == "Страж ветеран") != null)
-						discord_member.removeRole(discord_member.guild.roles.find(role => role.name == "Страж ветеран"));
-					if(discord_member.roles.find(role => role.name == "Страж легенда") != null)
-						discord_member.removeRole(discord_member.guild.roles.find(role => role.name == "Страж легенда"));
-				}
-			}else if(sum < 26){
-				if(discord_member.roles.find(role => role.name == "Страж ветеран") == null) {
-					discord_member.addRole(discord_member.guild.roles.find(role => role.name == "Страж ветеран"));
-					if(discord_member.roles.find(role => role.name == "Страж") != null)
-						discord_member.removeRole(discord_member.guild.roles.find(role => role.name == "Страж"));
-					if(discord_member.roles.find(role => role.name == "Опытный Страж") != null)
-						discord_member.removeRole(discord_member.guild.roles.find(role => role.name == "Опытный Страж"));
-					if(discord_member.roles.find(role => role.name == "Страж легенда") != null)
-						discord_member.removeRole(discord_member.guild.roles.find(role => role.name == "Страж легенда"));
-				}
-			}else{
-				if(discord_member.roles.find(role => role.name == "Страж легенда") == null) {
-					discord_member.addRole(discord_member.guild.roles.find(role => role.name == "Страж легенда"));
-					if(discord_member.roles.find(role => role.name == "Страж") != null)
-						discord_member.removeRole(discord_member.guild.roles.find(role => role.name == "Страж"));
-					if(discord_member.roles.find(role => role.name == "Опытный Страж") != null)
-						discord_member.removeRole(discord_member.guild.roles.find(role => role.name == "Опытный Страж"));
-					if(discord_member.roles.find(role => role.name == "Страж ветеран") != null)
-						discord_member.removeRole(discord_member.guild.roles.find(role => role.name == "Страж ветеран"));
-				}
-			}
-		}else{
+		if(discord_member == null){
 			console.log(displayName + ' '.repeat(40-displayName.length), "DISCORD MEMBER NOT FOUND");
+			return;
 		}
+		console.log(displayName + ' '.repeat(40-displayName.length), "set roles");
+		var roles = get_roles_definition(discord_member.guild);
+		 
+		checkAndProcessRole(discord_member, roles.clan, true, false, "set clan header");
+		checkAndProcessRole(discord_member, roles.penumbra, clanid == "3055823", false, "process penumbra");
+		checkAndProcessRole(discord_member, roles.antumbra, clanid == "3858144", false, "process antumbra");
+		checkAndProcessRole(discord_member, roles.characters, true, false, "set characters header");
+		checkAndProcessRole(discord_member, roles.warlock, charactersLight.warlock >= minlight, false, "process warlock");
+		checkAndProcessRole(discord_member, roles.hunter, charactersLight.hunter >= minlight, false, "process hunter");
+		checkAndProcessRole(discord_member, roles.titan, charactersLight.titan >= minlight, false, "process titan");
+		checkAndProcessRole(discord_member, roles.medals, true, false, "set medals header");
+		checkAndProcessRole(discord_member, roles.footer, true, false, "set footer");
+		checkAndProcessRole(discord_member, roles.poi, medals.extra.poi.state, false, "process poi");
+		
+		if (discord_member.roles.find(role => role.name.includes("frozen")) != null) return;
+		
+		checkAndProcessRole(discord_member, roles.day1, medals.raids.day1.state, false, "day 1");
+		checkAndProcessRoleBlock(discord_member, roles.top_raids, 3, medals.raids);
+		checkAndProcessRoleBlock(discord_member, roles.top_seals, 5, medals.seals);
+		checkAndProcessRoleBlock(discord_member, roles.top_legacy_seals, 4, medals.legacy_seals);
+		checkAndProcessRoleBlock(discord_member, roles.top_locations, 3, medals.locations);
+		checkAndProcessRoleBlock(discord_member, roles.top_triumphs, 3, medals.triumphs);
+		checkAndProcessRoleBlock(discord_member, roles.top_legacy_triumphs, 3, medals.legacy_triumphs);
+		checkAndProcessRoleBlock(discord_member, roles.top_season, 2, medals.season);
+		checkAndProcessRole(discord_member, roles.solo, medals.extra.solo.state, medals.extra.soloflawless.state, "solo");
+		checkAndProcessRole(discord_member, roles.soloflawless, medals.extra.soloflawless.state, false, "soloflawless");
+
+		if (discord_member.roles.find(role => role.name.includes("Келл")) != null) return;
+		if (discord_member.roles.find(role => role.name.includes("Инквизиция")) != null) return;
+		if (discord_member.roles.find(role => role.name.includes("Returned")) != null) return;
+		if (discord_member.roles.find(role => role.name.includes("Страж")) != null) return;
+		if (discord_member.roles.find(role => role.name.includes("Незнакомец")) != null) return;
+
+		var sum = sumMedals(discord_member, medals);
+		checkAndProcessRole	(discord_member, roles.role_t2, sum >=0, sum > 6, "Страж");
+		checkAndProcessRole	(discord_member, roles.role_t3, sum > 6, sum > 15, "Опытный");
+		checkAndProcessRole	(discord_member, roles.role_t4, sum > 15, sum > 23, "Ветеран");
+		checkAndProcessRole	(discord_member, roles.role_t5, sum > 23, false, "Легенда");
 	}catch(e){
 		console.log(displayName + ' Ошибка ' + e.name + ":" + e.message + "\n<@149245139389251584> \n" + e.stack);
+	}
+}
+
+function checkAndProcessRole(discord_member, role, medal, medalNext, title){
+	if(discord_member.roles.find(r => r.position == role.position) == null){
+		if(medal == true && medalNext == false){
+			discord_member.addRole(role);
+		}
+	}else{
+		if(medal == false || medalNext == true) {
+			discord_member.removeRole(role);
+		}
+	}
+}
+function checkAndProcessRoleBlock(discord_member, role, block_size, data){
+	var i = 0;
+	var sum = sumSubcategory(data);
+	while (i < block_size) {
+		checkAndProcessRole(discord_member, discord_member.guild.roles.find(r => r.position == (role.position - i)), sum > i, sum > i+1, "");
+		i++;
+	}
+};
+function sumMedals(discord_member, medals){
+	var sum = 0;
+	for (subcategoryName of Object.keys(medals)) {
+		if(subcategoryName != "crucible" && subcategoryName != "extra") sum = sum + sumSubcategory(medals[subcategoryName]);
+	};
+	return sum + sumCrucible(discord_member);
+}
+function sumSubcategory(subcategory){
+	var sum = 0;
+	for (child of Object.values(subcategory)) {
+		sum = sum + (child.state?1:0);
+	};
+	return sum;
+}
+function sumCrucible(discord_member){
+	var pvp_top_role = discord_member.guild.roles.find(role => role.id == 646150826791796739);
+	return  (discord_member.roles.find(role => role.position == (pvp_top_role.position - 0)) != null ? 3 : 0) + 
+			(discord_member.roles.find(role => role.position == (pvp_top_role.position - 1)) != null ? 1 : 0) + 
+			(discord_member.roles.find(role => role.position == (pvp_top_role.position - 2)) != null ? 2 : 0) +  
+			(discord_member.roles.find(role => role.position == (pvp_top_role.position - 3)) != null ? 3 : 0) +
+			(discord_member.roles.find(role => role.position == (pvp_top_role.position - 4)) != null ? 2 : 0) + 
+			(discord_member.roles.find(role => role.position == (pvp_top_role.position - 5)) != null ? 3 : 0) +  
+			(discord_member.roles.find(role => role.position == (pvp_top_role.position - 6)) != null ? 4 : 0);
+}
+function get_roles_definition(guild){
+	return {
+		role_t1: guild.roles.find(role => role.id == 471046830700888075),
+		role_t2: guild.roles.find(role => role.id == 471048548318969888),
+		role_t3: guild.roles.find(role => role.id == 471046764800114689),
+		role_t4: guild.roles.find(role => role.id == 471043840485097473),
+		role_t5: guild.roles.find(role => role.id == 572776313794854940),
+		clan: guild.roles.find(role => role.id == 618949527851761674),
+		penumbra: guild.roles.find(role => role.id == 618949692935372841),
+		antumbra: guild.roles.find(role => role.id == 618949694953095169),
+		characters: guild.roles.find(role => role.id == 581016395140300820),
+		warlock: guild.roles.find(role => role.id == 581016530322587650),
+		hunter: guild.roles.find(role => role.id == 581016534751641601),
+		titan: guild.roles.find(role => role.id == 581016532499300353),
+		medals: guild.roles.find(role => role.id == 572759260023226379),
+		footer: guild.roles.find(role => role.id == 572759337836216330),
+		poi: guild.roles.find(role => role.id == 604763831620861992),
+
+		day1: guild.roles.find(role => role.id == 632110262153117706),
+		solo: guild.roles.find(role => role.id == 577473336611700756),
+		soloflawless: guild.roles.find(role => role.id == 632110696099872768),
+		
+		top_raids: guild.roles.find(role => role.id == 572759650928164875),
+		top_seals: guild.roles.find(role => role.id == 636579093214658563),
+		top_legacy_seals: guild.roles.find(role => role.id == 577473317997379584),
+		top_locations: guild.roles.find(role => role.id == 646150830533378111),
+		top_triumphs: guild.roles.find(role => role.id == 646153691811807240),
+		top_legacy_triumphs: guild.roles.find(role => role.id == 572759694607908894),
+		top_season: guild.roles.find(role => role.id == 572759686919618561)
+	}
+}
+
+function form_field(data){
+	var field = "";
+	for (child of Object.values(data)) {
+		field = field + "\n" + form_line(child);
+	};
+	return field;
+}
+function form_line(data){
+	try{
+		return (data.state ? "🔶 " : "🔷 ") + data.text;
+	}catch{
+		return "🔷 not defined";
+	}
+}
+
+function get_node_data(jsondata, recordHash, textprefix){
+	try{
+		return{
+			state: 
+				jsondata.Response.profilePresentationNodes.data.nodes[recordHash].progressValue >= 
+				jsondata.Response.profilePresentationNodes.data.nodes[recordHash].completionValue,
+			text:
+				textprefix + ": " + 
+				jsondata.Response.profilePresentationNodes.data.nodes[recordHash].progressValue + "/" +
+				jsondata.Response.profilePresentationNodes.data.nodes[recordHash].completionValue
+		}
+	}catch(e){	
+		console.log('Error ' + e.name + ":" + e.message + "\n" + e.stack);
+		return{
+			state: false,
+			text: textprefix + ": not defined"
+		}
+	}
+}
+function get_character_node_data(characterPresentationNodes, recordHash, textprefix){
+	try{
+		return{
+			state: 
+				characterPresentationNodes[0][1].nodes[recordHash].progressValue >= 
+				characterPresentationNodes[0][1].nodes[recordHash].completionValue,
+			text:
+				textprefix + ": " + 
+				characterPresentationNodes[0][1].nodes[recordHash].progressValue + "/" +
+				characterPresentationNodes[0][1].nodes[recordHash].completionValue
+		}
+	}catch(e){	
+		console.log('Error ' + e.name + ":" + e.message + "\n" + e.stack);
+		return{
+			state: false,
+			text: textprefix + ": not defined"
+		}
+	}
+}
+function get_character_progression_data(characterProgressions, recordHash, neededValue, textprefix){
+	try{
+		return{
+			state: 
+				characterProgressions[0][1].progressions[recordHash].currentProgress >= neededValue,
+			text:
+				(textprefix == "" ? "" : textprefix + ": " ) + 
+				characterProgressions[0][1].progressions[recordHash].currentProgress + "/" + neededValue
+		}
+	}catch(e){	
+		console.log('Error ' + e.name + ":" + e.message + "\n" + e.stack);
+		return{
+			state: false,
+			text: textprefix + ": not defined"
+		}
+	}
+}
+function get_any_of_data(characterPresentationNodes, recordHashArray, textprefix){
+	var data;
+	for (recordHash of recordHashArray){
+		data = get_character_node_data(characterPresentationNodes, recordHash, textprefix);
+		if (data.state) return data;
+	}
+	return data;
+}
+function get_profile_records(jsondata, dataname, neededValue, textprefix){
+	try{
+		return{
+			state: 
+				jsondata.Response.profileRecords.data[dataname] >= neededValue,
+			text:
+				(textprefix == "" ? "" : textprefix + ": " ) + 
+				jsondata.Response.profileRecords.data[dataname] + "/" + (neededValue/1000) + "k"
+		}
+	}catch(e){	
+		console.log('Error ' + e.name + ":" + e.message + "\n" + e.stack);
+		return{
+			state: false,
+			text: textprefix + ": not defined"
+		}
+	}
+}
+function get_season_triumphs(jsondata, characterPresentationNodes, nodeHash, ignoredRecordHashArray, textprefix){
+	try{
+		var ignored = 0;
+		for (ignoredRecordHash of ignoredRecordHashArray){
+			ignored = ignored + ((jsondata.Response.profileRecords.data.records[ignoredRecordHash].state == 67) ? 0 : 1);
+		}
+		return{
+			state: 
+				characterPresentationNodes[0][1].nodes[nodeHash].currentProgress == 
+				characterPresentationNodes[0][1].nodes[nodeHash].completionValue - ignored
+				&& characterPresentationNodes[0][1].nodes[nodeHash].completionValue > 0,
+			text:
+				(textprefix == "" ? "" : textprefix + ": " ) + 
+				characterPresentationNodes[0][1].nodes[nodeHash].progressValue + "/" + 
+				(characterPresentationNodes[0][1].nodes[nodeHash].completionValue - ignored)
+		}
+	}catch(e){	
+		console.log('Error ' + e.name + ":" + e.message + "\n" + e.stack);
+		return{
+			state: false,
+			text: textprefix + ": not defined"
+		}
+	}
+}
+function get_day_one(jsondata, characterCollectibles){
+	try{
+		return{
+			state: 
+				jsondata.Response.profileCollectibles.data.collectibles[2273453972].state%2 != 1 &&
+				characterCollectibles[0][1].collectibles[3938759711].state%2 != 1 &&
+				jsondata.Response.profileCollectibles.data.collectibles[3171386140].state%2 != 1 &&
+				jsondata.Response.profileCollectibles.data.collectibles[1171206947].state%2 != 1,
+			text: "Day1: " +
+				(jsondata.Response.profileCollectibles.data.collectibles[2273453972].state%2 != 1 ? "СГК " : "") + 
+				(characterCollectibles[0][1].collectibles[3938759711].state%2 != 1 ? "СС " : "") + 
+				(jsondata.Response.profileCollectibles.data.collectibles[3171386140].state%2 != 1 ? "КС " : "") + 
+				(jsondata.Response.profileCollectibles.data.collectibles[1171206947].state%2 != 1 ? "ПЖ " : "")
+		}
+	}catch(e){	
+		console.log('Error ' + e.name + ":" + e.message + "\n" + e.stack);
+		return{
+			state: false,
+			text: "Day1: not defined"
+		}
+	}
+}
+function get_all_nodes(jsondata, recordHashArray, textprefix){
+	var counter = 0;
+	for (recordHash of recordHashArray){
+		counter = counter + (jsondata.Response.profileRecords.data.records[recordHash].state == 67 ? 1 : 0);
+	}
+	return {
+		state: 
+			counter == recordHashArray.length,
+		text: textprefix + ": " + counter + "/" + recordHashArray.length
+	};
+}
+function get_poi(jsondata){
+	try{
+		return{
+			state: 
+				((jsondata.Response.profileRecords.data.records[3448775736].state == 67 ? 1 : 0) + 
+				(jsondata.Response.profileRecords.data.records[3804486505].state == 67 ? 1 : 0) + 
+				(jsondata.Response.profileRecords.data.records[3185876102].state == 67 ? 1 : 0)) < 3,
+			text: ""
+		}
+	}catch(e){	
+		console.log('Error ' + e.name + ":" + e.message + "\n" + e.stack);
+		return{	state: false, text: ""	}
 	}
 }
