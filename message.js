@@ -21,7 +21,7 @@ exports.main = (message) => {
 			} else if (developerCommands.includes(args[0])) {
 				if (message.author.id == config.users.developer) {
 					switch (args[0]) {
-						case 'oauth2': message.channel.send("https://www.bungie.net/ru/OAuth/Authorize?response_type=code&client_id=" + config.d2clientId + "&state=12345"); break;
+						case 'oauth2': message.channel.send(`https://www.bungie.net/ru/OAuth/Authorize?response_type=code&client_id=${config.d2clientId}&state=12345`); break;
 						case 'code': reset.newToken(message, args[1]); break;
 					}
 				}
@@ -81,7 +81,7 @@ function sendAdminCommand (message) {
 	if(message.channel.type == "text"){
 		guild = client.guilds.get(config.guild);
 		gm = guild.roles.find(role => role.id == config.roles.gm);
-		if(gm.position <= message.member.highestRole.position){
+		if(gm.position <= message.member.roles.highest.position){
 			switch(args[0]) {
 				case 'checksync':	checksync.checksync(message.channel);					break;
 				case 'sync':		roles.roles_bytag(message.channel, args.length > 1 ? args[1] : message.member.id, true);					break;

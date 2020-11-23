@@ -1,3 +1,5 @@
+// https://discordjs.guide/additional-info/changes-in-v12.html
+
 const Discord = require("discord.js");
 const config = require("./config.json");
 
