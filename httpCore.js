@@ -23,6 +23,19 @@ class AccessToken{
     }
 }
 
+async export function httpRequest(url, setAuth){
+	var request = new XMLHttpRequest();
+	request.open("GET", url, true);
+	if (setAuth == true) request.setRequestHeader("Authorization", "Bearer "+AccessToken.access_token);
+	request.setRequestHeader("X-API-Key", config.d2apiKey);
+	request.onreadystatechange = function(){
+		if(this.readyState === 4 && this.status === 200){
+			return JSON.parse(this.responseText);
+		}
+	}
+	request.send();
+}
+
 export async function refreshAuthToken(){
     AccessToken.ReadFile('access_token.json');
 

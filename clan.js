@@ -1,26 +1,14 @@
 import Discord from "discord.js";
 import config from "./config.json";
-import AccessToken from "./auth.js";
 
-async function httpRequest(url, setAuth){
-	var request = new XMLHttpRequest();
-	request.open("GET", url, true);
-	if (setAuth == true) request.setRequestHeader("Authorization", "Bearer "+AccessToken.access_token);
-	request.setRequestHeader("X-API-Key", config.d2apiKey);
-	request.onreadystatechange = function(){
-		if(this.readyState === 4 && this.status === 200){
-			return JSON.parse(this.responseText);
-		}
-	}
-	request.send();
-}
+import HttpCore from "./httpCore.json";
 
 function getClanMembers(clanId){
-	return httpRequest(`https://www.bungie.net/Platform/GroupV2/${clanId}/Members/`);
+	return HttpCore.httpRequest(`https://www.bungie.net/Platform/GroupV2/${clanId}/Members/`);
 }
 
 function getFullMemberData(membershipType, membershipId){
-	return httpRequest(`https://www.bungie.net/Platform/Destiny2/${membershipType}/Profile/${membershipId}/?components=Profiles,Characters,CharacterProgressions,PresentationNodes,Records,Collectibles`)
+	return HttpCore.httpRequest(`https://www.bungie.net/Platform/Destiny2/${membershipType}/Profile/${membershipId}/?components=Profiles,Characters,CharacterProgressions,PresentationNodes,Records,Collectibles`)
 }
 
 function getAllMembers(){

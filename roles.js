@@ -1,9 +1,11 @@
 const Discord = require("discord.js");
 import config from "./config.json";
+import BungieApi from "./bungieApi.js";
+
 var Clan = require("./clan.js");
 var iconv = require('iconv-lite');
 
-
+// redundant
 exports.roles_bytag = function(channel, battleTag, sync) {
 
 	if (sync == true) CreateSync(channel, discord_id, found_member.destinyUserInfo.membershipType, found_member.destinyUserInfo.membershipId, found_member.destinyUserInfo.LastSeenDisplayName);
@@ -33,8 +35,9 @@ exports.roles_bytag = function(channel, battleTag, sync) {
 		if (sync == true) CreateSync(channel, discord_id, found_member.destinyUserInfo.membershipType, found_member.destinyUserInfo.membershipId, found_member.destinyUserInfo.LastSeenDisplayName);
 		roles(channel, found_member.destinyUserInfo.membershipType, found_member.destinyUserInfo.membershipId, found_member.destinyUserInfo.LastSeenDisplayName, "3858144");
 	}
-}				
+}		
 
+// needs refactoring
 exports.set_clan_roles = function(channel){
 	var xhr_clan = new XMLHttpRequest();
 	xhr_clan.open("GET", "https://www.bungie.net/Platform/GroupV2/3858144/Members/", true);
@@ -85,7 +88,7 @@ exports.set_clan_roles = function(channel){
 	}
 	xhr_clan.send();
 }
-
+// needs refactoring
 function CreateSync(channel, discord_id, membershipType, membershipId, LastSeenDisplayName){
 	pool.getConnection(function(err, connection) {
 		if (err) throw err; // not connected!
@@ -130,12 +133,22 @@ function CreateSync(channel, discord_id, membershipType, membershipId, LastSeenD
 	});
 }
 
-export function Roles(channel, discordMention){
+export function Roles(message, args){
+	if (args < 1){
+		RolesByDiscordMention(message.channel, message.member.id);
+	}else if(args[1].StartsWith('id:')){
+		RolesByMembershipId(message.channel, args[1]);
+	}else{
+		RolesByDiscordMention(message.channel, args[1]);
+	}
+}
+
+export function RolesByDiscordMention(channel, discordMention){
 	console.log(discordMention);
 	var discordId = discordMention.replace(/\D/g,'');
 	var discordMember = channel.guild.members.find(member => member.user.id == discordId);
 	if(discordMember == null){
-		channel.send('Дискорд пользователь не найден.');
+		SendRolesMessage(channel, discordMember);
 		return;
 	}
 
@@ -144,16 +157,37 @@ export function Roles(channel, discordMention){
 	var rolesData = GetRolesData(profileData.userInfo.membershipType, profileData.userInfo.membershipId);
 	
 	console.log(rolesData);
-	SendMessage(channel, profileData, rolesData);
+	SendRolesMessage(channel, discordMember, profileData, rolesData);
 	SetRoles(discordMember, rolesData.charactersLight, rolesData.medals, clanid, profileData.displayName);
 }
 
-function SendMessage(channel, profileData, rolesData){
-	if(rolesData.medals == null) {
-		channel.send('Данные профиля не были получены. Профиль закрыт настройками приватности.\n'+
+export function RolesByMembershipId(channel, membership){
+	var membershipType = membership.replace('id:','').split('/');
+	var membershipId = membership.replace('id:','').split('/');
+
+	var discordMember = channel.guild.members.find(member => member.user.id == 000000000000000000000000);
+
+	var rolesData = GetRolesData(membershipType, membershipId);
+	
+	console.log(rolesData);
+	SendRolesMessage(channel, discordMember, profileData, rolesData);
+
+	channel.send('Временно (или нет) не выдает роли.');
+
+	SetRoles(discordMember, rolesData.charactersLight, rolesData.medals, clanid, profileData.displayName);
+}
+
+function SendRolesMessage(channel, discordMember, profileData, rolesData){
+	if(discordMember == null) {
+		channel.send('Дискорд профиль не найден.');
+	}
+	if(rolesData == null) {
+		channel.send('Игровой профиль не найден.');
+	}else if(rolesData.medals == null) {
+		channel.send('Данные профиля не были получены. Вероятно профиль закрыт настройками приватности.\n'+
 					 'Настройки приватности: https://www.bungie.net/ru/Profile/Settings/?category=Privacy');
 	}else{
-		const embed = new Discord.RichEmbed()
+		const embed = new Discord.MessageEmbed()
 			.setAuthor(profileData.userInfo.displayName + " 💠" + sumMedals(discordMember, rolesData.medals) + "💠")
 			.setColor(0x00AE86)
 			.setFooter("ПВП медали выдают гм-ы; ранжирование ролей: 7/16/24 • id: "+discordId, "https://cdn.discordapp.com/avatars/543342030768832524/7da47eaca948d9874b66fc5884ca2d00.png")
@@ -173,15 +207,11 @@ function SendMessage(channel, profileData, rolesData){
 		channel.send({embed});
 	}
 }
+
 function GetRolesData(membershipType, membershipId) {
 	var jsondata = clan.getFullMemberData(membershipType, membershipId);
 	if(typeof(jsondata.Response.profileRecords.data) == 'undefined') return null;
 	
-	var charactersLight = {
-		titan: -1,
-		hunter: -1,
-		warlock: -1
-	};
 	var data = {
 		raids:{}, 
 		locations:{}, 
@@ -193,73 +223,55 @@ function GetRolesData(membershipType, membershipId) {
 		season:{}, 
 		extra:{}
 	};
-	var characterIds = jsondata.Response.profile.data.characterIds;
-	var characters = jsondata.Response.characters.data;
-	characterIds.forEach(function(characterId){
-		switch(characters[characterId].classType){
-			case 0:
-				charactersLight.titan = characters[characterId].light;
-				break;
-			case 1:
-				charactersLight.hunter = characters[characterId].light;
-				break;
-			case 2:
-				charactersLight.warlock = characters[characterId].light;
-				break;
-		}
-	});
+	var charactersLight = get_character_light(jsondata);
 	
 	if(charactersLight.titan == -1 && charactersLight.titan == -1 && charactersLight.titan == -1) return {charactersLight: charactersLight, medals: null};
 
 	//				ROLES
 	var characterPresentationNodes = [];
-	for (var characterID in jsondata.Response.characterPresentationNodes.data) characterPresentationNodes.push([characterID, jsondata.Response.characterPresentationNodes.data[characterID]]);
-	
 	var characterRecords = [];
-	for (var characterID in jsondata.Response.characterRecords.data) characterRecords.push([characterID, jsondata.Response.characterRecords.data[characterID]]);
-	
 	var characterProgressions = [];
-	for (var characterID in jsondata.Response.characterProgressions.data) characterProgressions.push([characterID, jsondata.Response.characterProgressions.data[characterID]]);
-	
 	var characterCollectibles = [];
+	for (var characterID in jsondata.Response.characterPresentationNodes.data) characterPresentationNodes.push([characterID, jsondata.Response.characterPresentationNodes.data[characterID]]);
+	for (var characterID in jsondata.Response.characterRecords.data) characterRecords.push([characterID, jsondata.Response.characterRecords.data[characterID]]);
+	for (var characterID in jsondata.Response.characterProgressions.data) characterProgressions.push([characterID, jsondata.Response.characterProgressions.data[characterID]]);
 	for (var characterID in jsondata.Response.characterProgressions.data) characterCollectibles.push([characterID, jsondata.Response.characterCollectibles.data[characterID]]);
 	
-	data.raids.lw  = get_node_data(jsondata, 1525933460, "ПЖ");
-	data.raids.gos = get_node_data(jsondata,  615240848, "CC");
-	data.raids.dsc = get_node_data(jsondata, 1726708384, "СГК");
-	data.raids.day1 = get_day_one(jsondata, characterCollectibles);
-	data.locations.dc   = get_node_data(jsondata, 3483405511, "Город Грез");
-	data.locations.moon = get_node_data(jsondata, 1473265108, "Луна");
-	data.locations.euro = get_node_data(jsondata, 2647590440, "Европа");
-	data.triumphs.t10k = get_profile_records(jsondata, "activeScore", 10000, "");
-	data.triumphs.t15k = get_profile_records(jsondata, "activeScore", 15000, "");
-	data.triumphs.t20k = get_profile_records(jsondata, "activeScore", 20000, "");
-	data.seals.cursebreaker = get_character_node_data(characterPresentationNodes, 560097044, "Гроза");
-	data.seals.harbinger = get_node_data(jsondata, 379405979, "Посланник");
-	data.seals.splintered = get_node_data(jsondata, 79180995, "Раскол");
-	data.seals.dredgen = get_node_data(jsondata, 3665267419, "Дреджен");
-	data.seals.conqueror = get_any_of_data(characterPresentationNodes, [3212358005, 1376640684], "Завоеватель");
-	data.crucible.glory2100 = get_character_progression_data(characterProgressions, 2000925172, 2100, "Ранкед");
-	data.crucible.glory3500 = get_character_progression_data(characterProgressions, 2000925172, 3500, "Ранкед");
-	data.crucible.glory5450 = get_character_progression_data(characterProgressions, 2000925172, 5450, "Ранкед");
-	data.crucible.flawless = get_any_of_data(characterPresentationNodes, [3251218484, 2086100423, 1276693937], "Безупречный");
-	data.legacy_seals.lore = get_character_node_data(characterPresentationNodes, 3680676656, "Летописец");
-	data.legacy_seals.blacksmith = get_character_node_data(characterPresentationNodes, 450166688, "Кузнец");
-	data.legacy_seals.reconeer = get_character_node_data(characterPresentationNodes, 2978379966, "Вершитель");
-	data.legacy_seals.shadow = get_character_node_data(characterPresentationNodes, 717225803, "Тень");
-	data.legacy_triumphs.t80k = get_profile_records(jsondata, "legacyScore", 80000, "");
-	data.legacy_triumphs.t100k = get_profile_records(jsondata, "legacyScore", 100000, "");
-	data.legacy_triumphs.t120k = get_profile_records(jsondata, "legacyScore", 120000, "");
-	data.season.seal = get_character_node_data(characterPresentationNodes, 1321008463, "Смотритель");
-	data.season.triumphs = get_season_triumphs(jsondata, characterPresentationNodes, 2255100699, 
+	data.raids.lw  = BungieApi.get_node_data(jsondata, 1525933460, "ПЖ");
+	data.raids.gos = BungieApi.get_node_data(jsondata,  615240848, "CC");
+	data.raids.dsc = BungieApi.get_node_data(jsondata, 1726708384, "СГК");
+	data.raids.day1 = BungieApi.get_day_one(jsondata, characterCollectibles);
+	data.locations.dc   = BungieApi.get_node_data(jsondata, 3483405511, "Город Грез");
+	data.locations.moon = BungieApi.get_node_data(jsondata, 1473265108, "Луна");
+	data.locations.euro = BungieApi.get_node_data(jsondata, 2647590440, "Европа");
+	data.triumphs.t10k = BungieApi.get_profile_records(jsondata, "activeScore", 10000, "");
+	data.triumphs.t15k = BungieApi.get_profile_records(jsondata, "activeScore", 15000, "");
+	data.triumphs.t20k = BungieApi.get_profile_records(jsondata, "activeScore", 20000, "");
+	data.seals.cursebreaker = BungieApi.get_character_node_data(characterPresentationNodes, 560097044, "Гроза");
+	data.seals.harbinger = BungieApi.get_node_data(jsondata, 379405979, "Посланник");
+	data.seals.splintered = BungieApi.get_node_data(jsondata, 79180995, "Раскол");
+	data.seals.dredgen = BungieApi.get_node_data(jsondata, 3665267419, "Дреджен");
+	data.seals.conqueror = BungieApi.get_any_of_data(characterPresentationNodes, [3212358005, 1376640684], "Завоеватель");
+	data.crucible.glory2100 = BungieApi.get_character_progression_data(characterProgressions, 2000925172, 2100, "Ранкед");
+	data.crucible.glory3500 = BungieApi.get_character_progression_data(characterProgressions, 2000925172, 3500, "Ранкед");
+	data.crucible.glory5450 = BungieApi.get_character_progression_data(characterProgressions, 2000925172, 5450, "Ранкед");
+	data.crucible.flawless = BungieApi.get_any_of_data(characterPresentationNodes, [3251218484, 2086100423, 1276693937], "Безупречный");
+	data.legacy_seals.lore = BungieApi.get_character_node_data(characterPresentationNodes, 3680676656, "Летописец");
+	data.legacy_seals.blacksmith = BungieApi.get_character_node_data(characterPresentationNodes, 450166688, "Кузнец");
+	data.legacy_seals.reconeer = BungieApi.get_character_node_data(characterPresentationNodes, 2978379966, "Вершитель");
+	data.legacy_seals.shadow = BungieApi.get_character_node_data(characterPresentationNodes, 717225803, "Тень");
+	data.legacy_triumphs.t80k = BungieApi.get_profile_records(jsondata, "legacyScore", 80000, "");
+	data.legacy_triumphs.t100k = BungieApi.get_profile_records(jsondata, "legacyScore", 100000, "");
+	data.legacy_triumphs.t120k = BungieApi.get_profile_records(jsondata, "legacyScore", 120000, "");
+	data.season.seal = BungieApi.get_character_node_data(characterPresentationNodes, 1321008463, "Смотритель");
+	data.season.triumphs = BungieApi.get_season_triumphs(jsondata, characterPresentationNodes, 2255100699, 
 		[91071118,1951157616,4186991151,3518211070,975308347,25634498], "Триумфы");
-	data.extra.poi = get_poi(jsondata);
-	data.extra.solo = get_all_nodes(jsondata, [3841336511, 3899996566]);
-	data.extra.soloflawless = get_all_nodes(jsondata, [3950599483, 3205009787]);
+	data.extra.poi = BungieApi.get_poi(jsondata);
+	data.extra.solo = BungieApi.get_all_nodes(jsondata, [3841336511, 3899996566]);
+	data.extra.soloflawless = BungieApi.get_all_nodes(jsondata, [3950599483, 3205009787]);
 	
 	return {charactersLight: charactersLight, medals: data};
 }
-
 function SetRoles(discord_member, charactersLight, medals, clanid, displayName){
 	LogRolesGranting(displayName, discord_member != null, medals);
 	try{
@@ -319,11 +331,11 @@ function LogRolesGranting(displayName, isDiscordMemberFound, medals){
 function checkAndProcessRole(discord_member, role, medal, medalNext, title){
 	if(discord_member.roles.find(r => r.position == role.position) == null){
 		if(medal == true && medalNext == false){
-			discord_member.addRole(role);
+			discord_member.roles.add(role);
 		}
 	}else{
 		if(medal == false || medalNext == true) {
-			discord_member.removeRole(role);
+			discord_member.roles.remove(role);
 		}
 	}
 }
@@ -350,6 +362,7 @@ function sumSubcategory(subcategory){
 	return sum;
 }
 function sumCrucible(discord_member){
+	if (discord_member == null) return 0;
 	var pvp_top_role = discord_member.guild.roles.find(role => role.id == 646150826791796739);
 	return  (discord_member.roles.find(role => role.position == (pvp_top_role.position - 0)) != null ? 3 : 0) + 
 			(discord_member.roles.find(role => role.position == (pvp_top_role.position - 1)) != null ? 1 : 0) + 
@@ -403,157 +416,5 @@ function form_line(data){
 		return (data.state ? "🔶 " : "🔷 ") + data.text;
 	}catch{
 		return "🔷 not defined";
-	}
-}
-
-function get_node_data(jsondata, recordHash, textprefix){
-	try{
-		return{
-			state: 
-				jsondata.Response.profilePresentationNodes.data.nodes[recordHash].progressValue >= 
-				jsondata.Response.profilePresentationNodes.data.nodes[recordHash].completionValue,
-			text:
-				textprefix + ": " + 
-				jsondata.Response.profilePresentationNodes.data.nodes[recordHash].progressValue + "/" +
-				jsondata.Response.profilePresentationNodes.data.nodes[recordHash].completionValue
-		}
-	}catch(e){	
-		console.log('Error ' + e.name + ":" + e.message + "\n" + e.stack);
-		return{
-			state: false,
-			text: textprefix + ": not defined"
-		}
-	}
-}
-function get_character_node_data(characterPresentationNodes, recordHash, textprefix){
-	try{
-		return{
-			state: 
-				characterPresentationNodes[0][1].nodes[recordHash].progressValue >= 
-				characterPresentationNodes[0][1].nodes[recordHash].completionValue,
-			text:
-				textprefix + ": " + 
-				characterPresentationNodes[0][1].nodes[recordHash].progressValue + "/" +
-				characterPresentationNodes[0][1].nodes[recordHash].completionValue
-		}
-	}catch(e){	
-		console.log('Error ' + e.name + ":" + e.message + "\n" + e.stack);
-		return{
-			state: false,
-			text: textprefix + ": not defined"
-		}
-	}
-}
-function get_character_progression_data(characterProgressions, recordHash, neededValue, textprefix){
-	try{
-		return{
-			state: 
-				characterProgressions[0][1].progressions[recordHash].currentProgress >= neededValue,
-			text:
-				(textprefix == "" ? "" : textprefix + ": " ) + 
-				characterProgressions[0][1].progressions[recordHash].currentProgress + "/" + neededValue
-		}
-	}catch(e){	
-		console.log('Error ' + e.name + ":" + e.message + "\n" + e.stack);
-		return{
-			state: false,
-			text: textprefix + ": not defined"
-		}
-	}
-}
-function get_any_of_data(characterPresentationNodes, recordHashArray, textprefix){
-	var data;
-	for (recordHash of recordHashArray){
-		data = get_character_node_data(characterPresentationNodes, recordHash, textprefix);
-		if (data.state) return data;
-	}
-	return data;
-}
-function get_profile_records(jsondata, dataname, neededValue, textprefix){
-	try{
-		return{
-			state: 
-				jsondata.Response.profileRecords.data[dataname] >= neededValue,
-			text:
-				(textprefix == "" ? "" : textprefix + ": " ) + 
-				jsondata.Response.profileRecords.data[dataname] + "/" + (neededValue/1000) + "k"
-		}
-	}catch(e){	
-		console.log('Error ' + e.name + ":" + e.message + "\n" + e.stack);
-		return{
-			state: false,
-			text: textprefix + ": not defined"
-		}
-	}
-}
-function get_season_triumphs(jsondata, characterPresentationNodes, nodeHash, ignoredRecordHashArray, textprefix){
-	try{
-		var ignored = 0;
-		for (ignoredRecordHash of ignoredRecordHashArray){
-			ignored = ignored + ((jsondata.Response.profileRecords.data.records[ignoredRecordHash].state == 67) ? 0 : 1);
-		}
-		return{
-			state: 
-				characterPresentationNodes[0][1].nodes[nodeHash].currentProgress == 
-				characterPresentationNodes[0][1].nodes[nodeHash].completionValue - ignored
-				&& characterPresentationNodes[0][1].nodes[nodeHash].completionValue > 0,
-			text:
-				(textprefix == "" ? "" : textprefix + ": " ) + 
-				characterPresentationNodes[0][1].nodes[nodeHash].progressValue + "/" + 
-				(characterPresentationNodes[0][1].nodes[nodeHash].completionValue - ignored)
-		}
-	}catch(e){	
-		console.log('Error ' + e.name + ":" + e.message + "\n" + e.stack);
-		return{
-			state: false,
-			text: textprefix + ": not defined"
-		}
-	}
-}
-function get_day_one(jsondata, characterCollectibles){
-	try{
-		return{
-			state: 
-				jsondata.Response.profileCollectibles.data.collectibles[2273453972].state%2 != 1 &&
-				characterCollectibles[0][1].collectibles[3938759711].state%2 != 1 &&
-				jsondata.Response.profileCollectibles.data.collectibles[3171386140].state%2 != 1 &&
-				jsondata.Response.profileCollectibles.data.collectibles[1171206947].state%2 != 1,
-			text: "Day1: " +
-				(jsondata.Response.profileCollectibles.data.collectibles[2273453972].state%2 != 1 ? "СГК " : "") + 
-				(characterCollectibles[0][1].collectibles[3938759711].state%2 != 1 ? "СС " : "") + 
-				(jsondata.Response.profileCollectibles.data.collectibles[3171386140].state%2 != 1 ? "КС " : "") + 
-				(jsondata.Response.profileCollectibles.data.collectibles[1171206947].state%2 != 1 ? "ПЖ " : "")
-		}
-	}catch(e){	
-		console.log('Error ' + e.name + ":" + e.message + "\n" + e.stack);
-		return{
-			state: false,
-			text: "Day1: not defined"
-		}
-	}
-}
-function get_all_nodes(jsondata, recordHashArray, textprefix){
-	var counter = 0;
-	for (recordHash of recordHashArray){
-		counter = counter + (jsondata.Response.profileRecords.data.records[recordHash].state == 67 ? 1 : 0);
-	}
-	return {
-		state: 
-			counter == recordHashArray.length,
-		text: textprefix + ": " + counter + "/" + recordHashArray.length
-	};
-}
-function get_poi(jsondata){
-	try{
-		return{
-			state: 
-				((jsondata.Response.profileRecords.data.records[3448775736].state == 67 ? 1 : 0) + 
-				(jsondata.Response.profileRecords.data.records[3804486505].state == 67 ? 1 : 0) + 
-				(jsondata.Response.profileRecords.data.records[3185876102].state == 67 ? 1 : 0)) < 3,
-			text: ""
-		}
-	}catch(e){	
-		console.log('Error ' + e.name + ":" + e.message + "\n" + e.stack);
-		return{	state: false, text: ""	}
 	}
 }
