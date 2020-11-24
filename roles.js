@@ -177,37 +177,6 @@ export function RolesByMembershipId(channel, membership){
 	SetRoles(discordMember, rolesData.charactersLight, rolesData.medals, clanid, profileData.displayName);
 }
 
-function SendRolesMessage(channel, discordMember, profileData, rolesData){
-	if(discordMember == null) {
-		channel.send('Дискорд профиль не найден.');
-	}
-	if(rolesData == null) {
-		channel.send('Игровой профиль не найден.');
-	}else if(rolesData.medals == null) {
-		channel.send('Данные профиля не были получены. Вероятно профиль закрыт настройками приватности.\n'+
-					 'Настройки приватности: https://www.bungie.net/ru/Profile/Settings/?category=Privacy');
-	}else{
-		const embed = new Discord.MessageEmbed()
-			.setAuthor(profileData.userInfo.displayName + " 💠" + sumMedals(discordMember, rolesData.medals) + "💠")
-			.setColor(0x00AE86)
-			.setFooter("ПВП медали выдают гм-ы; ранжирование ролей: 7/16/24 • id: "+discordId, "https://cdn.discordapp.com/avatars/543342030768832524/7da47eaca948d9874b66fc5884ca2d00.png")
-			.addField("Рейды",    			form_field(rolesData.medals.raids), true)
-			.addField("Печати",   			form_field(rolesData.medals.seals), true)
-			.addField("Наследные печати", 	form_field(rolesData.medals.legacy_seals), true)
-			.addField("Планеты",  			form_field(rolesData.medals.locations), true)
-			.addField("Триумфы",  			form_field(rolesData.medals.triumphs), true)
-			.addField("Наследные триумфы", 	form_field(rolesData.medals.legacy_triumphs), true)
-			.addField("Горнило",  			form_field(rolesData.medals.crucible), true)
-			.addField("Сезон 12",			form_field(rolesData.medals.season), true)
-			.addField('\u200B', '\u200B', true)
-	        .addField("Ссылки", "[Raid Report](https://raid.report/pc/"+profileData.userInfo.membershipId+")"
-							+" | [Braytech](https://beta.braytech.org/"+profileData.userInfo.membershipType+"/"+profileData.userInfo.membershipId+"/"+profileData.characterIds[0]+"/)"
-							+" | [D2 Checklist](https://www.d2checklist.com/"+profileData.userInfo.membershipType+"/"+profileData.userInfo.membershipId+"/triumphs)"
-							+" | [Destiny Tracker](https://destinytracker.com/destiny-2/profile/steam/"+profileData.userInfo.membershipId+"/overview)")
-		channel.send({embed});
-	}
-}
-
 function GetRolesData(membershipType, membershipId) {
 	var jsondata = clan.getFullMemberData(membershipType, membershipId);
 	if(typeof(jsondata.Response.profileRecords.data) == 'undefined') return null;
@@ -276,46 +245,76 @@ function SetRoles(discord_member, charactersLight, medals, clanid, displayName){
 	LogRolesGranting(displayName, discord_member != null, medals);
 	try{
 		if(discord_member == null) return;
-		var roles = get_roles_definition(discord_member.guild);
 		 
-		checkAndProcessRole(discord_member, roles.clan, true, false, "set clan header");
-		checkAndProcessRole(discord_member, roles.penumbra, clanid == "3055823", false, "process penumbra");
-		checkAndProcessRole(discord_member, roles.antumbra, clanid == "3858144", false, "process antumbra");
-		checkAndProcessRole(discord_member, roles.characters, true, false, "set characters header");
-		checkAndProcessRole(discord_member, roles.warlock, charactersLight.warlock >= minlight, false, "process warlock");
-		checkAndProcessRole(discord_member, roles.hunter, charactersLight.hunter >= minlight, false, "process hunter");
-		checkAndProcessRole(discord_member, roles.titan, charactersLight.titan >= minlight, false, "process titan");
-		checkAndProcessRole(discord_member, roles.medals, true, false, "set medals header");
-		checkAndProcessRole(discord_member, roles.footer, true, false, "set footer");
+		checkAndProcessRole(discord_member, config.roles.separators.clanname, true, false);
+		checkAndProcessRole(discord_member, config.roles.clans[0], clanid == config.clans[0].id, false);
+		checkAndProcessRole(discord_member, config.roles.clans[1], clanid == config.clans[1].id, false);
+		checkAndProcessRole(discord_member, config.roles.separators.characters, true, false);
+		checkAndProcessRole(discord_member, config.roles.characters.warlock, charactersLight.warlock >= config.minimal_light, false);
+		checkAndProcessRole(discord_member, config.roles.characters.hunter, charactersLight.hunter >= config.minimal_light, false);
+		checkAndProcessRole(discord_member, config.roles.characters.titan, charactersLight.titan >= config.minimal_light, false);
+		checkAndProcessRole(discord_member, config.roles.separators.medals, true, false);
+		checkAndProcessRole(discord_member, config.roles.separators.footer, true, false);
 		
-		if (discord_member.roles.find(role => role.name.includes("frozen")) != null) return;
+		if (discord_member.roles.find(role => role.id == config.roles.no_medals) != null) return;
 		if (medals == null) return;
 
-		checkAndProcessRole(discord_member, roles.day1, medals.raids.day1.state, false, "day 1");
-		checkAndProcessRoleBlock(discord_member, roles.top_raids, 3, medals.raids);
-		checkAndProcessRoleBlock(discord_member, roles.top_seals, 5, medals.seals);
-		checkAndProcessRoleBlock(discord_member, roles.top_legacy_seals, 4, medals.legacy_seals);
-		checkAndProcessRoleBlock(discord_member, roles.top_locations, 3, medals.locations);
-		checkAndProcessRoleBlock(discord_member, roles.top_triumphs, 3, medals.triumphs);
-		checkAndProcessRoleBlock(discord_member, roles.top_legacy_triumphs, 3, medals.legacy_triumphs);
-		checkAndProcessRoleBlock(discord_member, roles.top_season, 2, medals.season);
-		checkAndProcessRole(discord_member, roles.solo, medals.extra.solo.state, medals.extra.soloflawless.state, "solo");
-		checkAndProcessRole(discord_member, roles.soloflawless, medals.extra.soloflawless.state, false, "soloflawless");
-		checkAndProcessRole(discord_member, roles.poi, medals.extra.poi.state, false, "process poi");
+		checkAndProcessRole(discord_member, config.roles.medals.specific.day1, medals.raids.day1.state, false);
+		checkAndProcessRole(discord_member, config.roles.medals.specific.solo, medals.extra.solo.state, medals.extra.soloflawless.state);
+		checkAndProcessRole(discord_member, config.roles.medals.specific.soloflawless, medals.extra.soloflawless.state, false);
+		checkAndProcessRole(discord_member, config.roles.medals.specific.poi, medals.extra.poi.state, false);
 
-		if (discord_member.roles.find(role => role.name.includes("Келл")) != null) return;
-		if (discord_member.roles.find(role => role.name.includes("Инквизиция")) != null) return;
-		if (discord_member.roles.find(role => role.name.includes("Returned")) != null) return;
-		if (discord_member.roles.find(role => role.name.includes("Страж")) != null) return;
-		if (discord_member.roles.find(role => role.name.includes("Незнакомец")) != null) return;
+		checkAndProcessRoleBlock(discord_member, config.roles.medals.category_first_role.raids, 4, medals.raids);
+		checkAndProcessRoleBlock(discord_member, config.roles.medals.category_first_role.seals, 5, medals.seals);
+		checkAndProcessRoleBlock(discord_member, config.roles.medals.category_first_role.legacy_seals, 4, medals.legacy_seals);
+		checkAndProcessRoleBlock(discord_member, config.roles.medals.category_first_role.locations, 3, medals.locations);
+		checkAndProcessRoleBlock(discord_member, config.roles.medals.category_first_role.triumphs, 3, medals.triumphs);
+		checkAndProcessRoleBlock(discord_member, config.roles.medals.category_first_role.legacy_triumphs, 3, medals.legacy_triumphs);
+		checkAndProcessRoleBlock(discord_member, config.roles.medals.category_first_role.season, 2, medals.season);
+		
+		if (discord_member.roles.find(role => role.id == config.roles.guildleader) != null) return;
+		if (discord_member.roles.find(role => role.id == config.roles.guildmaster) != null) return;
+		if (discord_member.roles.find(role => role.id == config.roles.afk) != null) return;
+		if (discord_member.roles.find(role => role.id == config.roles.newbie) != null) return;
+		if (discord_member.roles.find(role => role.id == config.roles.guest) != null) return;
 
 		var sum = sumMedals(discord_member, medals);
-		checkAndProcessRole	(discord_member, roles.role_t2, sum >=0, sum > 6, "Страж");
-		checkAndProcessRole	(discord_member, roles.role_t3, sum > 6, sum > 15, "Опытный");
-		checkAndProcessRole	(discord_member, roles.role_t4, sum > 15, sum > 23, "Ветеран");
-		checkAndProcessRole	(discord_member, roles.role_t5, sum > 23, false, "Легенда");
+		checkAndProcessRole	(discord_member, config.roles.guardians[0], sum >=  0, sum >=  7);
+		checkAndProcessRole	(discord_member, config.roles.guardians[1], sum >=  7, sum >= 16);
+		checkAndProcessRole	(discord_member, config.roles.guardians[2], sum >= 16, sum >= 24);
+		checkAndProcessRole	(discord_member, config.roles.guardians[3], sum >= 24, false);
 	}catch(e){
-		console.log(displayName + ' Ошибка ' + e.name + ":" + e.message + "\n<@149245139389251584> \n" + e.stack);
+		require('./catcherror').catcherror(e, discord_member.client);
+	}
+}
+function SendRolesMessage(channel, discordMember, profileData, rolesData){
+	if(discordMember == null) {
+		channel.send('Дискорд профиль не найден.');
+	}
+	if(rolesData == null) {
+		channel.send('Игровой профиль не найден.');
+	}else if(rolesData.medals == null) {
+		channel.send('Данные профиля не были получены. Вероятно профиль закрыт настройками приватности.\n'+
+					 'Настройки приватности: https://www.bungie.net/ru/Profile/Settings/?category=Privacy');
+	}else{
+		const embed = new Discord.MessageEmbed()
+			.setAuthor(profileData.userInfo.displayName + " 💠" + sumMedals(discordMember, rolesData.medals) + "💠")
+			.setColor(0x00AE86)
+			.setFooter("ПВП медали выдают гм-ы; ранжирование ролей: 7/16/24 • id: "+discordId, "https://cdn.discordapp.com/avatars/543342030768832524/7da47eaca948d9874b66fc5884ca2d00.png")
+			.addField("Рейды",    			form_field(rolesData.medals.raids), true)
+			.addField("Печати",   			form_field(rolesData.medals.seals), true)
+			.addField("Наследные печати", 	form_field(rolesData.medals.legacy_seals), true)
+			.addField("Планеты",  			form_field(rolesData.medals.locations), true)
+			.addField("Триумфы",  			form_field(rolesData.medals.triumphs), true)
+			.addField("Наследные триумфы", 	form_field(rolesData.medals.legacy_triumphs), true)
+			.addField("Горнило",  			form_field(rolesData.medals.crucible), true)
+			.addField("Сезон 12",			form_field(rolesData.medals.season), true)
+			.addField('\u200B', '\u200B', true)
+	        .addField("Ссылки", "[Raid Report](https://raid.report/pc/"+profileData.userInfo.membershipId+")"
+							+" | [Braytech](https://beta.braytech.org/"+profileData.userInfo.membershipType+"/"+profileData.userInfo.membershipId+"/"+profileData.characterIds[0]+"/)"
+							+" | [D2 Checklist](https://www.d2checklist.com/"+profileData.userInfo.membershipType+"/"+profileData.userInfo.membershipId+"/triumphs)"
+							+" | [Destiny Tracker](https://destinytracker.com/destiny-2/profile/steam/"+profileData.userInfo.membershipId+"/overview)")
+		channel.send({embed});
 	}
 }
 function LogRolesGranting(displayName, isDiscordMemberFound, medals){
@@ -328,7 +327,9 @@ function LogRolesGranting(displayName, isDiscordMemberFound, medals){
 	}
 }
 
-function checkAndProcessRole(discord_member, role, medal, medalNext, title){
+function checkAndProcessRole(discord_member, roleId, medal, medalNext, role){
+	if (role == null) role = discord_member.guild.roles.find(r => r.id == roleId);
+	if (role == null) return;
 	if(discord_member.roles.find(r => r.position == role.position) == null){
 		if(medal == true && medalNext == false){
 			discord_member.roles.add(role);
@@ -339,14 +340,19 @@ function checkAndProcessRole(discord_member, role, medal, medalNext, title){
 		}
 	}
 }
-function checkAndProcessRoleBlock(discord_member, role, block_size, data){
+function checkAndProcessRoleBlock(discord_member, firstRoleId, blockSize, data){
+	var role = discord_member.guild.roles.find(r => r.id == firstRoleId);
+	if (role == null) return;
+
 	var i = 0;
 	var sum = sumSubcategory(data);
-	while (i < block_size) {
-		checkAndProcessRole(discord_member, discord_member.guild.roles.find(r => r.position == (role.position - i)), sum > i, sum > i+1, "");
+	while (i < blockSize) {
+		var nextRole = discord_member.guild.roles.find(r => r.position == (role.position - i));
+		checkAndProcessRole(discord_member, null, sum > i, sum > i+1, nextRole);
 		i++;
 	}
 };
+
 function sumMedals(discord_member, medals){
 	var sum = 0;
 	for (subcategoryName of Object.keys(medals)) {
@@ -371,37 +377,6 @@ function sumCrucible(discord_member){
 			(discord_member.roles.find(role => role.position == (pvp_top_role.position - 4)) != null ? 2 : 0) + 
 			(discord_member.roles.find(role => role.position == (pvp_top_role.position - 5)) != null ? 3 : 0) +  
 			(discord_member.roles.find(role => role.position == (pvp_top_role.position - 6)) != null ? 4 : 0);
-}
-function get_roles_definition(guild){
-	return {
-		role_t1: guild.roles.find(role => role.id == 471046830700888075),
-		role_t2: guild.roles.find(role => role.id == 471048548318969888),
-		role_t3: guild.roles.find(role => role.id == 471046764800114689),
-		role_t4: guild.roles.find(role => role.id == 471043840485097473),
-		role_t5: guild.roles.find(role => role.id == 572776313794854940),
-		clan: guild.roles.find(role => role.id == 618949527851761674),
-		penumbra: guild.roles.find(role => role.id == 618949692935372841),
-		antumbra: guild.roles.find(role => role.id == 618949694953095169),
-		characters: guild.roles.find(role => role.id == 581016395140300820),
-		warlock: guild.roles.find(role => role.id == 581016530322587650),
-		hunter: guild.roles.find(role => role.id == 581016534751641601),
-		titan: guild.roles.find(role => role.id == 581016532499300353),
-		medals: guild.roles.find(role => role.id == 572759260023226379),
-		footer: guild.roles.find(role => role.id == 572759337836216330),
-		poi: guild.roles.find(role => role.id == 604763831620861992),
-
-		day1: guild.roles.find(role => role.id == 632110262153117706),
-		solo: guild.roles.find(role => role.id == 577473336611700756),
-		soloflawless: guild.roles.find(role => role.id == 632110696099872768),
-		
-		top_raids: guild.roles.find(role => role.id == 572759650928164875),
-		top_seals: guild.roles.find(role => role.id == 636579093214658563),
-		top_legacy_seals: guild.roles.find(role => role.id == 577473317997379584),
-		top_locations: guild.roles.find(role => role.id == 646150830533378111),
-		top_triumphs: guild.roles.find(role => role.id == 646153691811807240),
-		top_legacy_triumphs: guild.roles.find(role => role.id == 572759694607908894),
-		top_season: guild.roles.find(role => role.id == 572759686919618561)
-	}
 }
 
 function form_field(data){

@@ -13,8 +13,8 @@ function getFullMemberData(membershipType, membershipId){
 
 function getAllMembers(){
 	var members = [];
-	Array.prototype.push.apply(members, getClanMembers(config.clan1));
-	Array.prototype.push.apply(members, getClanMembers(config.clan2));
+	Array.prototype.push.apply(members, getClanMembers(config.clans.clan1));
+	Array.prototype.push.apply(members, getClanMembers(config.clans.clan2));
 	return members;
 }
 
