@@ -1,7 +1,6 @@
-const Discord = require("discord.js");
-const config = require("./config.json");
+import config from "./config.json";
 
-exports.main = function (reaction, user) {
+export function MessageReactionRemove(reaction, user) {
 	if(reaction.message.channel.type == "text" && reaction.message.member.user.id == config.users.bot){
 		console.log(`${user.username} removed reaction.`);
 		var member = reaction.message.member.guild.members.find(mmbr => mmbr.user.id === user.id);

@@ -1,14 +1,16 @@
-const config = require("./config.json");
+import Discord from "discord.js";
+import config from "./config.json";
+import { CatchError } from "./catcherror.js";
 
 const publicCommands = ['сбор','mymt','cap','invitefriend','medals','region','roles', 'rl','triumph','triumphs','horohelp','help'];
 const adminCommands =  ['testreset', 'xur','reset','membertime','copy','raidadd','raidkick', 'size','ck','clankick','ckp','clankickpub', 'csr','nicknames','q','qq',
 						'n','gmhelp','pvpdrop', 'pmspam', 'forum', 'forumtime', 'setmaxtriumphs', 'watermelon', 'message', 'sync', 'checksync'];
-const developerCommands = ['oauth2','code'];
+const developerCommands = ['oauth2','code','status'];
 const notLimitedCommands = ['ping','rand','clown'];
 
-exports.main = (message) => {
+export function Message(message){
 	try {
-		if (message.content.StartsWith("!")) {
+		if (!message.author.bot && message.content.startsWith("!")) {
 			console.log(new Date(), (message.member != null ? message.member.displayName : message.author.username), message.content);
 			var args = message.content.replace('  ', ' ').replace('  ', ' ').substring(1).split(' ');
 
@@ -44,7 +46,7 @@ exports.main = (message) => {
 			channel_sandbox.send("**" + message.author.username + "** написал в ЛС:\n" + message.content);
 		}
 	} catch (e) {
-		require('./catcherror').catcherror(e);
+		CatchError(e, message.client);
 	}
 };
 

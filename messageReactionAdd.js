@@ -1,7 +1,6 @@
-const Discord = require("discord.js");
-const config = require("./config.json");
+import config from "./config.json";
 
-exports.main = function (reaction, user) {
+export function MessageReactionAdd(reaction, user) {
 	console.log(user.username + " set reaction.");
 	
 	if(reaction.message.member.user.id == config.users.boss){

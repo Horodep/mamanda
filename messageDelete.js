@@ -1,7 +1,6 @@
-const Discord = require("discord.js");
-const config = require("./config.json");
+import config from "./config.json";
 
-exports.main = function(message) {
+export function MessageDelete(message) {
 	console.log("messageDeleted");
 	try{
 		client = message.client;
