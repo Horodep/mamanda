@@ -27,7 +27,7 @@ function NewMember(member){
 	console.log("NEW MEMBER " + member.displayName);
 }
 
-function RawEvent(event){
+async function RawEvent(event){
 	try {
 		if (!events.hasOwnProperty(event.t)) return;
 
