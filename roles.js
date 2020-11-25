@@ -178,7 +178,7 @@ export function RolesByMembershipId(channel, membership){
 }
 
 function GetRolesData(membershipType, membershipId) {
-	var jsondata = clan.getFullMemberData(membershipType, membershipId);
+	var jsondata = BungieApi.GetFullMemberData(membershipType, membershipId);
 	if(typeof(jsondata.Response.profileRecords.data) == 'undefined') return null;
 	
 	var data = {
