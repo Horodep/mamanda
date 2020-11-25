@@ -1,34 +1,35 @@
-const Discord = require("discord.js");
+import { MessageEmbed } from "discord.js";
+import config from "./config.json";
 
-exports.inviteFriend = (message) => {
-	var topRole = message.member.highestRole.position;
-	var minRole = message.guild.roles.find(role => role.name === "Опытный Страж").position;
+export function InviteFriend(message, discordMention) {
+	var topRole = message.member.roles.highest.position;
+	var minRole = message.guild.roles.cache.find(role => role.id == config.roles.guardians[1]).position;
 	
 	if(minRole <= topRole){
-		var d_member = message.guild.members.find(member => member.user.id == (args[1].replace(/\D/g,'')));
+		var discordId = discordMention.replace(/\D/g,'')
+		var discordMember = message.guild.members.cache.find(member => member.user.id == discordId);
 		
-		if (d_member == null){
+		if (discordMember == null){
 			message.channel.send('Страж не найден.');
-		}else{
-			if((d_member.roles.find(role => role.name === "Очередь") && d_member.roles.size === 2)
-																	 || d_member.roles.size === 1){
-				var role_old = message.guild.roles.find(role => role.name === "Очередь");
-				var role_new = message.guild.roles.find(role => role.name === "Путник");
-				d_member.addRole(role_new);
-				d_member.removeRole(role_old);
-				message.channel.send('Стражу ' + d_member.displayName + ' приоткрыли двери.');
-			}else{
-				message.channel.send('Страж уже часть клана.');
-			}
+			return;
+		}
+		
+		if(discordMember.roles.cache.find(role => role.id == config.roles.queue)){
+			var role_old = message.guild.roles.cache.find(role => role.id == config.roles.queue);
+			var role_new = message.guild.roles.cache.find(role => role.id == config.roles.guest);
+			discordMember.roles.add(role_new);
+			discordMember.roles.remove(role_old);
+
+			message.channel.send(`Стража <@${discordId}> пустили на сервер.`);
 		}
 	}else{
 		message.channel.send('У вас нет прав на это действие.');
 	};
 }
 
-exports.changeRegion = (message) => {
-    var topRole = message.member.highestRole.position;
-	var minRole = message.guild.roles.find(role => role.name === "Guardian is down").position;
+export function ChangeRegion(message) {
+    var topRole = message.member.roles.highest.position;
+	var minRole = message.guild.roles.cache.find(role => role.id == config.roles.afk).position;
 	
 	if(minRole <= topRole){
 		if(message.guild.region == "russia"){
@@ -39,34 +40,28 @@ exports.changeRegion = (message) => {
 			message.channel.send('Регион дискорда сменен на Россию');
 		}
 	}else{
-		message.channel.send('У вас нет прав на это действие. (' + topRole + ' ' + minRole + ')');
+		message.channel.send('У вас нет прав на это действие.');
 	};
 }
 
-exports.changeChannelCap = (message) => {
-    if (message.member.voiceChannel == null){
-        message.channel.send('Вы не в голосовом канале.');
-    }else if( message.member.voiceChannel.id == "568319252558512129" ||
-        message.member.voiceChannel.id == "568319320657231909" ||
-        message.member.voiceChannel.id == "601927549198794755" ||
-        message.member.voiceChannel.id == "639170376366030888" ||
-        message.member.voiceChannel.id == "568319415532126219" ||
-        message.member.voiceChannel.id == "568319461225136129" ||
-        message.member.voiceChannel.id == "601927666173607937" ||
-        message.member.voiceChannel.id == "631893130387521541" ||
-        message.member.voiceChannel.id == "631893153502461992"){
-        message.channel.send('Вы не можете изменить размер данной комнаты.');
-    }else{
-        try{
-			message.member.voiceChannel.setUserLimit(args.length > 1 ? args[1] : 0);
-	    }catch{
-	    	message.channel.send('Введено некорректное значение.');
-      }
+export function ChangeChannelCap(message, limit) {
+    if (message.member.voice.channel == null){
+		message.channel.send('Вы не в голосовом канале.');
+		return;
+	}
+	if( config.channels.limited.includes(message.member.voice.channel.id)){
+		message.channel.send('Вы не можете изменить размер данной комнаты.');
+		return;
+	}
+	try{
+		message.member.voice.channel.setUserLimit(limit);
+	}catch{
+		message.channel.send('Введено некорректное значение.');
     }
 }
 
-exports.showHelp = (message) => {
-    embed = new Discord.RichEmbed()
+export function showHelp(message) {
+    embed = new MessageEmbed()
 		  .setAuthor("Horobot :: Список доступных команд:")
 		  .setColor(0x00AE86)
 		  .setThumbnail('https://images-ext-1.discordapp.net/external/veZptUu_KDKmwtUJX5QT3QxESYCaRp4_k0XUwEQxubo/https/i.imgur.com/e9DIB8e.png')
@@ -87,8 +82,8 @@ exports.showHelp = (message) => {
 	message.channel.send({embed});
 }
 
-exports.showGmHelp = (message) => {
-    embed = new Discord.RichEmbed()
+export function showGmHelp(message) {
+    embed = new MessageEmbed()
         .setAuthor("Horobot :: Список ГМских команд:")
         .setColor(0x00AE86)
         .setThumbnail('https://images-ext-1.discordapp.net/external/veZptUu_KDKmwtUJX5QT3QxESYCaRp4_k0XUwEQxubo/https/i.imgur.com/e9DIB8e.png')

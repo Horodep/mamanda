@@ -1,6 +1,8 @@
 import Discord from "discord.js";
 import config from "./config.json";
 import { CatchError } from "./catcherror.js";
+import { InviteFriend, ChangeChannelCap, ChangeRegion } from "./discordFeatures.js"
+import {} from "./roles.js"
 
 const publicCommands = ['сбор','mymt','cap','invitefriend','medals','region','roles', 'rl','triumph','triumphs','horohelp','help'];
 const adminCommands =  ['testreset', 'xur','reset','membertime','copy','raidadd','raidkick', 'size','ck','clankick','ckp','clankickpub', 'csr','nicknames','q','qq',
@@ -25,15 +27,7 @@ export function Message(message){
 					switch (args[0]) {
 						case 'oauth2': message.channel.send(`https://www.bungie.net/ru/OAuth/Authorize?response_type=code&client_id=${config.d2clientId}&state=12345`); break;
 						case 'code': reset.newToken(message, args[1]); break;
-						case 'status': 
-							const embed = new Discord.MessageEmbed()
-								.setAuthor("Статус")
-								.setColor(0x00AE86)
-								.setFooter("That was a h̶a̶n̶d̶o̶u̶t̶ hangover.")
-								.addField("Public",":yes: asfdas\n:no:dsafsf", true)
-								.addField("Guildmaster",":reload: sadfas", true)
-							message.channel.send({embed});
-							break;
+						case 'status': ShowStatus(message.channel); break;
 					}
 				}
 			} else if (publicCommands.includes(args[0])) {
@@ -50,7 +44,56 @@ export function Message(message){
 	}
 };
 
+function ShowStatus(channel){
+	//<:yes:769922757592612874>
+	//<:no:769922772549632031>
+	//<:reload:781107772224962561>
+	const embed = new Discord.MessageEmbed()
+		.setAuthor("Статус")
+		.setColor(0x00AE86)
+		.setFooter("That was a h̶a̶n̶d̶o̶u̶t̶  hangover.")
+		.addField("Public", "<:yes:769922757592612874> cap\n"+
+							"<:reload:781107772224962561> help\n"+
+							"<:reload:781107772224962561> horohelp\n"+
+							"<:yes:769922757592612874> invitefriend\n"+
+							"<:reload:781107772224962561> medals\n"+
+							"<:reload:781107772224962561> mymt\n"+
+							"<:yes:769922757592612874> region\n"+
+							"<:reload:781107772224962561> rl\n"+
+							"<:reload:781107772224962561> roles\n"+
+							"<:reload:781107772224962561> triumph\n"+
+							"<:reload:781107772224962561> triumphs\n"+
+							"<:reload:781107772224962561> сбор", true)
+		.addField("Guildmaster","<:reload:781107772224962561> checksync\n"+
+								"<:reload:781107772224962561> ck clankick\n"+
+								"<:reload:781107772224962561> ckp clankickpub\n"+
+								"<:reload:781107772224962561> copy\n"+
+								"<:reload:781107772224962561> csr\n"+
+								"<:reload:781107772224962561> forum\n"+
+								"<:reload:781107772224962561> forumtime\n"+
+								"<:reload:781107772224962561> gmhelp\n"+
+								"<:reload:781107772224962561> membertime\n"+
+								"<:reload:781107772224962561> message\n"+
+								"<:reload:781107772224962561> n\n"+
+								"<:reload:781107772224962561> nicknames\n"+
+								"<:reload:781107772224962561> pmspam", true)
+		.addField("Guildmaster","<:reload:781107772224962561> pvpdrop\n"+
+								"<:reload:781107772224962561> q\n"+
+								"<:reload:781107772224962561> qq\n"+
+								"<:reload:781107772224962561> raidadd\n"+
+								"<:reload:781107772224962561> raidkick\n"+
+								"<:reload:781107772224962561> reset\n"+
+								"<:reload:781107772224962561> setmaxtriumphs\n"+
+								"<:reload:781107772224962561> size\n"+
+								"<:reload:781107772224962561> sync\n"+
+								"<:reload:781107772224962561> testreset\n"+
+								"<:reload:781107772224962561> watermelon\n"+
+								"<:reload:781107772224962561> xur", true)
+	channel.send({embed});
+}
+
 function sendPublicCommand (message) {
+	var args = message.content.replace('  ', ' ').replace('  ', ' ').substring(1).split(' ');
 	if( message.channel.id == config.channels.statistics ||
 		message.channel.id == config.channels.admintext  ||
 		message.channel.id == config.channels.sandbox    ||
@@ -59,25 +102,25 @@ function sendPublicCommand (message) {
 		message.author.id  == config.user.boss
 		){
 		switch(args[0]) {
-			case 'сбор':		raid.create_raid(message, args);							break;
-			case 'mymt':		clantime.membertime(message, message.member.id, (args.length > 1 ? args[1] : 7), false);	break;
-			case 'cap':         cap(message);												break;
-			case 'medals':		medalstat.medals(message);									break;
-			case 'region':		region(message);											break;
-			case 'roles':		roles.roles_bytag(message.channel, args.length > 1 ? args[1] : message.member.id);	break;
-			case 'triumph':		seals.triumph(message, (args.length > 1 ? args[1] : 0));	break;
-			case 'triumphs':	triumphs.triumphs(message, (args.length > 1 ? 1 : null));	break;
-			case 'rl':			raidleader.rl(message.channel, (args.length > 1 ? args[1] : message.member.user.id), (args.length > 2 ? args[2] : 7));	break;
-			case 'invitefriend':invitefriend(message);										break;
-			case 'horohelp':	help(message);												break;
-			case 'help':		help(message);												break;
+			case 'cap':         	ChangeChannelCap(message, (args.length > 1 ? args[1] : 0)); break;
+			//case 'сбор':			raid.create_raid(message, args);							break;
+			//case 'mymt':			clantime.membertime(message, message.member.id, (args.length > 1 ? args[1] : 7), false);	break;
+			//case 'medals':		medalstat.medals(message);									break;
+			case 'region':			ChangeRegion(message); break;
+			//case 'roles':			roles.roles_bytag(message.channel, args.length > 1 ? args[1] : message.member.id);	break;
+			//case 'triumph':		seals.triumph(message, (args.length > 1 ? args[1] : 0));	break;
+			//case 'triumphs':		triumphs.triumphs(message, (args.length > 1 ? 1 : null));	break;
+			//case 'rl':			raidleader.rl(message.channel, (args.length > 1 ? args[1] : message.member.user.id), (args.length > 2 ? args[2] : 7));	break;
+			case 'invitefriend':	InviteFriend(message, (args.length > 1 ? args[1] : "")); break;
+			//case 'horohelp':		help(message);												break;
+			//case 'help':			help(message);												break;
 		}
 	}else{
 		var answers = [
-			'Омежка, Вы достаточно глупы, чтобы понять, что это не <#471032648811413514>.',
+			`Омежка, Вы достаточно глупы, чтобы понять, что это не <#${config.channels.statistics}>.`,
 			'Сам придумал или Бенедикт подсказал? Иди в другом канале пиши.',
-			'Пупсяш, не пиши мне здесь. Встретимся в канале <#471032648811413514>.',
-			'Ну ты выдал конечно. Иди в <#471032648811413514> лучше напиши.',
+			`Пупсяш, не пиши мне здесь. Встретимся в канале <#${config.channels.statistics}>.`,
+			`Ну ты выдал конечно. Иди в <#${config.channels.statistics}> лучше напиши.`,
 			'Не хочу здесь работать! И не проси.',
 			'Бросай курить, Илон Маск! Эта команда тут не работает!',
 			'Чей это плохой стражик опять пишет не в тот канал?',

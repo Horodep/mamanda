@@ -23,7 +23,8 @@ const events = {
 };
 
 function NewMember(member){
-	member.roles.add(member.guild.roles.cache.find(role => role.id == config.roles.queue));
+	var queueRole = member.guild.roles.cache.find(role => role.id == config.roles.queue);
+	member.roles.add(queueRole);
 	console.log("NEW MEMBER " + member.displayName);
 }
 
