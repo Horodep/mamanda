@@ -1,11 +1,11 @@
-import HttpCore from "./httpCore.json";
+import { httpRequest } from "./httpCore.js";
 
-function GetClanMembers(clanId){
-	return HttpCore.httpRequest(`https://www.bungie.net/Platform/GroupV2/${clanId}/Members/`);
+export function GetClanMembers(clanId){
+	return httpRequest(`https://www.bungie.net/Platform/GroupV2/${clanId}/Members/`);
 }
 
-function GetFullMemberData(membershipType, membershipId){
-	return HttpCore.httpRequest(`https://www.bungie.net/Platform/Destiny2/${membershipType}/Profile/${membershipId}/?components=Profiles,Characters,CharacterProgressions,PresentationNodes,Records,Collectibles`)
+export function GetFullMemberData(membershipType, membershipId){
+	return httpRequest(`https://www.bungie.net/Platform/Destiny2/${membershipType}/Profile/${membershipId}/?components=Profiles,Characters,CharacterProgressions,PresentationNodes,Records,Collectibles`)
 }
 
 export function get_character_light(jsondata){

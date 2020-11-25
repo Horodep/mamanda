@@ -23,6 +23,7 @@
     "ffmpeg-static": "^3.0.0",
     "opusscript": "0.0.6",
     "pg": "^8.4.2",
-    "utf-8-validate": "^5.0.2"
+    "utf-8-validate": "^5.0.2",
+    "xmlhttprequest": "^1.8.0"
   }
 }

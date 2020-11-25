@@ -2,7 +2,7 @@ import Discord from "discord.js";
 import config from "./config.json";
 import { CatchError } from "./catcherror.js";
 import { InviteFriend, ChangeChannelCap, ChangeRegion } from "./discordFeatures.js"
-import {} from "./roles.js"
+import { Roles } from "./roles.js"
 
 const publicCommands = ['сбор','mymt','cap','invitefriend','medals','region','roles', 'rl','triumph','triumphs','horohelp','help'];
 const adminCommands =  ['testreset', 'xur','reset','membertime','copy','raidadd','raidkick', 'size','ck','clankick','ckp','clankickpub', 'csr','nicknames','q','qq',
@@ -107,7 +107,7 @@ function sendPublicCommand (message) {
 			//case 'mymt':			clantime.membertime(message, message.member.id, (args.length > 1 ? args[1] : 7), false);	break;
 			//case 'medals':		medalstat.medals(message);									break;
 			case 'region':			ChangeRegion(message); break;
-			//case 'roles':			roles.roles_bytag(message.channel, args.length > 1 ? args[1] : message.member.id);	break;
+			case 'roles':			Roles(message, args); break;
 			//case 'triumph':		seals.triumph(message, (args.length > 1 ? args[1] : 0));	break;
 			//case 'triumphs':		triumphs.triumphs(message, (args.length > 1 ? 1 : null));	break;
 			//case 'rl':			raidleader.rl(message.channel, (args.length > 1 ? args[1] : message.member.user.id), (args.length > 2 ? args[2] : 7));	break;

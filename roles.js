@@ -1,12 +1,12 @@
-const Discord = require("discord.js");
+import Discord from "discord.js";
 import config from "./config.json";
-import BungieApi from "./bungieApi.js";
+import * as BungieApi from "./bungieApi.js";
+import { FindMemberByFullName } from "./clan.js";
 
-var Clan = require("./clan.js");
-var iconv = require('iconv-lite');
+//var iconv = require('iconv-lite');
 
 // redundant
-exports.roles_bytag = function(channel, battleTag, sync) {
+export function roles_bytag (channel, battleTag, sync) {
 
 	if (sync == true) CreateSync(channel, discord_id, found_member.destinyUserInfo.membershipType, found_member.destinyUserInfo.membershipId, found_member.destinyUserInfo.LastSeenDisplayName);
 
@@ -38,7 +38,7 @@ exports.roles_bytag = function(channel, battleTag, sync) {
 }		
 
 // needs refactoring
-exports.set_clan_roles = function(channel){
+export function set_clan_roles(channel){
 	var xhr_clan = new XMLHttpRequest();
 	xhr_clan.open("GET", "https://www.bungie.net/Platform/GroupV2/3858144/Members/", true);
 	xhr_clan.setRequestHeader("X-API-Key", d2apiKey);
@@ -134,9 +134,9 @@ function CreateSync(channel, discord_id, membershipType, membershipId, LastSeenD
 }
 
 export function Roles(message, args){
-	if (args < 1){
+	if (args.length == 1){
 		RolesByDiscordMention(message.channel, message.member.id);
-	}else if(args[1].StartsWith('id:')){
+	}else if(args[1].startsWith('id:')){
 		RolesByMembershipId(message.channel, args[1]);
 	}else{
 		RolesByDiscordMention(message.channel, args[1]);
@@ -146,13 +146,13 @@ export function Roles(message, args){
 export function RolesByDiscordMention(channel, discordMention){
 	console.log(discordMention);
 	var discordId = discordMention.replace(/\D/g,'');
-	var discordMember = channel.guild.members.find(member => member.user.id == discordId);
+	var discordMember = channel.guild.members.cache.find(member => member.user.id == discordId);
 	if(discordMember == null){
 		SendRolesMessage(channel, discordMember);
 		return;
 	}
 
-	var member = Clan.FindMemberByFullName(discordMember.displayName);
+	var member = FindMemberByFullName(discordMember.displayName);
 	var profileData = member.profile.data;
 	var rolesData = GetRolesData(profileData.userInfo.membershipType, profileData.userInfo.membershipId);
 	
@@ -165,7 +165,7 @@ export function RolesByMembershipId(channel, membership){
 	var membershipType = membership.replace('id:','').split('/');
 	var membershipId = membership.replace('id:','').split('/');
 
-	var discordMember = channel.guild.members.find(member => member.user.id == 000000000000000000000000);
+	var discordMember = channel.guild.members.find(member => member.user.id == 0);
 
 	var rolesData = GetRolesData(membershipType, membershipId);
 	
@@ -328,9 +328,9 @@ function LogRolesGranting(displayName, isDiscordMemberFound, medals){
 }
 
 function checkAndProcessRole(discord_member, roleId, medal, medalNext, role){
-	if (role == null) role = discord_member.guild.roles.find(r => r.id == roleId);
+	if (role == null) role = discord_member.guild.roles.cache.find(r => r.id == roleId);
 	if (role == null) return;
-	if(discord_member.roles.find(r => r.position == role.position) == null){
+	if(discord_member.roles.cache.find(r => r.position == role.position) == null){
 		if(medal == true && medalNext == false){
 			discord_member.roles.add(role);
 		}
@@ -369,14 +369,14 @@ function sumSubcategory(subcategory){
 }
 function sumCrucible(discord_member){
 	if (discord_member == null) return 0;
-	var pvp_top_role = discord_member.guild.roles.find(role => role.id == 646150826791796739);
-	return  (discord_member.roles.find(role => role.position == (pvp_top_role.position - 0)) != null ? 3 : 0) + 
-			(discord_member.roles.find(role => role.position == (pvp_top_role.position - 1)) != null ? 1 : 0) + 
-			(discord_member.roles.find(role => role.position == (pvp_top_role.position - 2)) != null ? 2 : 0) +  
-			(discord_member.roles.find(role => role.position == (pvp_top_role.position - 3)) != null ? 3 : 0) +
-			(discord_member.roles.find(role => role.position == (pvp_top_role.position - 4)) != null ? 2 : 0) + 
-			(discord_member.roles.find(role => role.position == (pvp_top_role.position - 5)) != null ? 3 : 0) +  
-			(discord_member.roles.find(role => role.position == (pvp_top_role.position - 6)) != null ? 4 : 0);
+	var pvp_top_role = discord_member.guild.roles.cache.find(role => role.id == config.roles.medals.category_first_role.crucible);
+	return  (discord_member.roles.cache.find(role => role.position == (pvp_top_role.position - 0)) != null ? 3 : 0) + 
+			(discord_member.roles.cache.find(role => role.position == (pvp_top_role.position - 1)) != null ? 1 : 0) + 
+			(discord_member.roles.cache.find(role => role.position == (pvp_top_role.position - 2)) != null ? 2 : 0) +  
+			(discord_member.roles.cache.find(role => role.position == (pvp_top_role.position - 3)) != null ? 3 : 0) +
+			(discord_member.roles.cache.find(role => role.position == (pvp_top_role.position - 4)) != null ? 2 : 0) + 
+			(discord_member.roles.cache.find(role => role.position == (pvp_top_role.position - 5)) != null ? 3 : 0) +  
+			(discord_member.roles.cache.find(role => role.position == (pvp_top_role.position - 6)) != null ? 4 : 0);
 }
 
 function form_field(data){

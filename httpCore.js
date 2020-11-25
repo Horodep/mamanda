@@ -1,4 +1,5 @@
-var fs = require('fs');
+import fs from "fs";
+import { XMLHttpRequest } from "xmlhttprequest";
 import config from "./config.json";
 
 class AccessToken{
@@ -22,12 +23,35 @@ class AccessToken{
         });
     }
 }
+function makeRequest(method, url) {
+    return new Promise(function (resolve, reject) {
+        let xhr = new XMLHttpRequest();
+        xhr.open(method, url);
+        xhr.onload = function () {
+            if (this.status >= 200 && this.status < 300) {
+                resolve(xhr.response);
+            } else {
+                reject({
+                    status: this.status,
+                    statusText: xhr.statusText
+                });
+            }
+        };
+        xhr.onerror = function () {
+            reject({
+                status: this.status,
+                statusText: xhr.statusText
+            });
+        };
+        xhr.send();
+    });
+}
 
-async export function httpRequest(url, setAuth){
+export function httpRequest(url, setAuth){
 	var request = new XMLHttpRequest();
 	request.open("GET", url, true);
 	if (setAuth == true) request.setRequestHeader("Authorization", "Bearer "+AccessToken.access_token);
-	request.setRequestHeader("X-API-Key", config.d2apiKey);
+	request.setRequestHeader("X-API-Key", config.credentials.d2apiKey);
 	request.onreadystatechange = function(){
 		if(this.readyState === 4 && this.status === 200){
 			return JSON.parse(this.responseText);

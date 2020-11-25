@@ -2,10 +2,11 @@ import Discord from "discord.js";
 import config from "./config.json";
 import {GetClanMembers} from "./bungieApi.js";
 
-function GetAllMembers(){
+async function GetAllMembers(){
 	var members = [];
-	Array.prototype.push.apply(members, GetClanMembers(config.clans[0]));
-	Array.prototype.push.apply(members, GetClanMembers(config.clans[1]));
+	var m1 = await GetClanMembers(config.clans[0].id);
+	Array.prototype.push.apply(members, m1);
+	await Array.prototype.push.apply(members, GetClanMembers(config.clans[1].id));
 	return members;
 }
 
