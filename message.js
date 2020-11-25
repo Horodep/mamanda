@@ -23,6 +23,15 @@ exports.main = (message) => {
 					switch (args[0]) {
 						case 'oauth2': message.channel.send(`https://www.bungie.net/ru/OAuth/Authorize?response_type=code&client_id=${config.d2clientId}&state=12345`); break;
 						case 'code': reset.newToken(message, args[1]); break;
+						case 'status': 
+							const embed = new Discord.MessageEmbed()
+								.setAuthor("Статус")
+								.setColor(0x00AE86)
+								.setFooter("That was a h̶a̶n̶d̶o̶u̶t̶ hangover.")
+								.addField("Public",":yes: asfdas\n:no:dsafsf", true)
+								.addField("Guildmaster",":reload: sadfas", true)
+							message.channel.send({embed});
+							break;
 					}
 				}
 			} else if (publicCommands.includes(args[0])) {
