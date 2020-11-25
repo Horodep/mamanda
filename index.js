@@ -1,8 +1,6 @@
 // https://discordjs.guide/additional-info/changes-in-v12.html
-
 import Discord from "discord.js";
 import config from "./config.json";
-
 import {Message} from "./message.js";
 import {MessageDelete} from "./messageDelete.js";
 import {MessageReactionAdd} from "./messageReactionAdd.js";
@@ -11,17 +9,25 @@ import {MessageReactionRemove} from "./messageReactionRemove.js";
 const client = new Discord.Client();
 client.login(config.credentials.discordApiKey);
 
-client.on("ready", () => {console.log("Hello " + config.credentials.BotName);});
-
-client.on("guildMemberAdd", member => {
-	member.roles.add(member.guild.roles.cache.find(role => role.id == config.roles.queue));
-	console.log("NEW MEMBER " + member.displayName);
-});
+client.on("ready", () => {console.log("ready!");});
+client.on("guildMemberAdd", (member) => NewMember(member));
 client.on("message", (_message) => Message(_message));
 client.on("messageDelete", (message) => MessageDelete(message));
 client.on("messageReactionAdd", (reaction, user) => MessageReactionAdd(reaction, user));
 client.on("messageReactionRemove", (reaction, user) => MessageReactionRemove(reaction, user));
-client.on("raw", async event => {
+client.on("raw", async event => RawEvent(event));
+
+const events = {
+	MESSAGE_REACTION_ADD: "messageReactionAdd",
+	MESSAGE_REACTION_REMOVE: "messageReactionRemove",
+};
+
+function NewMember(member){
+	member.roles.add(member.guild.roles.cache.find(role => role.id == config.roles.queue));
+	console.log("NEW MEMBER " + member.displayName);
+}
+
+function RawEvent(event){
 	try {
 		if (!events.hasOwnProperty(event.t)) return;
 
@@ -46,9 +52,4 @@ client.on("raw", async event => {
 	} catch (e) {
 		require("./catcherror").catcherror(e, client);
 	}
-});
-
-const events = {
-	MESSAGE_REACTION_ADD: "messageReactionAdd",
-	MESSAGE_REACTION_REMOVE: "messageReactionRemove",
-};
+}
