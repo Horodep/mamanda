@@ -1,5 +1,6 @@
 import { MessageEmbed } from "discord.js";
 import { InviteFriend, ChangeChannelCap, ChangeRegion } from "./discordFeatures.js"
+import { ClanSize } from "./clan.js"
 import { Roles } from "./roles.js"
 import { newAuthToken } from "./httpCore.js"
 
@@ -181,7 +182,9 @@ export class CommandManager{
         this.AddCommand("guildmaster", 2, "raidkick", "!raidkick message_id member_id", "исключение из рейда стража, пример: https://media.discordapp.net/attachments/515244455033438209/626795525710020638/unknown.png;", function(args, message){});
         this.AddCommand("guildmaster", 2, "reset", "!reset", "генерация текстового еженедельного ресета в текущий канал;", function(args, message){});
         this.AddCommand("guildmaster", 2, "setmaxtriumphs", "!setmaxtriumphs NUMBER", "обновить значение максимального количества триумфов;", function(args, message){});
-        this.AddCommand("guildmaster", 2, "size", "!size", "количество стражей в составах;", function(args, message){});
+        this.AddCommand("guildmaster", 0, "size", "!size", "количество стражей в составах;", function(args, message){
+            ClanSize().then(value => message.channel.send(value));
+        });
         this.AddCommand("guildmaster", 2, "sync", "!______________", "_______________;", function(args, message){});
         this.AddCommand("guildmaster", 2, "testreset", "!testreset", "генерация ссылок на англоязычные изображения еженедельного ресета в текущий канал;", function(args, message){});
         this.AddCommand("guildmaster", 2, "watermelon", "!watermelon @DiscrordTag", "проверка стража на абуз;", function(args, message){});

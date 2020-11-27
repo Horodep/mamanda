@@ -9,6 +9,11 @@ async function GetAllMembers(){
 	return members;
 }
 
+export async function ClanSize(){
+	return config.clans[0].name + ": " + (await GetClanMembers(config.clans[0].id)).length + "\n" + 
+		   config.clans[1].name + ": " + (await GetClanMembers(config.clans[1].id)).length;
+}
+
 export async function FindMemberByFullName(fullName) {
 	var members = await GetAllMembers();
 	try{

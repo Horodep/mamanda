@@ -27,7 +27,7 @@ export function Message(message){
 		}
 		if (CommandManager.IsGuildMasterCommand(commandName)) {
 			var guildMasterRole = message.guild.roles.cache.find(role => role.id == config.roles.guildmaster);
-			if(guildMasterRole.position >= message.member.roles.highest.position) {
+			if(guildMasterRole.position <= message.member.roles.highest.position) {
 				CommandManager.Run(args, message);
 			}else{
 				message.channel.send('У вас нет прав на это действие.');
