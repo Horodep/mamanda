@@ -1,15 +1,7 @@
 import Discord from "discord.js";
 import config from "./config.json";
 import { CatchError } from "./catcherror.js";
-import { InviteFriend, ChangeChannelCap, ChangeRegion } from "./discordFeatures.js"
-import { Roles } from "./roles.js"
 import { CommandManager } from "./commandManager.js";
-
-const publicCommands = ['сбор','mymt','cap','invitefriend','medals','region','roles', 'rl','triumph','triumphs','horohelp','help'];
-const adminCommands =  ['testreset', 'xur','reset','membertime','copy','raidadd','raidkick', 'size','ck','clankick','ckp','clankickpub', 'csr','nicknames','q','qq',
-						'n','gmhelp','pvpdrop', 'pmspam', 'forum', 'forumtime', 'setmaxtriumphs', 'watermelon', 'message', 'sync', 'checksync'];
-const developerCommands = ['oauth2','code','status'];
-const notLimitedCommands = ['ping','rand','clown'];
 
 export function Message(message){
 	try {

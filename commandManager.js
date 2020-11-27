@@ -1,3 +1,6 @@
+import { InviteFriend, ChangeChannelCap, ChangeRegion } from "./discordFeatures.js"
+import { Roles } from "./roles.js"
+
 export class CommandManager{
     static commandList = [];
 
