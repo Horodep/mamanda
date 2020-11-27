@@ -20,17 +20,20 @@ export function Message(message){
 
 		if (CommandManager.IsCommonCommand(commandName)) {
 			CommandManager.Run(args, message);
-		} else if (CommandManager.IsDeveloperCommand(commandName)) {
+		}
+		if (CommandManager.IsDeveloperCommand(commandName)) {
 			if (message.author.id != config.users.developer) return;
 			CommandManager.Run(args, message);
-		} else if (CommandManager.IsGuildMasterCommand(commandName)) {
+		}
+		if (CommandManager.IsGuildMasterCommand(commandName)) {
 			var guildMasterRole = message.guild.roles.cache.find(role => role.id == config.roles.guildmaster);
-			if(guildMasterRole.position < message.member.roles.highest.position) {
+			if(guildMasterRole.position >= message.member.roles.highest.position) {
+				CommandManager.Run(args, message);
+			}else{
 				message.channel.send('У вас нет прав на это действие.');
-				return;
 			}
-			CommandManager.Run(args, message);
-		} else if (CommandManager.IsRestrictedCommand(commandName)) {
+		}
+		if (CommandManager.IsRestrictedCommand(commandName)) {
 			if(restrictedChannels.includes(message.channel.id) || message.author.id  == config.user.boss){
 				CommandManager.Run(args, message);
 			}else{
