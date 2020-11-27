@@ -5,9 +5,11 @@ import {Message} from "./message.js";
 import {MessageDelete} from "./messageDelete.js";
 import {MessageReactionAdd} from "./messageReactionAdd.js";
 import {MessageReactionRemove} from "./messageReactionRemove.js";
+import { CommandManager } from "./commandManager.js";
 
 const client = new Discord.Client();
 client.login(config.credentials.discordApiKey);
+CommandManager.Init();
 
 client.on("ready", () => {console.log("ready!");});
 client.on("guildMemberAdd", (member) => NewMember(member));
