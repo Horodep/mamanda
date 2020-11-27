@@ -6,18 +6,23 @@ async function GetAllMembers(){
 	var members = [];
 	var m1 = await GetClanMembers(config.clans[0].id);
 	Array.prototype.push.apply(members, m1);
-	await Array.prototype.push.apply(members, GetClanMembers(config.clans[1].id));
+	var m2 = await GetClanMembers(config.clans[1].id);
+	Array.prototype.push.apply(members, m2);
 	return members;
 }
 
-export function FindMemberByFullName(fullName) {
-	var members = GetAllMembers();
-	members.forEach(function(member) { 
-		if(fullName.startsWith(member.destinyUserInfo.LastSeenDisplayName + " ") || 
-		   fullName == member.destinyUserInfo.LastSeenDisplayName){
-			return member;
-		}
-	});
+export async function FindMemberByFullName(fullName) {
+	var members = await GetAllMembers();
+	try{
+		members.forEach(function(member) { 
+			if(fullName.startsWith(member.destinyUserInfo.LastSeenDisplayName + " ") || 
+			fullName == member.destinyUserInfo.LastSeenDisplayName){
+				throw member;
+			}
+		});
+	}catch (member){
+		return member;
+	}
 }
 
 export function ExecuteForEveryMember(timeout, callback) {

@@ -23,41 +23,24 @@ class AccessToken{
         });
     }
 }
-function makeRequest(method, url) {
+
+export async function makeRequestWithPromise(method, url, setAuth) {
     return new Promise(function (resolve, reject) {
-        let xhr = new XMLHttpRequest();
-        xhr.open(method, url);
-        xhr.onload = function () {
-            if (this.status >= 200 && this.status < 300) {
-                resolve(xhr.response);
-            } else {
-                reject({
-                    status: this.status,
-                    statusText: xhr.statusText
-                });
-            }
-        };
-        xhr.onerror = function () {
-            reject({
-                status: this.status,
-                statusText: xhr.statusText
-            });
-        };
+		let xhr = new XMLHttpRequest();
+		xhr.open(method, url, true);
+		xhr.setRequestHeader("X-API-Key", config.credentials.d2apiKey);
+        if (setAuth == true) xhr.setRequestHeader("Authorization", "Bearer "+AccessToken.access_token);
+		xhr.onreadystatechange = function() {
+			if (xhr.readyState == 4) {
+			    if (xhr.status >= 300) {
+				    reject("Error, status code = " + xhr.status)
+			    } else {
+				    resolve(JSON.parse(xhr.responseText));
+			    }
+			}
+		  }
         xhr.send();
     });
-}
-
-export function httpRequest(url, setAuth){
-	var request = new XMLHttpRequest();
-	request.open("GET", url, true);
-	if (setAuth == true) request.setRequestHeader("Authorization", "Bearer "+AccessToken.access_token);
-	request.setRequestHeader("X-API-Key", config.credentials.d2apiKey);
-	request.onreadystatechange = function(){
-		if(this.readyState === 4 && this.status === 200){
-			return JSON.parse(this.responseText);
-		}
-	}
-	request.send();
 }
 
 export async function refreshAuthToken(){
