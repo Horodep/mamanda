@@ -4,10 +4,8 @@ import {GetClanMembers} from "./bungieApi.js";
 
 async function GetAllMembers(){
 	var members = [];
-	var m1 = await GetClanMembers(config.clans[0].id);
-	Array.prototype.push.apply(members, m1);
-	var m2 = await GetClanMembers(config.clans[1].id);
-	Array.prototype.push.apply(members, m2);
+	Array.prototype.push.apply(members, await GetClanMembers(config.clans[0].id));
+	Array.prototype.push.apply(members, await GetClanMembers(config.clans[1].id));
 	return members;
 }
 
