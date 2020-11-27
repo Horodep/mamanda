@@ -1,17 +1,22 @@
+import { MessageEmbed } from "discord.js";
 import { InviteFriend, ChangeChannelCap, ChangeRegion } from "./discordFeatures.js"
 import { Roles } from "./roles.js"
+import { newAuthToken } from "./httpCore.js"
 
 export class CommandManager{
     static commandList = [];
 
     static Run(args, message){
         var command = this.FindCommand(args[0]);
-        command?.callback(args, message);
+        if (command.status > 1) message.channel.send("Команда отключена");
+        else command?.callback(args, message);
     }
-    static AddCommand(name, rights, description, callback){
+    static AddCommand(rights, status, name, title, description, callback){
         this.commandList.push({
             name: name,
             rights: rights,
+            status: status,
+            title: title,
             description: description,
             callback: callback
         });
@@ -19,6 +24,68 @@ export class CommandManager{
     static FindCommand(commandName){
         var foundCommands = this.commandList.filter(c => c.name === commandName);
         return foundCommands.length > 0 ? foundCommands[0] : null;
+    }
+    static GetStatus(){
+        var embed = new MessageEmbed()
+              .setAuthor("Статус")
+              .setColor(0x00AE86)
+              .setFooter("That was a h̶a̶n̶d̶o̶u̶t̶  hangover.")
+              .setTimestamp()
+        var restricted = [];
+        var guildmaster = [];
+        this.commandList.forEach(command => {
+            var line = "";
+            switch(command.status){
+                case 0:
+                    line += "<:yes:769922757592612874> ";
+                    break;
+                case 1:
+                    line += "<:reload:781107772224962561> ";
+                    break;
+                default:
+                    line += "<:no:769922772549632031> ";
+                    break;
+            }
+            if(command.name != ""){
+                line += command.name;
+                switch(command.rights){
+                    case "restricted":
+                        restricted.push(line);
+                        break;
+                    case "guildmaster":
+                        guildmaster.push(line);
+                        break;
+                }
+            }
+        });
+        embed.addField("Restricted", restricted.join("\n"), true)
+        embed.addField("Guildmaster", guildmaster.filter((_,i) => i <  guildmaster.length/2).join("\n"), true)
+        embed.addField("Guildmaster", guildmaster.filter((_,i) => i >= guildmaster.length/2).join("\n"), true)
+        return embed;
+    }
+    static GetRestrictedHelp(){
+        var embed = new MessageEmbed()
+              .setAuthor("Horobot :: Список доступных команд:")
+              .setColor(0x00AE86)
+              .setThumbnail('https://images-ext-1.discordapp.net/external/veZptUu_KDKmwtUJX5QT3QxESYCaRp4_k0XUwEQxubo/https/i.imgur.com/e9DIB8e.png')
+              .setFooter("Horobot", "https://cdn.discordapp.com/avatars/543342030768832524/7da47eaca948d9874b66fc5884ca2d00.png")
+              .setTimestamp()
+        this.commandList.filter(c => (c.rights === 'restricted' && c.status == 0)).forEach(command => {
+            embed.addField(command.title, command.description);
+        });
+        return embed;
+    }
+    static GetGuildMAsterHelp(){
+        var embed = new MessageEmbed()
+              .setAuthor("Horobot :: Список ГМ-ских команд:")
+              .setColor(0x00AE86)
+              .setThumbnail('https://images-ext-1.discordapp.net/external/veZptUu_KDKmwtUJX5QT3QxESYCaRp4_k0XUwEQxubo/https/i.imgur.com/e9DIB8e.png')
+              .setFooter("Horobot", "https://cdn.discordapp.com/avatars/543342030768832524/7da47eaca948d9874b66fc5884ca2d00.png")
+              .setTimestamp()
+        this.commandList.filter(c => (c.rights === 'guildmaster' && c.status == 0)).forEach(command => {
+            embed.addField(command.title, command.description);
+        });
+        return embed;
     }
     static CheckRights(commandName, rights){
         var command = this.FindCommand(commandName);
@@ -37,37 +104,92 @@ export class CommandManager{
         return this.CheckRights(commandName, 'developer');
     }
     static Init(){
-        this.AddCommand("ping", "common", "testing functionality", function(args, message){
-            message.channel.send('pong'+args[0]);});
+        this.AddCommand("developer", 0, "status", "!status", "статус команд;", function(args, message){
+            message.channel.send(CommandManager.GetStatus());
+        });
+        this.AddCommand("developer", 0, "oauth2", "!oauth2", "выслать команду авторизации;", function(args, message){
+            message.channel.send(`https://www.bungie.net/ru/OAuth/Authorize?response_type=code&client_id=${config.d2clientId}&state=12345`); 
+        });
+        this.AddCommand("developer", 0, "code", "!code", "сохранить код авторизации;", function(args, message){
+            newAuthToken(args[1]);
+        });
+
+
+        this.AddCommand("common", 0, "ping", "!ping", "testing functionality", function(args, message){
+            message.channel.send('pong '+args[0]);
+        });
+        this.AddCommand("common", 0, "rand", "!rand", "отправить рандомный эмоджик", function(args, message){
+            message.channel.send(emoji.random().emoji);
+        });
+        this.AddCommand("common", 0, "clown", "!clown", "отправить клоуна", function(args, message){
+            message.channel.send('🤡');
+        });
+
+        //case 'сбор':			raid.create_raid(message, args);							break;
+        //case 'mymt':			clantime.membertime(message, message.member.id, (args.length > 1 ? args[1] : 7), false);	break;
+        //case 'medals':		medalstat.medals(message);									break;
+        //case 'triumph':		seals.triumph(message, (args.length > 1 ? args[1] : 0));	break;
+        //case 'triumphs':		triumphs.triumphs(message, (args.length > 1 ? 1 : null));	break;
+        //case 'rl':			raidleader.rl(message.channel, (args.length > 1 ? args[1] : message.member.user.id), (args.length > 2 ? args[2] : 7));	break;
+        
+        this.AddCommand("restricted", 0, "cap", "!cap NUMBER", "ограничение комнаты до NUMBER мест;", function(args, message){
+            ChangeChannelCap(message, (args.length > 1 ? args[1] : 0));
+        });
+        this.AddCommand("restricted", 0, "help", "!help", "список доступных команд;", function(args, message){
+            message.channel.send(CommandManager.GetRestrictedHelp());});
+        this.AddCommand("restricted", 0, "invitefriend", "!invitefriend @DiscordTag", "выдача роли 'Странник' вместо роли 'Очередь';\n_доступна опытным стражам_;", function(args, message){
+            InviteFriend(message, (args.length > 1 ? args[1] : ""));
+        });
+        this.AddCommand("restricted", 2, "medals", "!medals", "стражи с большим количеством медалей;", function(args, message){});
+        this.AddCommand("restricted", 2, "mymt", "!mymt", "проверка активности стража в голосовом чате (только своей);", function(args, message){});
+        this.AddCommand("restricted", 0, "region", "!region", "смена региона сервера;", function(args, message){
+            ChangeRegion(message);
+        });
+        this.AddCommand("restricted", 2, "rl", "!rl / !rl @DiscordTag", "отчет по стражу на пригодность в качестве наставника;", function(args, message){});
+        this.AddCommand("restricted", 0, "roles", "!roles / !roles @DiscordTag", "отображение и выдача стражу заслуженных медалей;", function(args, message){
+            Roles(message, args);
+        });
+        this.AddCommand("restricted", 1, "roles id:", "!______________", "_______________;", function(args, message){
+            Roles(message, args);
+        });
+        this.AddCommand("restricted", 2, "triumph", "!triumph TRIUMPH_HASH", "отобразить стражей клана, получивших конкретный триумф;", function(args, message){});
+        this.AddCommand("restricted", 2, "triumphs", "!triumphs", "топ 15 стражей клана по очкам триумфов текстом;", function(args, message){});
+        this.AddCommand("restricted", 2, "triumphs 1", "!triumphs gimmeimageplz", "топ 15 стражей клана по очкам триумфов графиком;", function(args, message){});
+        this.AddCommand("restricted", 2, "сбор", "!сбор ДД.ММ ЧЧ:ММ название активности, комментарии", "создание сбора на активность на 6 человек;", function(args, message){});
+        this.AddCommand("restricted", 2, "", "!сбор ДД.ММ ЧЧ:ММ [N] название активности", "создание сбора на активность на N человек;", function(args, message){});
+ 
+
+        this.AddCommand("guildmaster", 2, "checksync", "!______________", "_______________;", function(args, message){});
+        this.AddCommand("guildmaster", 2, "ck clankick", "!clankick %days%", "выборка активности малоактивных стражей;\n_по умолчанию — 7 дней_;", function(args, message){});
+        this.AddCommand("guildmaster", 2, "ckp clankickpub", "!clankickpub %days%", "выборка активности **самых** малоактивных стражей;\n_по умолчанию — 7 дней_;", function(args, message){});
+        this.AddCommand("guildmaster", 2, "copy", "!copy", "ручной запуск переноса в архив старых сборов рейдов;", function(args, message){});
+        this.AddCommand("guildmaster", 2, "csr", "!csr", "ручной запуск выдачи ролей всему клану;", function(args, message){});
+        this.AddCommand("guildmaster", 2, "forum", "!forum LINKTEXT", "опубликовать объявление о наборе в канал новостей;", function(args, message){});
+        this.AddCommand("guildmaster", 2, "forumtime", "!forumtime", "выдать всем стражам роли перед объявлением о наборе;", function(args, message){});
+        this.AddCommand("guildmaster", 0, "gmhelp", "!gmhelp", "список доступных ГМ-ских команд;", function(args, message){
+            message.channel.send(CommandManager.GetRestrictedHelp());
+        });
+        this.AddCommand("guildmaster", 2, "membertime", "!membertime @DiscrordTag %days%", "выборка активности стража;\n_по умолчанию — 7 дней_;", function(args, message){});
+        this.AddCommand("guildmaster", 2, "message", "!______________", "_______________;", function(args, message){});
+        this.AddCommand("guildmaster", 2, "n", "!n", "список новичков в клане;", function(args, message){});
+        this.AddCommand("guildmaster", 2, "nicknames", "!nicknames", "проверка никнеймов стражей;", function(args, message){});
+        this.AddCommand("guildmaster", 2, "pmspam", "!pmspam", "спам говном в личку по роли; НЕ ЮЗАТЬ;", function(args, message){});
+        this.AddCommand("guildmaster", 2, "pvpdrop", "!pvpdrop", "снять все пвп роли;", function(args, message){});
+        this.AddCommand("guildmaster", 2, "q", "!q", "список стражей в очереди;", function(args, message){});
+        this.AddCommand("guildmaster", 2, "qq", "!qq", "список анкет стражей в очереди;", function(args, message){});
+        this.AddCommand("guildmaster", 2, "raidadd", "!raidadd message_id member_id", "добавление в рейд стража;", function(args, message){});
+        this.AddCommand("guildmaster", 2, "raidkick", "!raidkick message_id member_id", "исключение из рейда стража, пример: https://media.discordapp.net/attachments/515244455033438209/626795525710020638/unknown.png;", function(args, message){});
+        this.AddCommand("guildmaster", 2, "reset", "!reset", "генерация текстового еженедельного ресета в текущий канал;", function(args, message){});
+        this.AddCommand("guildmaster", 2, "setmaxtriumphs", "!setmaxtriumphs NUMBER", "обновить значение максимального количества триумфов;", function(args, message){});
+        this.AddCommand("guildmaster", 2, "size", "!size", "количество стражей в составах;", function(args, message){});
+        this.AddCommand("guildmaster", 2, "sync", "!______________", "_______________;", function(args, message){});
+        this.AddCommand("guildmaster", 2, "testreset", "!testreset", "генерация ссылок на англоязычные изображения еженедельного ресета в текущий канал;", function(args, message){});
+        this.AddCommand("guildmaster", 2, "watermelon", "!watermelon @DiscrordTag", "проверка стража на абуз;", function(args, message){});
+        this.AddCommand("guildmaster", 2, "xur", "!xur", "геренация изображения товаров Зура в текущий канал;", function(args, message){});
     }
 }
+
 /*
-RESTRICTED
-
-    case 'cap':         	ChangeChannelCap(message, (args.length > 1 ? args[1] : 0)); break;
-    //case 'сбор':			raid.create_raid(message, args);							break;
-    //case 'mymt':			clantime.membertime(message, message.member.id, (args.length > 1 ? args[1] : 7), false);	break;
-    //case 'medals':		medalstat.medals(message);									break;
-    case 'region':			ChangeRegion(message); break;
-    case 'roles':			Roles(message, args); break;
-    //case 'triumph':		seals.triumph(message, (args.length > 1 ? args[1] : 0));	break;
-    //case 'triumphs':		triumphs.triumphs(message, (args.length > 1 ? 1 : null));	break;
-    //case 'rl':			raidleader.rl(message.channel, (args.length > 1 ? args[1] : message.member.user.id), (args.length > 2 ? args[2] : 7));	break;
-    case 'invitefriend':	InviteFriend(message, (args.length > 1 ? args[1] : "")); break;
-    //case 'horohelp':		help(message);												break;
-    //case 'help':			help(message);												break;
-            
-ALL 
-    case 'ping': message.channel.send('pong'); break;
-    case 'rand': message.channel.send(emoji.random().emoji); break;
-    case 'clown': message.channel.send('🤡'); break;
-
-\DEV
-    
-    case 'oauth2': message.channel.send(`https://www.bungie.net/ru/OAuth/Authorize?response_type=code&client_id=${config.d2clientId}&state=12345`); break;
-    case 'code': reset.newToken(message, args[1]); break;
-    case 'status': ShowStatus(message.channel); break;
-
 GM
     case 'checksync':	checksync.checksync(message.channel);					break;
     case 'sync':		roles.roles_bytag(message.channel, args.length > 1 ? args[1] : message.member.id, true);					break;
@@ -226,5 +348,4 @@ GM
             }, 5000);
         });
         break;
-    case 'gmhelp':				gmhelp(message);					break;
 }*/
