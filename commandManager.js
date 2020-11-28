@@ -1,5 +1,6 @@
 import { MessageEmbed } from "discord.js";
 import { InviteFriend, ChangeChannelCap, ChangeRegion } from "./discordFeatures.js"
+import { ShowNewbieList, ShowQueueList, ShowQueueReqestsList } from "./discordGuildMasterFeatures.js"
 import { ClanSize } from "./clan.js"
 import { Roles } from "./roles.js"
 import { newAuthToken } from "./httpCore.js"
@@ -165,6 +166,7 @@ export class CommandManager{
         this.AddCommand("guildmaster", 2, "ckp clankickpub", "!clankickpub %days%", "выборка активности **самых** малоактивных стражей;\n_по умолчанию — 7 дней_;", function(args, message){});
         this.AddCommand("guildmaster", 2, "copy", "!copy", "ручной запуск переноса в архив старых сборов рейдов;", function(args, message){});
         this.AddCommand("guildmaster", 2, "csr", "!csr", "ручной запуск выдачи ролей всему клану;", function(args, message){});
+        this.AddCommand("guildmaster", 2, "engreset", "!engreset", "генерация ссылок на англоязычные изображения еженедельного ресета в текущий канал;", function(args, message){});
         this.AddCommand("guildmaster", 2, "forum", "!forum LINKTEXT", "опубликовать объявление о наборе в канал новостей;", function(args, message){});
         this.AddCommand("guildmaster", 2, "forumtime", "!forumtime", "выдать всем стражам роли перед объявлением о наборе;", function(args, message){});
         this.AddCommand("guildmaster", 0, "gmhelp", "!gmhelp", "список доступных ГМ-ских команд;", function(args, message){
@@ -172,12 +174,18 @@ export class CommandManager{
         });
         this.AddCommand("guildmaster", 2, "membertime", "!membertime @DiscrordTag %days%", "выборка активности стража;\n_по умолчанию — 7 дней_;", function(args, message){});
         this.AddCommand("guildmaster", 2, "message", "!______________", "_______________;", function(args, message){});
-        this.AddCommand("guildmaster", 2, "n", "!n", "список новичков в клане;", function(args, message){});
+        this.AddCommand("guildmaster", 0, "n", "!n", "список новичков в клане;", function(args, message){
+            ShowNewbieList(message);
+        });
         this.AddCommand("guildmaster", 2, "nicknames", "!nicknames", "проверка никнеймов стражей;", function(args, message){});
         this.AddCommand("guildmaster", 2, "pmspam", "!pmspam", "спам говном в личку по роли; НЕ ЮЗАТЬ;", function(args, message){});
         this.AddCommand("guildmaster", 2, "pvpdrop", "!pvpdrop", "снять все пвп роли;", function(args, message){});
-        this.AddCommand("guildmaster", 2, "q", "!q", "список стражей в очереди;", function(args, message){});
-        this.AddCommand("guildmaster", 2, "qq", "!qq", "список анкет стражей в очереди;", function(args, message){});
+        this.AddCommand("guildmaster", 0, "q", "!q", "список стражей в очереди;", function(args, message){
+            ShowQueueList(message);
+        });
+        this.AddCommand("guildmaster", 0, "qq", "!qq", "список анкет стражей в очереди;", function(args, message){
+            ShowQueueReqestsList(message);
+        });
         this.AddCommand("guildmaster", 2, "raidadd", "!raidadd message_id member_id", "добавление в рейд стража;", function(args, message){});
         this.AddCommand("guildmaster", 2, "raidkick", "!raidkick message_id member_id", "исключение из рейда стража, пример: https://media.discordapp.net/attachments/515244455033438209/626795525710020638/unknown.png;", function(args, message){});
         this.AddCommand("guildmaster", 2, "reset", "!reset", "генерация текстового еженедельного ресета в текущий канал;", function(args, message){});
@@ -186,7 +194,6 @@ export class CommandManager{
             ClanSize().then(value => message.channel.send(value));
         });
         this.AddCommand("guildmaster", 2, "sync", "!______________", "_______________;", function(args, message){});
-        this.AddCommand("guildmaster", 2, "testreset", "!testreset", "генерация ссылок на англоязычные изображения еженедельного ресета в текущий канал;", function(args, message){});
         this.AddCommand("guildmaster", 2, "watermelon", "!watermelon @DiscrordTag", "проверка стража на абуз;", function(args, message){});
         this.AddCommand("guildmaster", 2, "xur", "!xur", "геренация изображения товаров Зура в текущий канал;", function(args, message){});
     }
