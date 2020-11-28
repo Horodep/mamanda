@@ -1,4 +1,3 @@
-import Discord from "discord.js";
 import config from "./config.json";
 import { CatchError } from "./catcherror.js";
 import { CommandManager } from "./commandManager.js";
@@ -14,7 +13,7 @@ export function Message(message){
 			return;
 		}
 
-		console.log(new Date(), (message.member != null ? message.member.displayName : message.author.username), message.content);
+		console.log(new Date().toISOString(), (message.member != null ? message.member.displayName : message.author.username), message.content);
 		var args = message.content.substring(1).split(' ').filter(item => item);
 		var commandName = args[0];
 
@@ -41,7 +40,7 @@ export function Message(message){
 			}
 		}
 	} catch (e) {
-		CatchError(e, message.client);
+		CatchError(e, message.channel);
 	}
 };
 
