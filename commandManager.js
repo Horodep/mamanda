@@ -1,7 +1,7 @@
 import { MessageEmbed } from "discord.js";
 import { InviteFriend, ChangeChannelCap, ChangeRegion } from "./discordFeatures.js"
 import { ShowNewbieList, ShowQueueList, ShowQueueReqestsList } from "./discordGuildMasterFeatures.js"
-import { ClanSize } from "./clan.js"
+import { ClanSize, SetRoles } from "./clan.js"
 import { Roles } from "./roles.js"
 import { newAuthToken } from "./httpCore.js"
 
@@ -165,7 +165,9 @@ export class CommandManager{
         this.AddCommand("guildmaster", 2, "ck clankick", "!clankick %days%", "выборка активности малоактивных стражей;\n_по умолчанию — 7 дней_;", function(args, message){});
         this.AddCommand("guildmaster", 2, "ckp clankickpub", "!clankickpub %days%", "выборка активности **самых** малоактивных стражей;\n_по умолчанию — 7 дней_;", function(args, message){});
         this.AddCommand("guildmaster", 2, "copy", "!copy", "ручной запуск переноса в архив старых сборов рейдов;", function(args, message){});
-        this.AddCommand("guildmaster", 2, "csr", "!csr", "ручной запуск выдачи ролей всему клану;", function(args, message){});
+        this.AddCommand("guildmaster", 1, "csr", "!csr", "ручной запуск выдачи ролей всему клану;", function(args, message){
+            SetRoles(message.channel);
+        });
         this.AddCommand("guildmaster", 2, "engreset", "!engreset", "генерация ссылок на англоязычные изображения еженедельного ресета в текущий канал;", function(args, message){});
         this.AddCommand("guildmaster", 2, "forum", "!forum LINKTEXT", "опубликовать объявление о наборе в канал новостей;", function(args, message){});
         this.AddCommand("guildmaster", 2, "forumtime", "!forumtime", "выдать всем стражам роли перед объявлением о наборе;", function(args, message){});

@@ -1,6 +1,8 @@
 import Discord from "discord.js";
 import config from "./config.json";
-import {GetClanMembers} from "./bungieApi.js";
+import { GetClanMembers } from "./bungieApi.js";
+import { GetShowAndSetRoles } from "./roles.js";
+import { ClanMember } from "./clanMember.js";
 
 async function GetAllMembers(){
 	var members = [];
@@ -28,12 +30,13 @@ export async function FindMemberByFullName(fullName) {
 	}
 }
 
-export function ExecuteForEveryMember(timeout, callback) {
-	var members = GetAllMembers();
+export async function ExecuteForEveryMember(timeout, callback) {
+	var members = await GetAllMembers();
 	var i = 0;
 	var iteration = function(){
 		if(i < members.length){
 			callback(members[i]);
+			i++;
 			setTimeout(iteration, timeout); 
 		}
 	}
@@ -43,6 +46,14 @@ export function ExecuteForEveryMember(timeout, callback) {
 export function ClanTime(message) {
 	ExecuteForEveryMember(1000, function(member){
 		// do stuff
+	});
+}
+
+export function SetRoles(channel) {
+	ExecuteForEveryMember(5000, (member) => {
+		var clanMember = new ClanMember(member);
+		clanMember.LookForDiscordMember(channel.guild);
+		GetShowAndSetRoles(clanMember, null);
 	});
 }
 
@@ -122,57 +133,4 @@ function CreateSync(channel, discord_id, membershipType, membershipId, LastSeenD
 			}
 		});
 	});
-}
-
-
-// needs refactoring
-export function set_clan_roles(channel){
-	var xhr_clan = new XMLHttpRequest();
-	xhr_clan.open("GET", "https://www.bungie.net/Platform/GroupV2/3858144/Members/", true);
-	xhr_clan.setRequestHeader("X-API-Key", d2apiKey);
-	xhr_clan.onreadystatechange = function(){
-		if(this.readyState === 4 && this.status === 200){
-			var json = JSON.parse(this.responseText);
-			
-			var size = 0;
-			members = json.Response.results;
-			members.forEach(function(member, i, members) { 
-				size++;
-			});
-			
-			var xhr_clan1 = new XMLHttpRequest();
-			xhr_clan1.open("GET", "https://www.bungie.net/Platform/GroupV2/3055823/Members/", true);
-			xhr_clan1.setRequestHeader("X-API-Key", d2apiKey);
-			xhr_clan1.onreadystatechange = function(){
-				if(this.readyState === 4 && this.status === 200){
-					var json = JSON.parse(this.responseText);
-					
-					var size = 0;
-					members1 = json.Response.results;
-					members1.forEach(function(member, i, members1) {
-						members.push(member);
-						size++; 
-					});
-					
-					var i = 0;
-					
-					var check = function(){
-						if(i < members.length){
-							roles(channel,
-									members[i].destinyUserInfo.membershipType, 
-									members[i].destinyUserInfo.membershipId, 
-									members[i].destinyUserInfo.LastSeenDisplayName, 
-									members[i].groupId,
-									true);
-							i++;
-							setTimeout(check, 5000); 
-						}
-					}
-					check();
-				}
-			}
-			xhr_clan1.send();
-		}
-	}
-	xhr_clan.send();
 }

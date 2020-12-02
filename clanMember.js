@@ -9,9 +9,9 @@ export class ClanMember{
     #displayName;*/
     discordMember;
 
-    constructor(destinyUserInfo, groupId){
-        this.#destinyUserInfo = destinyUserInfo;
-        this.#clanId = groupId;
+    constructor(member) {
+        this.#destinyUserInfo = member.destinyUserInfo ?? member.userInfo;
+        this.#clanId = member.groupId;
     }
 
     get membershipType(){
@@ -20,7 +20,10 @@ export class ClanMember{
     get membershipId(){
         return this.#destinyUserInfo.membershipId;
     }
-    get displayName(){
+    get displayName() {
+        if (this.#destinyUserInfo.lastSeenDisplayName != null) {
+            return this.#destinyUserInfo.lastSeenDisplayName;
+        }
         return this.#destinyUserInfo.displayName;
     }
 
@@ -36,5 +39,10 @@ export class ClanMember{
     }
     SetDiscordMember(_discordMember) {
         this.discordMember = _discordMember;
+    }
+    LookForDiscordMember(guild) {
+        this.discordMember =
+            guild.members.cache.find(member => (member.displayName.startsWith(this.displayName + " ") 
+                || member.displayName == this.displayName));
     }
 }

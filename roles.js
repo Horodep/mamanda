@@ -1,7 +1,7 @@
 import Discord from "discord.js";
 import config from "./config.json";
 import { CatchError } from "./catcherror.js";
-import { GetFullMemberData } from "./bungieApi.js";
+import { GetFullMemberData, GetProfileData } from "./bungieApi.js";
 import { FindMemberByFullName } from "./clan.js";
 import * as BungieApiLogic from "./coreLogic/bungieApiDataLogic.js";
 import { LogRolesGranting, CheckAndProcessRole, CheckAndProcessRoleBlock, SumMedals, EmbedFormField } from "./coreLogic/rolesLogic.js";
@@ -36,6 +36,31 @@ export async function RolesByDiscordMention(channel, discordMention){
 		var clanMember = new ClanMember(member.destinyUserInfo, member.groupId);
 		clanMember.SetDiscordMember(discordMember);
 
+	await GetShowAndSetRoles(clanMember, channel);
+}
+
+export async function RolesByMembershipId(channel, membership) {
+	try {
+		var membershipType = membership.replace('id:', '').split('/')[0];
+		var membershipId = membership.replace('id:', '').split('/')[1];
+
+		var member = await GetProfileData(membershipType, membershipId);
+		if (member == null) {
+			channel.send('Игровой профиль не найден.');
+			return;
+		}
+
+		var clanMember = new ClanMember(member.data);
+		clanMember.LookForDiscordMember(channel.guild);
+
+		await GetShowAndSetRoles(clanMember, channel);
+	} catch (e){
+		CatchError(e, channel);
+	}
+}
+
+export async function GetShowAndSetRoles(clanMember, channel) {
+	try {
 		var rolesData = await GetRolesData(clanMember.membershipType, clanMember.membershipId);
 		
 		console.log(rolesData);
@@ -44,22 +69,6 @@ export async function RolesByDiscordMention(channel, discordMention){
 	}catch(e){
 		CatchError(e, channel);
 	}
-}
-
-export function RolesByMembershipId(channel, membership){
-	var membershipType = membership.replace('id:','').split('/');
-	var membershipId = membership.replace('id:','').split('/');
-
-	var discordMember = channel.guild.members.find(member => member.user.id == 0);
-
-	var rolesData = GetRolesData(membershipType, membershipId);
-	
-	console.log(rolesData);
-	SendRolesMessage(channel, discordMember, profileData, rolesData);
-
-	channel.send('Временно (или нет) не выдает роли.');
-
-	SetRoles(discordMember, rolesData.charactersLight, rolesData.medals, clanid, profileData.displayName);
 }
 
 async function GetRolesData(membershipType, membershipId) {
