@@ -1,8 +1,9 @@
 import Discord from "discord.js";
 import config from "./config.json";
-import { GetClanMembers, GetProfileData } from "./bungieApi.js";
+import { GetClanMembers } from "./bungieApi.js";
 import { GetShowAndSetRoles } from "./roles.js";
 import { ClanMember } from "./clanMember.js";
+import { GetClanVoiceSummary } from "./sql.js";
 
 async function GetAllMembers() {
 	var members = [];
@@ -43,7 +44,8 @@ export async function ExecuteForEveryMember(timeout, callback) {
 	iteration();
 }
 
-export function ClanTime(channel) {
+export async function ClanTime(channel) {
+	var clanVoiceSummary = await GetClanVoiceSummary(7);
 	channel.send("bruh").then((msg)=>{
 		ExecuteForEveryMember(200, async function (member, i, members) {
 			if(i%10 == 0 || i == members.length){
