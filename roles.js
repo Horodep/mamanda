@@ -5,6 +5,7 @@ import { GetFullMemberData } from "./bungieApi.js";
 import { FindMemberByFullName } from "./clan.js";
 import * as BungieApiLogic from "./coreLogic/bungieApiDataLogic.js";
 import { LogRolesGranting, CheckAndProcessRole, CheckAndProcessRoleBlock, SumMedals, EmbedFormField } from "./coreLogic/rolesLogic.js";
+import { ClanMember } from "./clanMember.js";
 
 export function Roles(message, args){
 	if (args.length == 1){
@@ -21,20 +22,25 @@ export async function RolesByDiscordMention(channel, discordMention){
 	var discordId = discordMention.replace(/\D/g,'');
 	var discordMember = channel.guild.members.cache.find(member => member.user.id == discordId);
 	if(discordMember == null){
-		SendRolesMessage(channel, discordMember);
+		channel.send('Дискорд профиль не найден.');
 		return;
 	}
 
 	try{
 		var member = await FindMemberByFullName(discordMember.displayName);
+		if(member==null) {
+			channel.send('Игровой профиль не найден.');
+			return;
+		}
 
-		if(member==null) return;
-		var profileData = member.destinyUserInfo;
-		var rolesData = await GetRolesData(profileData.membershipType, profileData.membershipId);
+		var clanMember = new ClanMember(member.destinyUserInfo, member.groupId);
+		clanMember.SetDiscordMember(discordMember);
+
+		var rolesData = await GetRolesData(clanMember.membershipType, clanMember.membershipId);
 		
 		console.log(rolesData);
-		SendRolesMessage(channel, discordMember, profileData, rolesData);
-		SetRoles(discordMember, rolesData.characterDetails, rolesData.medals, member.groupId, profileData.displayName);
+		SendRolesMessage(channel, clanMember, rolesData);
+		SetRoles(clanMember, rolesData.characterDetails, rolesData.medals);
 	}catch(e){
 		CatchError(e, channel);
 	}
@@ -121,20 +127,17 @@ async function GetRolesData(membershipType, membershipId) {
 	return {characterDetails: characterDetails, medals: data};
 }
 
-function SendRolesMessage(channel, discordMember, profileData, rolesData){
-	if(discordMember == null) {
-		channel.send('Дискорд профиль не найден.');
-	}
-	if(rolesData == null) {
-		channel.send('Игровой профиль не найден.');
-	}else if(rolesData.medals == null) {
+function SendRolesMessage(channel, clanMember, rolesData){
+	if(rolesData.medals == null) {
 		channel.send('Данные профиля не были получены. Вероятно профиль закрыт настройками приватности.\n'+
 					 'Настройки приватности: https://www.bungie.net/ru/Profile/Settings/?category=Privacy');
 	}else{
+		var medalsSum = SumMedals(clanMember.discordMemberObject, rolesData.medals)
 		const embed = new Discord.MessageEmbed()
-			.setAuthor(profileData.displayName + " 💠" + SumMedals(discordMember, rolesData.medals) + "💠")
+			.setAuthor(clanMember.displayName + " 💠" + medalsSum + "💠")
 			.setColor(0x00AE86)
-			.setFooter("ПВП медали выдают гм-ы; ранжирование ролей: 7/16/24 • id: "+discordMember.id, "https://cdn.discordapp.com/avatars/543342030768832524/7da47eaca948d9874b66fc5884ca2d00.png")
+			.setFooter("ПВП медали выдают гм-ы; ранжирование ролей: 7/16/24 • id: "+clanMember.discordMemberId, 
+				"https://cdn.discordapp.com/avatars/543342030768832524/7da47eaca948d9874b66fc5884ca2d00.png")
 			.addField("Рейды",    			EmbedFormField(rolesData.medals.raids), true)
 			.addField("Печати",   			EmbedFormField(rolesData.medals.seals), true)
 			.addField("Наследные печати", 	EmbedFormField(rolesData.medals.legacy_seals), true)
@@ -144,53 +147,55 @@ function SendRolesMessage(channel, discordMember, profileData, rolesData){
 			.addField("Горнило",  			EmbedFormField(rolesData.medals.crucible), true)
 			.addField("Сезон 12",			EmbedFormField(rolesData.medals.season), true)
 			.addField('\u200B', '\u200B', true)
-	        .addField("Ссылки", "[Raid Report](https://raid.report/pc/"+profileData.membershipId+")"
-							+" | [Braytech](https://beta.braytech.org/"+profileData.membershipType+"/"+profileData.membershipId+"/"+rolesData.characterDetails.GetBestCharacterId()+"/)"
-							+" | [D2 Checklist](https://www.d2checklist.com/"+profileData.membershipType+"/"+profileData.membershipId+"/triumphs)"
-							+" | [Destiny Tracker](https://destinytracker.com/destiny-2/profile/steam/"+profileData.membershipId+"/overview)")
+	        .addField("Ссылки", "[Raid Report](https://raid.report/pc/"+clanMember.membershipId+")"
+							+" | [Braytech](https://beta.braytech.org/"+clanMember.membershipType+"/"+clanMember.membershipId+"/"+rolesData.characterDetails.GetBestCharacterId()+"/)"
+							+" | [D2 Checklist](https://www.d2checklist.com/"+clanMember.membershipType+"/"+clanMember.membershipId+"/triumphs)"
+							+" | [Destiny Tracker](https://destinytracker.com/destiny-2/profile/steam/"+clanMember.membershipId+"/overview)")
 		channel.send({embed});
 	}
 }
 
-function SetRoles(discord_member, characterDetails, medals, clanid, displayName){
-	LogRolesGranting(displayName, discord_member != null, medals);
-	if(discord_member == null) return;
-		
-	CheckAndProcessRole(discord_member, config.roles.separators.clanname, true, false);
-	CheckAndProcessRole(discord_member, config.roles.clans[0], clanid == config.clans[0].id, false);
-	CheckAndProcessRole(discord_member, config.roles.clans[1], clanid == config.clans[1].id, false);
-	CheckAndProcessRole(discord_member, config.roles.separators.characters, true, false);
-	CheckAndProcessRole(discord_member, config.roles.characters.warlock, characterDetails.warlock.light >= config.minimal_light, false);
-	CheckAndProcessRole(discord_member, config.roles.characters.hunter, characterDetails.hunter.light >= config.minimal_light, false);
-	CheckAndProcessRole(discord_member, config.roles.characters.titan, characterDetails.titan.light >= config.minimal_light, false);
-	CheckAndProcessRole(discord_member, config.roles.separators.medals, true, false);
-	CheckAndProcessRole(discord_member, config.roles.separators.footer, true, false);
+function SetRoles(clanMember, characterDetails, medals){
+	LogRolesGranting(clanMember.displayName, clanMember.discordMemberExists, medals);
+	if(!clanMember.discordMemberExists) return;
 	
-	if (discord_member.roles.cache.find(role => role.id == config.roles.no_medals) != null) return;
+	var discordMember = clanMember.discordMember;
+
+	CheckAndProcessRole(discordMember, config.roles.separators.clanname, true, false);
+	CheckAndProcessRole(discordMember, config.roles.clans[0], clanMember.clanId == config.clans[0].id, false);
+	CheckAndProcessRole(discordMember, config.roles.clans[1], clanMember.clanId == config.clans[1].id, false);
+	CheckAndProcessRole(discordMember, config.roles.separators.characters, true, false);
+	CheckAndProcessRole(discordMember, config.roles.characters.warlock, characterDetails.warlock.light >= config.minimal_light, false);
+	CheckAndProcessRole(discordMember, config.roles.characters.hunter, characterDetails.hunter.light >= config.minimal_light, false);
+	CheckAndProcessRole(discordMember, config.roles.characters.titan, characterDetails.titan.light >= config.minimal_light, false);
+	CheckAndProcessRole(discordMember, config.roles.separators.medals, true, false);
+	CheckAndProcessRole(discordMember, config.roles.separators.footer, true, false);
+	
+	if (discordMember.roles.cache.find(role => role.id == config.roles.no_medals) != null) return;
 	if (medals == null) return;
 
-	CheckAndProcessRole(discord_member, config.roles.medals.specific.day1, medals.raids.day1.state, false);
-	CheckAndProcessRole(discord_member, config.roles.medals.specific.solo, medals.extra.solo.state, medals.extra.soloflawless.state);
-	CheckAndProcessRole(discord_member, config.roles.medals.specific.soloflawless, medals.extra.soloflawless.state, false);
-	CheckAndProcessRole(discord_member, config.roles.medals.specific.poi, medals.extra.poi.state, false);
+	CheckAndProcessRole(discordMember, config.roles.medals.specific.day1, medals.raids.day1.state, false);
+	CheckAndProcessRole(discordMember, config.roles.medals.specific.solo, medals.extra.solo.state, medals.extra.soloflawless.state);
+	CheckAndProcessRole(discordMember, config.roles.medals.specific.soloflawless, medals.extra.soloflawless.state, false);
+	CheckAndProcessRole(discordMember, config.roles.medals.specific.poi, medals.extra.poi.state, false);
 
-	CheckAndProcessRoleBlock(discord_member, config.roles.medals.category_first_role.raids, 4, medals.raids);
-	CheckAndProcessRoleBlock(discord_member, config.roles.medals.category_first_role.seals, 5, medals.seals);
-	CheckAndProcessRoleBlock(discord_member, config.roles.medals.category_first_role.legacy_seals, 4, medals.legacy_seals);
-	CheckAndProcessRoleBlock(discord_member, config.roles.medals.category_first_role.locations, 3, medals.locations);
-	CheckAndProcessRoleBlock(discord_member, config.roles.medals.category_first_role.triumphs, 3, medals.triumphs);
-	CheckAndProcessRoleBlock(discord_member, config.roles.medals.category_first_role.legacy_triumphs, 3, medals.legacy_triumphs);
-	CheckAndProcessRoleBlock(discord_member, config.roles.medals.category_first_role.season, 2, medals.season);
+	CheckAndProcessRoleBlock(discordMember, config.roles.medals.category_first_role.raids, 4, medals.raids);
+	CheckAndProcessRoleBlock(discordMember, config.roles.medals.category_first_role.seals, 5, medals.seals);
+	CheckAndProcessRoleBlock(discordMember, config.roles.medals.category_first_role.legacy_seals, 4, medals.legacy_seals);
+	CheckAndProcessRoleBlock(discordMember, config.roles.medals.category_first_role.locations, 3, medals.locations);
+	CheckAndProcessRoleBlock(discordMember, config.roles.medals.category_first_role.triumphs, 3, medals.triumphs);
+	CheckAndProcessRoleBlock(discordMember, config.roles.medals.category_first_role.legacy_triumphs, 3, medals.legacy_triumphs);
+	CheckAndProcessRoleBlock(discordMember, config.roles.medals.category_first_role.season, 2, medals.season);
 	
-	if (discord_member.roles.cache.find(role => role.id == config.roles.guildleader) != null) return;
-	if (discord_member.roles.cache.find(role => role.id == config.roles.guildmaster) != null) return;
-	if (discord_member.roles.cache.find(role => role.id == config.roles.afk) != null) return;
-	if (discord_member.roles.cache.find(role => role.id == config.roles.newbie) != null) return;
-	if (discord_member.roles.cache.find(role => role.id == config.roles.guest) != null) return;
+	if (discordMember.roles.cache.find(role => role.id == config.roles.guildleader) != null) return;
+	if (discordMember.roles.cache.find(role => role.id == config.roles.guildmaster) != null) return;
+	if (discordMember.roles.cache.find(role => role.id == config.roles.afk) != null) return;
+	if (discordMember.roles.cache.find(role => role.id == config.roles.newbie) != null) return;
+	if (discordMember.roles.cache.find(role => role.id == config.roles.guest) != null) return;
 
-	var sum = SumMedals(discord_member, medals);
-	CheckAndProcessRole	(discord_member, config.roles.guardians[0], sum >=  0, sum >=  7);
-	CheckAndProcessRole	(discord_member, config.roles.guardians[1], sum >=  7, sum >= 16);
-	CheckAndProcessRole	(discord_member, config.roles.guardians[2], sum >= 16, sum >= 24);
-	CheckAndProcessRole	(discord_member, config.roles.guardians[3], sum >= 24, false);
+	var sum = SumMedals(discordMember, medals);
+	CheckAndProcessRole	(discordMember, config.roles.guardians[0], sum >=  0, sum >=  7);
+	CheckAndProcessRole	(discordMember, config.roles.guardians[1], sum >=  7, sum >= 16);
+	CheckAndProcessRole	(discordMember, config.roles.guardians[2], sum >= 16, sum >= 24);
+	CheckAndProcessRole	(discordMember, config.roles.guardians[3], sum >= 24, false);
 }
