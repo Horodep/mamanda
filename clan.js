@@ -1,6 +1,6 @@
 import Discord from "discord.js";
 import config from "./config.json";
-import { GetClanMembers } from "./bungieApi.js";
+import { GetClanMembers, GetProfileData } from "./bungieApi.js";
 import { GetShowAndSetRoles } from "./roles.js";
 import { ClanMember } from "./clanMember.js";
 
@@ -35,7 +35,7 @@ export async function ExecuteForEveryMember(timeout, callback) {
 	var i = 0;
 	var iteration = function () {
 		if (i < members.length) {
-			callback(members[i]);
+			callback(members[i], i+1, members);
 			i++;
 			setTimeout(iteration, timeout);
 		}
@@ -44,8 +44,12 @@ export async function ExecuteForEveryMember(timeout, callback) {
 }
 
 export function ClanTime(channel) {
-	ExecuteForEveryMember(1000, function (member) {
-		// do stuff
+	channel.send("bruh").then((msg)=>{
+		ExecuteForEveryMember(200, async function (member, i, members) {
+			if(i%10 == 0 || i == members.length){
+				msg.edit("bruh "+i+"/"+members.length);
+			}
+		});
 	});
 }
 
@@ -58,7 +62,17 @@ export function SetRoles(channel) {
 }
 
 //var iconv = require('iconv-lite');
+/*
+const embed = new Discord.RichEmbed()
+		.setAuthor("Clankick — request in progress: [00/"+size+"]")
+		.setColor(0x00AE86)
+		.setFooter("Horobot", "https://cdn.discordapp.com/avatars/543342030768832524/7da47eaca948d9874b66fc5884ca2d00.png")
+		.setTimestamp()
 
+message.channel.send({embed}).then((msg)=>{
+	bot_msg = msg;
+});
+*/
 // redundant
 export function database_stuff(channel, battleTag, sync) {
 

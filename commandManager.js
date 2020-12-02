@@ -1,7 +1,7 @@
 import { MessageEmbed } from "discord.js";
 import { InviteFriend, ChangeChannelCap, ChangeRegion } from "./discordFeatures.js"
 import { ShowNewbieList, ShowQueueList, ShowQueueReqestsList } from "./discordGuildMasterFeatures.js"
-import { ClanSize, SetRoles } from "./clan.js"
+import { ClanSize, ClanTime, SetRoles } from "./clan.js"
 import { Roles } from "./roles.js"
 import { newAuthToken } from "./httpCore.js"
 
@@ -151,7 +151,7 @@ export class CommandManager{
         this.AddCommand("restricted", 0, "roles", "!roles / !roles @DiscordTag", "отображение и выдача стражу заслуженных медалей;", function(args, message){
             Roles(message, args);
         });
-        this.AddCommand("restricted", 1, "roles id:", "!______________", "_______________;", function(args, message){
+        this.AddCommand("restricted", 0, "roles id:", "!roles id:type/id", "отображение и выдача заслуженных медалей по bungie id;", function(args, message){
             Roles(message, args);
         });
         this.AddCommand("restricted", 2, "triumph", "!triumph TRIUMPH_HASH", "отобразить стражей клана, получивших конкретный триумф;", function(args, message){});
@@ -162,7 +162,12 @@ export class CommandManager{
  
 
         this.AddCommand("guildmaster", 2, "checksync", "!______________", "_______________;", function(args, message){});
-        this.AddCommand("guildmaster", 2, "ck clankick", "!clankick %days%", "выборка активности малоактивных стражей;\n_по умолчанию — 7 дней_;", function(args, message){});
+        this.AddCommand("guildmaster", 1, "ck", "", "", function(args, message){
+            ClanTime(message.channel);
+        });
+        this.AddCommand("guildmaster", 1, "clankick", "!clankick %days%", "выборка активности малоактивных стражей;\n_по умолчанию — 7 дней_;", function(args, message){
+            ClanTime(message.channel);
+        });
         this.AddCommand("guildmaster", 2, "ckp clankickpub", "!clankickpub %days%", "выборка активности **самых** малоактивных стражей;\n_по умолчанию — 7 дней_;", function(args, message){});
         this.AddCommand("guildmaster", 2, "copy", "!copy", "ручной запуск переноса в архив старых сборов рейдов;", function(args, message){});
         this.AddCommand("guildmaster", 0, "csr", "!csr", "ручной запуск выдачи ролей всему клану;", function(args, message){
