@@ -1,4 +1,4 @@
-export class ClanMember{
+export class ClanMember {
     #destinyUserInfo;
     #clanId;/*
     #crossSaveOverride;
@@ -14,10 +14,10 @@ export class ClanMember{
         this.#clanId = member.groupId;
     }
 
-    get membershipType(){
+    get membershipType() {
         return this.#destinyUserInfo.membershipType;
     }
-    get membershipId(){
+    get membershipId() {
         return this.#destinyUserInfo.membershipId;
     }
     get displayName() {
@@ -27,14 +27,14 @@ export class ClanMember{
         return this.#destinyUserInfo.displayName;
     }
 
-    get clanId(){
+    get clanId() {
         return this.#clanId;
     }
 
-    get discordMemberExists(){
+    get discordMemberExists() {
         return this.discordMember != null;
     }
-    get discordMemberId(){
+    get discordMemberId() {
         return this.discordMember.id != null;
     }
     SetDiscordMember(_discordMember) {
