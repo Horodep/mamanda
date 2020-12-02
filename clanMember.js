@@ -35,7 +35,7 @@ export class ClanMember {
         return this.discordMember != null;
     }
     get discordMemberId() {
-        return this.discordMember.id != null;
+        return this.discordMember?.id;
     }
     SetDiscordMember(_discordMember) {
         this.discordMember = _discordMember;
