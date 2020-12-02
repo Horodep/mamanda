@@ -165,7 +165,7 @@ export class CommandManager{
         this.AddCommand("guildmaster", 2, "ck clankick", "!clankick %days%", "выборка активности малоактивных стражей;\n_по умолчанию — 7 дней_;", function(args, message){});
         this.AddCommand("guildmaster", 2, "ckp clankickpub", "!clankickpub %days%", "выборка активности **самых** малоактивных стражей;\n_по умолчанию — 7 дней_;", function(args, message){});
         this.AddCommand("guildmaster", 2, "copy", "!copy", "ручной запуск переноса в архив старых сборов рейдов;", function(args, message){});
-        this.AddCommand("guildmaster", 1, "csr", "!csr", "ручной запуск выдачи ролей всему клану;", function(args, message){
+        this.AddCommand("guildmaster", 0, "csr", "!csr", "ручной запуск выдачи ролей всему клану;", function(args, message){
             SetRoles(message.channel);
         });
         this.AddCommand("guildmaster", 2, "engreset", "!engreset", "генерация ссылок на англоязычные изображения еженедельного ресета в текущий канал;", function(args, message){});
