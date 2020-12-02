@@ -15,7 +15,7 @@ export async function GetClanVoiceSummary(days) {
     try{
         var clanVoiceSummary = [];
         var results = await pool.query(guildVoiceSummaryQuery, []);
-        results.forEach(function (row) {
+        results.rows.forEach(function (row) {
             clanVoiceSummary[row.id] = row.online;
         });
         console.log("guild voice online - ok");
