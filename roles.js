@@ -50,7 +50,7 @@ export async function RolesByMembershipId(channel, membership) {
 		}
 
 		var clanMember = new ClanMember(member.data);
-		clanMember.LookForDiscordMember(channel.guild);
+		clanMember.FetchDiscordMember(channel.guild);
 
 		await GetShowAndSetRoles(clanMember, channel);
 	} catch (e){

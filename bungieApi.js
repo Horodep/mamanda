@@ -26,3 +26,15 @@ export async function GetProfileData(membershipType, membershipId){
 		console.log("Rejected: " + result);
 	}
 }
+
+export async function GetActivitiesFromApi(membershipType, membershipId, characterId, page, mode){
+	try{
+		mode = mode ? mode : "None";
+		var result = await makeRequestWithPromise('GET', 
+			`https://www.bungie.net/Platform/Destiny2/${membershipType}/Account/${membershipId}/Character/${characterId}/Stats/Activities/?mode=${mode}&count=250&page=${page}`);
+		return result.Response.activities;
+	}catch{
+		console.log("Rejected: " + result);
+		return result;
+	}
+}
