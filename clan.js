@@ -17,12 +17,12 @@ export async function ClanSize() {
 		config.clans[1].name + ": " + (await GetClanMembers(config.clans[1].id)).length;
 }
 
-export async function FindMemberByFullName(fullName) {
+export async function GetMemberByDiscordName(discordName) {
 	var members = await GetAllMembers();
 	try {
 		members.forEach(function (member) {
-			if (fullName.startsWith(member.destinyUserInfo.LastSeenDisplayName + " ") ||
-				fullName == member.destinyUserInfo.LastSeenDisplayName) {
+			if (discordName.startsWith(member.destinyUserInfo.LastSeenDisplayName + " ") ||
+				discordName == member.destinyUserInfo.LastSeenDisplayName) {
 				throw member;
 			}
 		});

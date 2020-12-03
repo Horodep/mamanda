@@ -2,7 +2,7 @@ import Discord from "discord.js";
 import config from "./config.json";
 import { CatchError } from "./catcherror.js";
 import { GetFullMemberData, GetProfileData } from "./bungieApi.js";
-import { FindMemberByFullName } from "./clan.js";
+import { GetMemberByDiscordName } from "./clan.js";
 import * as BungieApiLogic from "./coreLogic/bungieApiDataLogic.js";
 import { LogRolesGranting, CheckAndProcessRole, CheckAndProcessRoleBlock, SumMedals, EmbedFormField } from "./coreLogic/rolesLogic.js";
 import { ClanMember } from "./clanMember.js";
@@ -26,7 +26,7 @@ export async function RolesByDiscordMention(channel, discordMention) {
 		return;
 	}
 
-	var member = await FindMemberByFullName(discordMember.displayName);
+	var member = await GetMemberByDiscordName(discordMember.displayName);
 	if (member == null) {
 		channel.send('Игровой профиль не найден.');
 		return;
