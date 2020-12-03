@@ -4,6 +4,7 @@ import { ShowNewbieList, ShowQueueList, ShowQueueReqestsList } from "./discordGu
 import { ClanSize, ClanTime, SetRoles } from "./clan.js"
 import { Roles } from "./roles.js"
 import { newAuthToken } from "./httpCore.js"
+import { GetClanMemberOnlineTime } from "./clanMember.js";
 
 export class CommandManager{
     static commandList = [];
@@ -143,7 +144,9 @@ export class CommandManager{
             InviteFriend(message, (args.length > 1 ? args[1] : ""));
         });
         this.AddCommand("restricted", 2, "medals", "!medals", "стражи с большим количеством медалей;", function(args, message){});
-        this.AddCommand("restricted", 2, "mymt", "!mymt", "проверка активности стража в голосовом чате (только своей);", function(args, message){});
+        this.AddCommand("restricted", 1, "mymt", "!mymt", "проверка активности стража в голосовом чате (только своей);", function(args, message){
+            GetClanMemberOnlineTime(message, args);
+        });
         this.AddCommand("restricted", 0, "region", "!region", "смена региона сервера;", function(args, message){
             ChangeRegion(message);
         });
