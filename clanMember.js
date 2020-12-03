@@ -50,9 +50,33 @@ export class ClanMember {
     get discordMemberId() {
         return this.discordMember?.id;
     }
+    get discordTag() {
+        return "<?" + this.discordMember?.id + "?>";
+    }
+    get joined(){
+        return Math.round((Date.now() - this.discordMember.joinedTimestamp) / (1000 * 60 * 60 * 24))
+    }
+    HasDiscordRole(roleId) {
+        return this.discordMember.roles.cache.find(role => role.id == roleId) != null;
+    }
 
+    get voiceOnline(){
+        return this.#voiceOnline;
+    }
+    get gameOnline(){
+        return this.#gameOnline;
+    }
     get percentage() {
         return (this.#gameOnline == 0) ? 0 : Math.floor(100 * this.#voiceOnline / this.#gameOnline);
+    }
+    get isLowGame() {
+        return this.#gameOnline < 7*60*60;
+    }
+    get isZeroGame() {
+        return this.#gameOnline == 0;
+    }
+    get isZeroVoice() {
+        return this.#voiceOnline == 0;
     }
 
     async FetchCharacterIds() {
@@ -76,6 +100,12 @@ export class ClanMember {
         this.#gameOnline += deltaTime;
     }
 
+    GetPercentageLine() {
+        var percentage = this.percentage();
+        if (percentage < 100) { percentage = "0" + percentage; }
+        if (percentage < 10) { percentage = "0" + percentage; }
+        return percentage + "%";
+    }
     GetTimeLine(seconds) {
         var hours = Math.floor(seconds / 3600);
         var minutes = Math.floor((seconds % 3600) / 60);
@@ -83,17 +113,19 @@ export class ClanMember {
         if (minutes < 10) { minutes = "0" + minutes; }
         return hours + ":" + minutes;
     }
+    GetGameTimeLine() {
+        return this.access ? this.GetTimeLine(this.#gameOnline) : "--:--";
+    }
+    GetVoiceTimeLine() {
+        return this.GetTimeLine(this.#voiceOnline);
+    }
     GetMemberTimeString() {
         if (this.access == false)
-            return "**" + this.displayName + "** :: профиль закрыт; в войсе — " + GetTimeLine(this.#voiceOnline);
+            return "**" + this.displayName + "** :: профиль закрыт; в войсе — " + this.GetVoiceTimeLine();
         else
             return "**" + this.displayName + "** :: " +
-                this.GetTimeLine(this.#voiceOnline) + " / " +
-                this.GetTimeLine(this.#gameOnline) + " = " + this.percentage + "%";
-
-        //var percentage = member.getPercentage();
-        //if (percentage < 100) {percentage = "0"+percentage;}
-        //if (percentage < 10)  {percentage = "0"+percentage;}
+                this.GetVoiceTimeLine() + " / " +
+                this.GetGameTimeLine() + " = " + this.percentage + "%";
     }
     FormLinesForDetailedVoice(results) {
         var lines = []
@@ -114,13 +146,13 @@ export class ClanMember {
                 " [(детальная статистика)](https://chrisfried.github.io/secret-scrublandeux/guardian/" + this.membershipType + "/" + this.membershipId + ")"))
         var body = "";
         detailedLines.forEach(line => {
-            if ((body + line) > 1010){
+            if ((body + line) > 1010) {
                 embed.addField("Voice online", "```" + body + "```");
                 body = line;
-            }else{
+            } else {
                 body += "\n" + line;
             }
-            
+
         });
         embed.addField("Voice online", "```" + body + "```");
         return embed;
@@ -145,7 +177,7 @@ export async function GetClanMemberOnlineTime(message, days, discordMention) {
     await clanMember.FetchCharacterIds();
     clanMember.FetchDiscordMember(message.guild);
 
-    //var clanVoiceSummary = await GetClanVoiceSummary(7);
+    //var clanVoiceSummary = await GetClanVoiceSummary(days);
     //clanMember.AddToVoiceOnline(clanVoiceSummary[clanMember.discordMemberId]); // don't work
 
     var activities = await GetAllActivities(clanMember, days);
