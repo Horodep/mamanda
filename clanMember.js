@@ -105,20 +105,25 @@ export class ClanMember {
         return lines;
     }
     GetMemberTimeEmbed(detailedLines) {
-
-
         const embed = new MessageEmbed()
             .setAuthor(this.displayName + " — " + this.percentage + "%")
             .setColor(0x00AE86)
-            .addField("Game online", this.access == false ? "Classified" : (this.GetTimeLine(this.#gameOnline) +
-                " [(детальная статистика)](https://chrisfried.github.io/secret-scrublandeux/guardian/" + this.membershipType + "/" + this.membershipId + ")"))
-
-        embed.addField("Voice online", createLine(message, finmember, "solotime") + "```" + (text.length > 0 ? text : " ") + "```")
-        if (text1.length > 0) embed.addField("Voice online", "```" + (text1.length > 0 ? text1 : " ") + "```")
-        if (text2.length > 0) embed.addField("Voice online", "```" + (text2.length > 0 ? text2 : " ") + "```")
-        embed
             .setFooter("Horobot", "https://cdn.discordapp.com/avatars/543342030768832524/7da47eaca948d9874b66fc5884ca2d00.png")
             .setTimestamp()
+            .addField("Game online", this.access == false ? "Classified" : (this.GetTimeLine(this.#gameOnline) +
+                " [(детальная статистика)](https://chrisfried.github.io/secret-scrublandeux/guardian/" + this.membershipType + "/" + this.membershipId + ")"))
+        var body = "";
+        detailedLines.forEach(line => {
+            if ((body + line) > 1010){
+                embed.addField("Voice online", "```" + body + "```");
+                body = line;
+            }else{
+                body += "\n" + line;
+            }
+            
+        });
+        embed.addField("Voice online", "```" + body + "```");
+        return embed;
     }
 }
 
@@ -179,28 +184,4 @@ async function GetCharacterActivities(clanMember, characterId, page, mode, delta
     });
     if (!isLastPage) Array.prototype.push.apply(filteredActivities, await GetCharacterActivities(clanMember, characterId, ++page, mode, deltaDate));
     return filteredActivities;
-}
-
-function FormMemberTimeMessage() {
-    if (doFull) {
-        text = "";
-        text1 = "";
-        text2 = "";
-        results.forEach(function (line) {
-            addon =
-                new Date(line.datetime.getTime() + 3 * 60 * 60 * 1000).toISOString().replace(/T/, ' ').replace(/\..+/, '').substring(5, 16) + "   " +
-                new Date(line.next_datetime_fixed.getTime() + 3 * 60 * 60 * 1000).toISOString().replace(/T/, ' ').replace(/\..+/, '').substring(5, 16) + "   " +
-                line.td.substring(0, 5) + "\n";
-
-            if ((text + addon).length > 1010) {
-                if ((text1 + addon).length > 1010) {
-                    text2 += addon;
-                } else {
-                    text1 += addon;
-                }
-            } else {
-                text += addon;
-            }
-        });
-    }
 }
