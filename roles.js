@@ -106,9 +106,9 @@ async function GetRolesData(membershipType, membershipId) {
 	data.locations.dc = BungieApiLogic.get_node_data(response, 3483405511, "Город Грез");
 	data.locations.moon = BungieApiLogic.get_node_data(response, 1473265108, "Луна");
 	data.locations.euro = BungieApiLogic.get_node_data(response, 2647590440, "Европа");
-	data.triumphs.t10k = BungieApiLogic.get_profile_records(response, "activeScore", 10000, "");
-	data.triumphs.t15k = BungieApiLogic.get_profile_records(response, "activeScore", 15000, "");
-	data.triumphs.t20k = BungieApiLogic.get_profile_records(response, "activeScore", 20000, "");
+	data.triumphs.tier1 = BungieApiLogic.get_profile_records(response, "activeScore", 10000, "");
+	data.triumphs.tier2 = BungieApiLogic.get_profile_records(response, "activeScore", 15000, "");
+	data.triumphs.tier3 = BungieApiLogic.get_profile_records(response, "activeScore", 20000, "");
 	data.seals.cursebreaker = BungieApiLogic.get_character_node_data(characterPresentationNodes, 560097044, "Гроза");
 	data.seals.harbinger = BungieApiLogic.get_node_data(response, 379405979, "Посланник");
 	data.seals.splintered = BungieApiLogic.get_node_data(response, 79180995, "Раскол");
