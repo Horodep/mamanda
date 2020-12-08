@@ -28,7 +28,7 @@ export async function GetMemberDetailsVoice(days, membershipId) {
 export async function GetClanVoiceSummary(days) {
     try {
         var clanVoiceSummary = [];
-        var results = await pool.query(guildVoiceSummaryQuery, []);
+        var results = await pool.query(guildVoiceSummaryQuery.replace('$1', days), []);
         results.rows.forEach(function (row) {
             clanVoiceSummary[row.id] = row.online;
         });
@@ -105,13 +105,13 @@ FROM(
                 ORDER BY datetime 
             )next_state 
         FROM log l) AS t) AS t1 
-WHERE t1.datetime > NOW() - INTERVAL $1 DAY 
+WHERE t1.datetime > NOW() - INTERVAL '$1 DAYS' 
 AND state = 1 
 AND t1.member_id = $2;`;
 
 const guildVoiceSummaryQuery =
     `SELECT 
-    CAST(t1.member_id as CHAR(50)) as id, 
+    t1.member_id as id, 
     SUM(t1.next_datetime_fixed - t1.datetime) AS online  
 FROM( 
     SELECT  
@@ -134,6 +134,6 @@ FROM(
                 ORDER BY datetime 
             )next_state 
         FROM log l) AS t) AS t1 
-WHERE t1.datetime > NOW() - INTERVAL '7 DAYS' 
+WHERE t1.datetime > NOW() - INTERVAL '$1 DAYS' 
 AND state = true 
 GROUP BY t1.member_id;`;

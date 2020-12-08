@@ -183,7 +183,7 @@ export class CommandManager{
             message.channel.send(CommandManager.GetRestrictedHelp());
         });
         this.AddCommand("guildmaster", 1, "membertime", "!membertime @DiscrordTag %days%", "выборка активности стража;\n_по умолчанию — 7 дней_;", function(args, message){
-            GetClanMemberOnlineTime(message, (args.length > 2 ? args[2] : 7), (args.length > 1 ? args[1] : message.member.id))
+            GetClanMemberOnlineTime(message, (args.length > 2 ? args[2] : 7), (args.length > 1 ? args[1] : message.member.id), true)
         });
         this.AddCommand("guildmaster", 2, "message", "!______________", "_______________;", function(args, message){});
         this.AddCommand("guildmaster", 0, "n", "!n", "список новичков в клане;", function(args, message){

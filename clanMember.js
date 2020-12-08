@@ -94,7 +94,8 @@ export class ClanMember {
     }
 
     AddToVoiceOnline(deltaTime) {
-        this.#voiceOnline += deltaTime;
+        var deltaSeconds = ((deltaTime.hours * 60) + deltaTime.minutes) * 60 + deltaTime.seconds;
+        this.#voiceOnline += deltaSeconds;
     }
     AddToGameOnline(deltaTime) {
         this.#gameOnline += deltaTime;
@@ -159,7 +160,7 @@ export class ClanMember {
     }
 }
 
-export async function GetClanMemberOnlineTime(message, days, discordMention) {
+export async function GetClanMemberOnlineTime(message, days, discordMention, isDetailed) {
     console.log(new Date());
     var discordName = message.member.displayName;
     if (discordMention != null) {
@@ -177,8 +178,8 @@ export async function GetClanMemberOnlineTime(message, days, discordMention) {
     await clanMember.FetchCharacterIds();
     clanMember.FetchDiscordMember(message.guild);
 
-    //var clanVoiceSummary = await GetClanVoiceSummary(days);
-    //clanMember.AddToVoiceOnline(clanVoiceSummary[clanMember.discordMemberId]); // don't work
+    var clanVoiceSummary = await GetClanVoiceSummary(days);
+    clanMember.AddToVoiceOnline(clanVoiceSummary[clanMember.discordMemberId]);
 
     var activities = await GetAllActivities(clanMember, days);
     activities.forEach(a => clanMember.AddToGameOnline(a.values.timePlayedSeconds.basic.value))
