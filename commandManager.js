@@ -6,6 +6,7 @@ import { Roles } from "./roles.js"
 import { newAuthToken } from "./httpCore.js"
 import { GetClanMemberOnlineTime } from "./clanMember.js";
 import { CatchError } from "./catcherror.js";
+import { ClanMedalsSummary } from "./discordCommunityFeatures.js";
 
 export class CommandManager{
     static commandList = [];
@@ -148,7 +149,9 @@ export class CommandManager{
         this.AddCommand("restricted", 0, "invitefriend", "!invitefriend @DiscordTag", "выдача роли 'Странник' вместо роли 'Очередь';\n_доступна опытным стражам_;", function(args, message){
             InviteFriend(message, (args.length > 1 ? args[1] : ""));
         });
-        this.AddCommand("restricted", 2, "medals", "!medals", "стражи с большим количеством медалей;", function(args, message){});
+        this.AddCommand("restricted", 0, "medals", "!medals", "стражи с большим количеством медалей;", function(args, message){
+            ClanMedalsSummary(message.channel);
+        });
         this.AddCommand("restricted", 0, "mymt", "!mymt", "проверка активности стража в голосовом чате (только своей);", function(args, message){
             GetClanMemberOnlineTime(message, (args.length > 1 ? args[1] : 7));
         });
@@ -350,16 +353,7 @@ GM
             message.channel.send('Указаны не все параметры');
         };
         break;
-    case 'size':			count.count(message);														break;
-    case 'ck':
-    case 'clankick':		clantime.clantime(message, (args.length > 1 ? args[1] : 7), 'full');		break;
-    case 'ckp':
-    case 'clankickpub':		clantime.clantime(message, (args.length > 1 ? args[1] : 7), 'pub');			break;
-    case 'csr':				roles.set_clan_roles(message.channel);										break;
     case 'nicknames':		dclan.dclan(message, true, message.channel);								break;
-    case 'q':				query.q(message);															break;
-    case 'qq':				query.qq(message);															break;
-    case 'n':				query.n(message);															break;
     case 'pvpdrop':
         var t1 = message.guild.roles.find(role => role.name == "💠 Левая рука Шакса");
         t1.members.forEach(function(member) {
