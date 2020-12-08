@@ -1,7 +1,7 @@
 import { MessageEmbed } from "discord.js";
 import { GetActivitiesFromApi, GetProfileData } from "./bungieApi.js";
 import { GetMemberByDiscordName } from "./clan.js";
-import { GetClanVoiceSummary } from "./sql.js"
+import { GetClanVoiceSummary, GetMemberDetailedVoice } from "./sql.js"
 /*
 #crossSaveOverride;
 #applicableMembershipTypes;
@@ -130,11 +130,14 @@ export class ClanMember {
     }
     FormLinesForDetailedVoice(results) {
         var lines = []
-        results.forEach((row) => {
+        results.rows.forEach((row) => {
             lines.push(new Date(row.datetime.getTime() + 3 * 60 * 60 * 1000).toISOString().replace(/T/, ' ').replace(/\..+/, '').substring(5, 16) + "   " +
                 new Date(row.next_datetime_fixed.getTime() + 3 * 60 * 60 * 1000).toISOString().replace(/T/, ' ').replace(/\..+/, '').substring(5, 16) + "   " +
-                row.td.substring(0, 5));
+                PeriodValueToLine(row.period.hours) + ":" + PeriodValueToLine(row.period.minutes));
         });
+        function PeriodValueToLine(value){
+            return value ? (value < 10 ? "0"+value : value) : "00";
+        }
         return lines;
     }
     GetMemberTimeEmbed(detailedLines) {
@@ -145,17 +148,17 @@ export class ClanMember {
             .setTimestamp()
             .addField("Game online", this.access == false ? "Classified" : (this.GetTimeLine(this.#gameOnline) +
                 " [(детальная статистика)](https://chrisfried.github.io/secret-scrublandeux/guardian/" + this.membershipType + "/" + this.membershipId + ")"))
-        var body = "";
+        var body = this.GetTimeLine(this.#voiceOnline) + "```";
         detailedLines.forEach(line => {
             if ((body + line) > 1010) {
-                embed.addField("Voice online", "```" + body + "```");
-                body = line;
+                embed.addField("Voice online", body + "```");
+                body = "```" + line;
             } else {
                 body += "\n" + line;
             }
 
         });
-        embed.addField("Voice online", "```" + body + "```");
+        embed.addField("Voice online", body + "```");
         return embed;
     }
 }
@@ -184,7 +187,12 @@ export async function GetClanMemberOnlineTime(message, days, discordMention, isD
     var activities = await GetAllActivities(clanMember, days);
     activities.forEach(a => clanMember.AddToGameOnline(a.values.timePlayedSeconds.basic.value))
 
-    message.channel.send(clanMember.GetMemberTimeString());
+    if (isDetailed) {
+        var detailedVoiceResults = await GetMemberDetailedVoice(days, clanMember.discordMemberId);
+        var lines = clanMember.FormLinesForDetailedVoice(detailedVoiceResults)
+        message.channel.send(clanMember.GetMemberTimeEmbed(lines));
+    }
+    else message.channel.send(clanMember.GetMemberTimeString());
     console.log(new Date());
 }
 

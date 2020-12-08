@@ -144,7 +144,7 @@ export class CommandManager{
             InviteFriend(message, (args.length > 1 ? args[1] : ""));
         });
         this.AddCommand("restricted", 2, "medals", "!medals", "стражи с большим количеством медалей;", function(args, message){});
-        this.AddCommand("restricted", 1, "mymt", "!mymt", "проверка активности стража в голосовом чате (только своей);", function(args, message){
+        this.AddCommand("restricted", 0, "mymt", "!mymt", "проверка активности стража в голосовом чате (только своей);", function(args, message){
             GetClanMemberOnlineTime(message, (args.length > 1 ? args[1] : 7));
         });
         this.AddCommand("restricted", 0, "region", "!region", "смена региона сервера;", function(args, message){
@@ -182,7 +182,7 @@ export class CommandManager{
         this.AddCommand("guildmaster", 0, "gmhelp", "!gmhelp", "список доступных ГМ-ских команд;", function(args, message){
             message.channel.send(CommandManager.GetRestrictedHelp());
         });
-        this.AddCommand("guildmaster", 1, "membertime", "!membertime @DiscrordTag %days%", "выборка активности стража;\n_по умолчанию — 7 дней_;", function(args, message){
+        this.AddCommand("guildmaster", 0, "membertime", "!membertime @DiscrordTag %days%", "выборка активности стража;\n_по умолчанию — 7 дней_;", function(args, message){
             GetClanMemberOnlineTime(message, (args.length > 2 ? args[2] : 7), (args.length > 1 ? args[1] : message.member.id), true)
         });
         this.AddCommand("guildmaster", 2, "message", "!______________", "_______________;", function(args, message){});

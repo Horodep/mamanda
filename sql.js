@@ -11,24 +11,20 @@ const pool = new Pool({
     max: 10
 });
 
-export async function GetMemberDetailsVoice(days, membershipId) {
+export async function GetMemberDetailedVoice(days, discordMemberId) {
     try {
-        var interval = 0;
-        var results = await pool.query(memberVoiceDetailsQuery, [days, membershipId]);
-        results.rows.forEach(function (row) {
-            clanVoiceSummary[row.id] = row.online;
-        });
-        console.log("guild voice online - ok");
+        var results = await pool.query(memberVoiceDetailsQuery.replace('$2', days), [discordMemberId]);
+        console.log("member voice online - ok");
     } catch (err) {
         console.log(err.stack)
     }
-    return interval;
+    return results;
 }
 
 export async function GetClanVoiceSummary(days) {
     try {
         var clanVoiceSummary = [];
-        var results = await pool.query(guildVoiceSummaryQuery.replace('$1', days), []);
+        var results = await pool.query(guildVoiceSummaryQuery.replace('$2', days), []);
         results.rows.forEach(function (row) {
             clanVoiceSummary[row.id] = row.online;
         });
@@ -83,7 +79,7 @@ const memberVoiceDetailsQuery =
     `SELECT 
     t1.datetime, 
     t1.next_datetime_fixed, 
-    TIMEDIFF(t1.next_datetime_fixed, t1.datetime) AS td 
+    (t1.next_datetime_fixed - t1.datetime) AS period 
 FROM( 
     SELECT 
       t.*, 
@@ -105,9 +101,9 @@ FROM(
                 ORDER BY datetime 
             )next_state 
         FROM log l) AS t) AS t1 
-WHERE t1.datetime > NOW() - INTERVAL '$1 DAYS' 
-AND state = 1 
-AND t1.member_id = $2;`;
+WHERE t1.datetime > NOW() - INTERVAL '$2 DAYS' 
+AND state = true 
+AND t1.member_id = $1;`;
 
 const guildVoiceSummaryQuery =
     `SELECT 
@@ -134,6 +130,6 @@ FROM(
                 ORDER BY datetime 
             )next_state 
         FROM log l) AS t) AS t1 
-WHERE t1.datetime > NOW() - INTERVAL '$1 DAYS' 
+WHERE t1.datetime > NOW() - INTERVAL '$2 DAYS' 
 AND state = true 
 GROUP BY t1.member_id;`;
