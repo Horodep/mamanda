@@ -2,7 +2,7 @@ import { MessageEmbed } from "discord.js";
 import config from "./config.json";
 import { GetClanMembers } from "./bungieApi.js";
 import { GetShowAndSetRoles } from "./roles.js";
-import { ClanMember } from "./clanMember.js";
+import { ClanMember, GetAllActivities } from "./clanMember.js";
 import { GetClanVoiceSummary } from "./sql.js";
 
 async function GetAllMembers() {
@@ -52,59 +52,56 @@ export function SetRoles(channel) {
 	});
 }
 
-export async function ClanTime(channel, days) {
+export async function ClanTime(channel, days, modificators) {
 	var clanMembers = [];
 	var clanVoiceSummary = await GetClanVoiceSummary(days);
-	channel.send("bruh").then((msg) => {
+	var iterator = 0;
+	channel.send(new MessageEmbed()).then((msg) => {
 		ExecuteForEveryMember(500, async function (member, i, members) {
-			var membershipId = member.destinyUserInfo.membershipId;
 			var clanMember = new ClanMember(member);
 			await clanMember.FetchCharacterIds();
-			clanMember.FetchDiscordMember(message.guild);
-			//clanMember.AddToVoiceOnline(clanVoiceSummary[clanMember.discordMemberId]); // don't work
+			clanMember.FetchDiscordMember(channel.guild);
+			clanMember.AddToVoiceOnline(clanVoiceSummary[clanMember.discordMemberId]);
 			var activities = await GetAllActivities(clanMember, days);
 			activities.forEach(a => clanMember.AddToGameOnline(a.values.timePlayedSeconds.basic.value))
 
-			clanMembers[membershipId] = clanMember;
+			clanMembers.push(clanMember);
+			iterator++;
 
-			if (i % 20 == 0 || i == members.length) {
-				msg.edit(FormClanTimeEmbed(clanMembers, i));
+			if (iterator % 20 == 0 || iterator == members.length) {
+				msg.edit(FormClanTimeEmbed(clanMembers, modificators+(iterator == members.length ? ' final' : '')));
 			}
 		});
 	});
 }
 
-function FormClanTimeEmbed(clanMembers, i) {
-	const embed = new MessageEmbed()
-		.setAuthor("Clankick "+i)
+function FormClanTimeEmbed(clanMembers, modificators) {
+	var guild = clanMembers[0].discordMember.guild;
+	var embed = new MessageEmbed()
+		.setAuthor("Clankick " + (modificators.includes("final") ? "" : clanMembers.length))
 		.setColor(0x00AE86)
 		.setFooter("Horobot", "https://cdn.discordapp.com/avatars/543342030768832524/7da47eaca948d9874b66fc5884ca2d00.png")
 		.setTimestamp()
 
+	var { lowGame, lowVoice, zeroGame, zeroVoice, goodNewbie, isAway, noData, weForgotToKik, discordNotFound } = filterClanMembersData(clanMembers);
 
-	var goodNewbie = clanMembers.filter(m => m.HasDiscordRole(config.roles.newbie) && m.joined >= 10).sort(byJoinDate);
-	var lowVoice = clanMembers.filter(m => m.percentage < 15).sort(byPercentage);
-	var lowGame = clanMembers.filter(m => m.isLowGame).sort(byGameTime);
-	var zeroGame = clanMembers.filter(m => m.isZeroGame).sort(byVoiceTime);
-	var zeroVoice = clanMembers.filter(m => m.isZeroVoice).sort(byGameTime);
-	var isAway = clanMembers.filter(m => m.HasDiscordRole(config.roles.afk)).sort(byGameTime);
-	var discordNotFound = clanMembers.filter(m => !m.discordMemberExists).sort(byGameTime);
-	var weForgotToKik = clanMembers.filter(m => m.HasDiscordRole(config.roles.guest));
-	var noData = clanMembers.filter(m => !m.access).sort(byVoiceTime);
+	var isFull = modificators.includes("full");
 
 	//       embed | field title | array | pattern | separator | show_if_empty | semicolumn | condition
 	addField(embed, "Меньше 5 часов", lowGame, null, "\n", false, false, isFull);
-	addField(embed, "Меньше 15%", lowVoice, null, "\n", false, false);
-	addField(embed, "0 в игре [в войсе]", zeroGame, "`$voice$role`$tag", "\n", false, true);
-	addField(embed, "0 в войсе [в игре]", zeroVoice, "`$game$role`$tag", "\n", false, true);
-	addField(embed, "Очернить стража", goodNewbie, null, "\n", true, false);
-	addField(embed, "В отпуске [в игре]", isAway, "$tag ($time)", "\n", false, false, isFull);
+	addField(embed, "Меньше 15%", lowVoice, null, "\n", false, false, true);
+	addField(embed, "0 в игре [в войсе]", zeroGame, "`$voice$role`$tag", "\n", false, true, true);
+	addField(embed, "0 в войсе [в игре]", zeroVoice, "`$game$role`$tag", "\n", false, true, true);
+	addField(embed, "Очернить стража", goodNewbie, null, "\n", true, false, true);
+	addField(embed, "В отпуске [в игре]", isAway, "$tag ($game)", "\n", false, true, isFull);
 	addField(embed, "Профиль закрыт [в войсе]", noData, "`$voice$role`$tag", "\n", false, true, isFull);
-	addField(embed, "Недокикнуты [в игре]", weForgotToKik, "$name ($time)", "\n", false, true);
-	addField(embed, '\u200B', [], "", "", true, false)
-	addField(embed, "Неверный ник [в игре]", discordNotFound, "$name ($time)", "\n", false, true);
+	addField(embed, '\u200B', [], "", "", true, false, true)
+	addField(embed, "Недокикнуты [в игре]", weForgotToKik, "$name ($game)", "\n", false, true, true);
+	addField(embed, "Неверный ник [в игре]", discordNotFound, "$name ($game)", "\n", false, true, true);
 
-	var discordMembers = getFullDiscordClanMemberList(clanMembers[0].discordMember.guild);
+	if (!modificators.includes("final")) return embed;
+
+	var discordMembers = getFullDiscordClanMemberList(guild);
 	var left = "";
 	discordMembers.forEach(function (member) {
 		if (clanMembers.filter(m => member.displayName.startsWith(m.displayName)).length == 0) {
@@ -113,16 +110,51 @@ function FormClanTimeEmbed(clanMembers, i) {
 	});
 	if (left.length > 0) embed.addField("Неверный ник [в дискорде]", left, true)
 	
+	return embed;
+}
+
+function filterClanMembersData(clanMembers) {
+	var filteredMembers = clanMembers;
+
+	var discordNotFound = filteredMembers.filter(m => !m.discordMemberExists).sort(byGameTime);
+	filteredMembers = filteredMembers.filter(e => !discordNotFound.includes(e));
+	
+	var filteredMembers = filteredMembers.filter(m => m.joined >= 7);
+
+	var isAway = filteredMembers.filter(m => m.HasDiscordRole(config.roles.afk)).sort(byGameTime);
+	filteredMembers = filteredMembers.filter(e => !isAway.includes(e));
+
+	var noData = filteredMembers.filter(m => !m.access && !m.HasDiscordRole(config.roles.newbie)).sort(byVoiceTime);
+	filteredMembers = filteredMembers.filter(e => !noData.includes(e));
+	
+	var zeroGame = filteredMembers.filter(m => m.isZeroGame).sort(byVoiceTime);
+	filteredMembers = filteredMembers.filter(e => !zeroGame.includes(e));
+
+	var zeroVoice = filteredMembers.filter(m => m.isZeroVoice).sort(byGameTime);
+	filteredMembers = filteredMembers.filter(e => !zeroVoice.includes(e));
+
+	var lowVoice = filteredMembers.filter(m => m.percentage < 15).sort(byPercentage);
+	filteredMembers = filteredMembers.filter(e => !lowVoice.includes(e));
+
+	var lowGame = filteredMembers.filter(m => m.isLowGame).sort(byGameTime);
+	filteredMembers = filteredMembers.filter(e => !lowGame.includes(e));
+
+	var goodNewbie = filteredMembers.filter(m => m.HasDiscordRole(config.roles.newbie) && m.joined >= 10).sort(byJoinDate);
+	filteredMembers = filteredMembers.filter(e => !goodNewbie.includes(e));
+
+	var weForgotToKik = filteredMembers.filter(m => m.HasDiscordRole(config.roles.guest));
+	
 	function byGameTime(a, b) { return a.gameOnline < b.gameOnline ? 1 : a.gameOnline > b.gameOnline ? -1 : 0;}
 	function byVoiceTime(a, b) { return a.voiceOnline < b.voiceOnline ? 1 : a.voiceOnline > b.voiceOnline ? -1 : 0;}
 	function byJoinDate(a, b) { return a.joined < b.joined ? 1 : a.joined > b.joined ? -1 : 0;}
-	function byPercentage(a, b) { return a.joined < b.joined ? 1 : a.joined > b.joined ? -1 : 0;}
-	return embed;
+	function byPercentage(a, b) { return a.percentage < b.percentage ? 1 : a.percentage > b.percentage ? -1 : 0;}
+
+	return { lowGame, lowVoice, zeroGame, zeroVoice, goodNewbie, isAway, noData, weForgotToKik, discordNotFound };
 }
 
 function addField(embed, embed_header, members, linePattern, separator, show_if_empty, semicolumn, show) {
 	if (!show) return;
-
+	if (members.length == 0 && !show_if_empty) return;
 	if (members.map(m => createLine(m, linePattern)).join(separator).length > 1010){
 		embed.addField(embed_header, members.filter((_,i) => i <  members.length/2).map(m => createLine(m, linePattern)).join(separator), semicolumn);
 		embed.addField(embed_header, members.filter((_,i) => i >= members.length/2).map(m => createLine(m, linePattern)).join(separator). semicolumn);
@@ -133,7 +165,7 @@ function addField(embed, embed_header, members, linePattern, separator, show_if_
 }
 
 function createLine(clanMember, pattern) {
-	if (!pattern) pattern = "`$percent $game $voice $role`$tag";
+	if (!pattern) pattern = "`$percent $voice $game $role`$tag";
 	return pattern
 		.replace("$name", clanMember.displayName)
 		.replace("$tag", clanMember.discordTag)
@@ -160,14 +192,15 @@ function getRoleMark(clanMember) {
 
 function getFullDiscordClanMemberList(guild){
 	var members = [];
-	Array.prototype.push.apply(members, guild.roles.cache.find(r => r.id == config.roles.guildleader));
-	Array.prototype.push.apply(members, guild.roles.cache.find(r => r.id == config.roles.guildmaster));
-	Array.prototype.push.apply(members, guild.roles.cache.find(r => r.id == config.roles.raidleader));
-	Array.prototype.push.apply(members, guild.roles.cache.find(r => r.id == config.roles.guardians[3]));
-	Array.prototype.push.apply(members, guild.roles.cache.find(r => r.id == config.roles.guardians[2]));
-	Array.prototype.push.apply(members, guild.roles.cache.find(r => r.id == config.roles.guardians[1]));
-	Array.prototype.push.apply(members, guild.roles.cache.find(r => r.id == config.roles.guardians[0]));
-	Array.prototype.push.apply(members, guild.roles.cache.find(r => r.id == config.roles.newbie));
+	guild.roles.cache.find(r => r.id == config.roles.guildleader).members.forEach(m => members.push(m));
+	guild.roles.cache.find(r => r.id == config.roles.guildmaster).members.forEach(m => members.push(m));
+	guild.roles.cache.find(r => r.id == config.roles.raidleader).members.forEach(m => members.push(m));
+	guild.roles.cache.find(r => r.id == config.roles.guardians[3]).members.forEach(m => members.push(m));
+	guild.roles.cache.find(r => r.id == config.roles.guardians[2]).members.forEach(m => members.push(m));
+	guild.roles.cache.find(r => r.id == config.roles.guardians[1]).members.forEach(m => members.push(m));
+	guild.roles.cache.find(r => r.id == config.roles.guardians[0]).members.forEach(m => members.push(m));
+	guild.roles.cache.find(r => r.id == config.roles.newbie).members.forEach(m => members.push(m));
+	guild.roles.cache.find(r => r.id == config.roles.afk).members.forEach(m => members.push(m));
 	return members;
 }
 

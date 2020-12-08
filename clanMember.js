@@ -31,8 +31,8 @@ export class ClanMember {
         return this.#destinyUserInfo.membershipId;
     }
     get displayName() {
-        if (this.#destinyUserInfo.lastSeenDisplayName != null) {
-            return this.#destinyUserInfo.lastSeenDisplayName;
+        if (this.#destinyUserInfo.LastSeenDisplayName != null) {
+            return this.#destinyUserInfo.LastSeenDisplayName;
         }
         return this.#destinyUserInfo.displayName;
     }
@@ -51,12 +51,14 @@ export class ClanMember {
         return this.discordMember?.id;
     }
     get discordTag() {
-        return "<?" + this.discordMember?.id + "?>";
+        return "<@" + this.discordMember?.id + ">";
     }
     get joined(){
-        return Math.round((Date.now() - this.discordMember.joinedTimestamp) / (1000 * 60 * 60 * 24))
+        return this.discordMember == null ? 0 :
+            Math.round((Date.now() - this.discordMember.joinedTimestamp) / (1000 * 60 * 60 * 24))
     }
     HasDiscordRole(roleId) {
+        if (!this.discordMemberExists) return false;
         return this.discordMember.roles.cache.find(role => role.id == roleId) != null;
     }
 
@@ -70,7 +72,7 @@ export class ClanMember {
         return (this.#gameOnline == 0) ? 0 : Math.floor(100 * this.#voiceOnline / this.#gameOnline);
     }
     get isLowGame() {
-        return this.#gameOnline < 7*60*60;
+        return this.#gameOnline < 5*60*60;
     }
     get isZeroGame() {
         return this.#gameOnline == 0;
@@ -94,7 +96,8 @@ export class ClanMember {
     }
 
     AddToVoiceOnline(deltaTime) {
-        var deltaSeconds = ((deltaTime.hours * 60) + deltaTime.minutes) * 60 + deltaTime.seconds;
+        if(typeof(deltaTime) == 'undefined') return;
+        var deltaSeconds = (((deltaTime.hours ?? 0) * 60) + (deltaTime.minutes ?? 0)) * 60 + (deltaTime.seconds ?? 0);
         this.#voiceOnline += deltaSeconds;
     }
     AddToGameOnline(deltaTime) {
@@ -102,7 +105,7 @@ export class ClanMember {
     }
 
     GetPercentageLine() {
-        var percentage = this.percentage();
+        var percentage = this.percentage;
         if (percentage < 100) { percentage = "0" + percentage; }
         if (percentage < 10) { percentage = "0" + percentage; }
         return percentage + "%";
@@ -150,7 +153,7 @@ export class ClanMember {
                 " [(детальная статистика)](https://chrisfried.github.io/secret-scrublandeux/guardian/" + this.membershipType + "/" + this.membershipId + ")"))
         var body = this.GetTimeLine(this.#voiceOnline) + "```";
         detailedLines.forEach(line => {
-            if ((body + line) > 1010) {
+            if ((body + line).length > 1010) {
                 embed.addField("Voice online", body + "```");
                 body = "```" + line;
             } else {
@@ -196,7 +199,7 @@ export async function GetClanMemberOnlineTime(message, days, discordMention, isD
     console.log(new Date());
 }
 
-async function GetAllActivities(clanMember, days) {
+export async function GetAllActivities(clanMember, days) {
     var deltaDate = new Date();
     deltaDate.setDate(deltaDate.getDate() - days);
 
@@ -210,13 +213,16 @@ async function GetAllActivities(clanMember, days) {
 
 async function GetCharacterActivities(clanMember, characterId, page, mode, deltaDate) {
     var filteredActivities = [];
-    var activities = await GetActivitiesFromApi(clanMember.membershipType, clanMember.membershipId, characterId, page, mode);
-    if (typeof (activities) == 'undefined') {
+    var responceActivities = await GetActivitiesFromApi(clanMember.membershipType, clanMember.membershipId, characterId, page, mode);
+    if (typeof (responceActivities) == 'undefined') {
         clanMember.access = false;
         return [];
     }
     var isLastPage = false;
-    activities.forEach(function (activity) {
+    if (typeof (responceActivities.activities) == 'undefined') {
+        return [];
+    }
+    responceActivities.activities.forEach(function (activity) {
         if (deltaDate < new Date(activity.period)) {
             filteredActivities.push(activity);
         } else {

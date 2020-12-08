@@ -5,14 +5,19 @@ import { ClanSize, ClanTime, SetRoles } from "./clan.js"
 import { Roles } from "./roles.js"
 import { newAuthToken } from "./httpCore.js"
 import { GetClanMemberOnlineTime } from "./clanMember.js";
+import { CatchError } from "./catcherror.js";
 
 export class CommandManager{
     static commandList = [];
 
     static Run(args, message){
-        var command = this.FindCommand(args[0]);
-        if (command.status > 1) message.channel.send("Команда отключена");
-        else command?.callback(args, message);
+        try{
+            var command = this.FindCommand(args[0]);
+            if (command.status > 1) message.channel.send("Команда отключена");
+            else command?.callback(args, message);
+        } catch (e) {
+            CatchError(e, message.channel);
+        }
     }
     static AddCommand(rights, status, name, title, description, callback){
         this.commandList.push({
@@ -165,13 +170,18 @@ export class CommandManager{
  
 
         this.AddCommand("guildmaster", 2, "checksync", "!______________", "_______________;", function(args, message){});
-        this.AddCommand("guildmaster", 1, "ck", "", "", function(args, message){
-            ClanTime(message.channel);
+        this.AddCommand("guildmaster", 0, "ck", "", "", function(args, message){
+            ClanTime(message.channel, (args.length > 1 ? args[1] : 7), 'full');
         });
-        this.AddCommand("guildmaster", 1, "clankick", "!clankick %days%", "выборка активности малоактивных стражей;\n_по умолчанию — 7 дней_;", function(args, message){
-            ClanTime(message.channel);
+        this.AddCommand("guildmaster", 0, "clankick", "!clankick %days%", "выборка активности малоактивных стражей;\n_по умолчанию — 7 дней_;", function(args, message){
+            ClanTime(message.channel, (args.length > 1 ? args[1] : 7), 'full');
         });
-        this.AddCommand("guildmaster", 2, "ckp clankickpub", "!clankickpub %days%", "выборка активности **самых** малоактивных стражей;\n_по умолчанию — 7 дней_;", function(args, message){});
+        this.AddCommand("guildmaster", 1, "ckp", "", "", function(args, message){
+            ClanTime(message.channel, (args.length > 1 ? args[1] : 7));
+        });
+        this.AddCommand("guildmaster", 0, "clankickpub", "!clankickpub %days%", "выборка активности **самых** малоактивных стражей;\n_по умолчанию — 7 дней_;", function(args, message){
+            ClanTime(message.channel, (args.length > 1 ? args[1] : 7));
+        });
         this.AddCommand("guildmaster", 2, "copy", "!copy", "ручной запуск переноса в архив старых сборов рейдов;", function(args, message){});
         this.AddCommand("guildmaster", 0, "csr", "!csr", "ручной запуск выдачи ролей всему клану;", function(args, message){
             SetRoles(message.channel);
