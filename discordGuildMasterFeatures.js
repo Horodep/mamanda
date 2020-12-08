@@ -2,6 +2,11 @@ import { MessageEmbed } from "discord.js";
 import config from "./config.json";
 import { CatchError } from "./catcherror.js";
 
+
+export function ForumTime(){}
+
+
+
 export function ShowNewbieList(message) {
 	var newbieList = [];
 	message.guild.roles.cache.find(role => role.id == config.roles.newbie).members.forEach(function (member) {

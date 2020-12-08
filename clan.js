@@ -53,6 +53,113 @@ export function SetRoles(channel) {
 	});
 }
 
+export function Nicknames(channel) {
+	var bot_msg = message;
+	var members = [];
+	
+	var xhr_clan = new XMLHttpRequest();
+	xhr_clan.open("GET", "https://www.bungie.net/Platform/GroupV2/3055823/Members/", true);
+	xhr_clan.setRequestHeader("X-API-Key", d2apiKey);
+	xhr_clan.onreadystatechange = function(){
+		if(this.readyState === 4 && this.status === 200){
+			var json = JSON.parse(this.responseText);
+			members_json = json.Response.results;
+			members_json.forEach(function(member) { members.push(member.destinyUserInfo.LastSeenDisplayName); });
+
+			var penumbra_size = members.length;
+			
+			var xhr_clan1 = new XMLHttpRequest();
+			xhr_clan1.open("GET", "https://www.bungie.net/Platform/GroupV2/3858144/Members/", true);
+			xhr_clan1.setRequestHeader("X-API-Key", d2apiKey);
+			xhr_clan1.onreadystatechange = function(){
+				if(this.readyState === 4 && this.status === 200){
+					var json = JSON.parse(this.responseText);
+					members_json1 = json.Response.results;
+					members_json1.forEach(function(member) { members.push(member.destinyUserInfo.LastSeenDisplayName); });
+						
+					const embed = new Discord.RichEmbed()
+						.setAuthor("Aurora" +   (nicknames == false ?
+												(" — "+ penumbra_size + " + "	+ (members.length-penumbra_size) + " = " + members.length + " members") : 
+												""))
+						.setColor(0x00AE86)
+						.setFooter("Horobot", "https://cdn.discordapp.com/avatars/543342030768832524/7da47eaca948d9874b66fc5884ca2d00.png")
+						.setTimestamp()
+					
+					console.log("Discord: "+ (channel.guild.roles.find(role => role.name == "Antumbra").members.length + 
+											  channel.guild.roles.find(role => role.name == "Penumbra").members.length) );
+					console.log("Game: "+ members.length);
+					var allroles = [
+						channel.guild.roles.find(role => role.id == 590079280575283211),
+						channel.guild.roles.find(role => role.id == 471039282627346432),
+						channel.guild.roles.find(role => role.id == 596724711782613002),
+						channel.guild.roles.find(role => role.id == 572776313794854940),
+						channel.guild.roles.find(role => role.id == 471043840485097473),
+						channel.guild.roles.find(role => role.id == 471046764800114689),
+						channel.guild.roles.find(role => role.id == 471048548318969888),
+						channel.guild.roles.find(role => role.id == 471046830700888075),
+						channel.guild.roles.find(role => role.id == 519980895642583041)];
+					
+					var counter = 0;
+					var discordList = [];
+					var discordFilteredList = [];
+					var discordPsnList = [];
+					allroles.forEach(function(role){
+						role.members.forEach(function(member){	
+							counter++;
+							var inClan = false;
+							for (var key in members) {
+								if(member.displayName.startsWith(members[key] + " ") || member.displayName == members[key]) inClan = true;
+								//if(member.displayName.startsWith("Dredgen") && members[key].startsWith("Dredgen") ) member.setNickname(members[key]+ " 🚬 (браск)");
+							};
+							if (!inClan) {
+								discordList.push("<@"+member.user.id+">");
+								if (member.roles.find(role => role.name === "PSN") == null) discordFilteredList.push("<@"+member.user.id+">");
+								else discordPsnList.push("<@"+member.user.id+">");
+							}
+						});
+					});
+					if(discordFilteredList.join("\n").length > 1024) {
+						if(discordPsnList.length > 0) embed.addField("PSN: " + discordPsnList.length + "/" + counter, discordPsnList.join("\n"), true)
+						embed.addField("Дискорд", 	discordFilteredList.filter((_,i) => i <  discordFilteredList.length/2).join("\n"), true)
+						embed.addField("Дискорд", 	discordFilteredList.filter((_,i) => i >= discordFilteredList.length/2).join("\n"), true)
+					}else{
+						if(discordPsnList.length > 0) 
+							embed.addField("PSN: " + discordPsnList.length + "/" + counter, discordPsnList.join("\n"), true)
+						if(discordFilteredList.length > 0) 
+							embed.addField("Дискорд: " + discordFilteredList.length + "/" + counter, discordFilteredList.join("\n"), true)
+					}
+					
+					var gameList = [];
+					for (var key in members) {
+						var inDisc = false;
+						allroles.forEach(function(role){
+							role.members.forEach(function(member){
+								if(member.displayName.startsWith(members[key] + " ") || member.displayName == members[key]) inDisc = true;	
+							});
+						});
+						if (!inDisc) gameList.push("`" + members[key] + "`");
+					};
+					if(gameList.join("\n").length > 1024) {
+						embed.addField("Игра", 	gameList.filter((_,i) => i <  gameList.length/2).join("\n"), true)
+						embed.addField("Игра", 	gameList.filter((_,i) => i >= gameList.length/2).join("\n"), true)
+					}else{
+						if(gameList.length > 0) embed.addField("Игра: " + gameList.length + "/" + members.length,
+																gameList.join("\n"), true)
+					}
+					
+					if(message != null) message.channel.send({embed});
+					else {
+						if(discordFilteredList.length > 0 ) channel.send(discordFilteredList.join(", ") + "\n\nОбращаю ваше внимание, что ваш никнейм в дискорде не соответствует игровому.");
+					}
+				}
+			}
+			xhr_clan1.send();
+		}
+	}
+	xhr_clan.send();
+}
+
+
 export async function ClanTime(channel, days, modificators) {
 	var clanMembers = [];
 	var clanVoiceSummary = await GetClanVoiceSummary(days);
