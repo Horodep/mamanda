@@ -4,9 +4,9 @@ import { GetClanMembers } from "./bungieApi.js";
 import { GetShowAndSetRoles } from "./roles.js";
 import { ClanMember, GetAllActivities } from "./clanMember.js";
 import { GetClanVoiceSummary } from "./sql.js";
-import { getFullDiscordClanMemberList } from "./discordCommunityFeatures.js";
+import { GetFullDiscordClanMemberList } from "./discordCommunityFeatures.js";
 
-async function GetAllMembers() {
+async function GetFullGameClanMemberList() {
 	var members = [];
 	Array.prototype.push.apply(members, await GetClanMembers(config.clans[0].id));
 	Array.prototype.push.apply(members, await GetClanMembers(config.clans[1].id));
@@ -19,7 +19,7 @@ export async function ClanSize() {
 }
 
 export async function GetMemberByDiscordName(discordName) {
-	var members = await GetAllMembers();
+	var members = await GetFullGameClanMemberList();
 	try {
 		members.forEach(function (member) {
 			if (discordName.startsWith(member.destinyUserInfo.LastSeenDisplayName + " ") ||
@@ -33,7 +33,7 @@ export async function GetMemberByDiscordName(discordName) {
 }
 
 export async function ExecuteForEveryMember(timeout, callback) {
-	var members = await GetAllMembers();
+	var members = await GetFullGameClanMemberList();
 	var i = 0;
 	var iteration = function () {
 		if (i < members.length) {
@@ -53,110 +53,45 @@ export function SetRoles(channel) {
 	});
 }
 
-export function Nicknames(channel) {
-	var bot_msg = message;
-	var members = [];
-	
-	var xhr_clan = new XMLHttpRequest();
-	xhr_clan.open("GET", "https://www.bungie.net/Platform/GroupV2/3055823/Members/", true);
-	xhr_clan.setRequestHeader("X-API-Key", d2apiKey);
-	xhr_clan.onreadystatechange = function(){
-		if(this.readyState === 4 && this.status === 200){
-			var json = JSON.parse(this.responseText);
-			members_json = json.Response.results;
-			members_json.forEach(function(member) { members.push(member.destinyUserInfo.LastSeenDisplayName); });
+export async function Nicknames(channel, isReminder) {
+	var gameMembers = await GetFullGameClanMemberList();
+	var discordMembers = GetFullDiscordClanMemberList(channel.guild);
 
-			var penumbra_size = members.length;
-			
-			var xhr_clan1 = new XMLHttpRequest();
-			xhr_clan1.open("GET", "https://www.bungie.net/Platform/GroupV2/3858144/Members/", true);
-			xhr_clan1.setRequestHeader("X-API-Key", d2apiKey);
-			xhr_clan1.onreadystatechange = function(){
-				if(this.readyState === 4 && this.status === 200){
-					var json = JSON.parse(this.responseText);
-					members_json1 = json.Response.results;
-					members_json1.forEach(function(member) { members.push(member.destinyUserInfo.LastSeenDisplayName); });
-						
-					const embed = new Discord.RichEmbed()
-						.setAuthor("Aurora" +   (nicknames == false ?
-												(" — "+ penumbra_size + " + "	+ (members.length-penumbra_size) + " = " + members.length + " members") : 
-												""))
-						.setColor(0x00AE86)
-						.setFooter("Horobot", "https://cdn.discordapp.com/avatars/543342030768832524/7da47eaca948d9874b66fc5884ca2d00.png")
-						.setTimestamp()
-					
-					console.log("Discord: "+ (channel.guild.roles.find(role => role.name == "Antumbra").members.length + 
-											  channel.guild.roles.find(role => role.name == "Penumbra").members.length) );
-					console.log("Game: "+ members.length);
-					var allroles = [
-						channel.guild.roles.find(role => role.id == 590079280575283211),
-						channel.guild.roles.find(role => role.id == 471039282627346432),
-						channel.guild.roles.find(role => role.id == 596724711782613002),
-						channel.guild.roles.find(role => role.id == 572776313794854940),
-						channel.guild.roles.find(role => role.id == 471043840485097473),
-						channel.guild.roles.find(role => role.id == 471046764800114689),
-						channel.guild.roles.find(role => role.id == 471048548318969888),
-						channel.guild.roles.find(role => role.id == 471046830700888075),
-						channel.guild.roles.find(role => role.id == 519980895642583041)];
-					
-					var counter = 0;
-					var discordList = [];
-					var discordFilteredList = [];
-					var discordPsnList = [];
-					allroles.forEach(function(role){
-						role.members.forEach(function(member){	
-							counter++;
-							var inClan = false;
-							for (var key in members) {
-								if(member.displayName.startsWith(members[key] + " ") || member.displayName == members[key]) inClan = true;
-								//if(member.displayName.startsWith("Dredgen") && members[key].startsWith("Dredgen") ) member.setNickname(members[key]+ " 🚬 (браск)");
-							};
-							if (!inClan) {
-								discordList.push("<@"+member.user.id+">");
-								if (member.roles.find(role => role.name === "PSN") == null) discordFilteredList.push("<@"+member.user.id+">");
-								else discordPsnList.push("<@"+member.user.id+">");
-							}
-						});
-					});
-					if(discordFilteredList.join("\n").length > 1024) {
-						if(discordPsnList.length > 0) embed.addField("PSN: " + discordPsnList.length + "/" + counter, discordPsnList.join("\n"), true)
-						embed.addField("Дискорд", 	discordFilteredList.filter((_,i) => i <  discordFilteredList.length/2).join("\n"), true)
-						embed.addField("Дискорд", 	discordFilteredList.filter((_,i) => i >= discordFilteredList.length/2).join("\n"), true)
-					}else{
-						if(discordPsnList.length > 0) 
-							embed.addField("PSN: " + discordPsnList.length + "/" + counter, discordPsnList.join("\n"), true)
-						if(discordFilteredList.length > 0) 
-							embed.addField("Дискорд: " + discordFilteredList.length + "/" + counter, discordFilteredList.join("\n"), true)
-					}
-					
-					var gameList = [];
-					for (var key in members) {
-						var inDisc = false;
-						allroles.forEach(function(role){
-							role.members.forEach(function(member){
-								if(member.displayName.startsWith(members[key] + " ") || member.displayName == members[key]) inDisc = true;	
-							});
-						});
-						if (!inDisc) gameList.push("`" + members[key] + "`");
-					};
-					if(gameList.join("\n").length > 1024) {
-						embed.addField("Игра", 	gameList.filter((_,i) => i <  gameList.length/2).join("\n"), true)
-						embed.addField("Игра", 	gameList.filter((_,i) => i >= gameList.length/2).join("\n"), true)
-					}else{
-						if(gameList.length > 0) embed.addField("Игра: " + gameList.length + "/" + members.length,
-																gameList.join("\n"), true)
-					}
-					
-					if(message != null) message.channel.send({embed});
-					else {
-						if(discordFilteredList.length > 0 ) channel.send(discordFilteredList.join(", ") + "\n\nОбращаю ваше внимание, что ваш никнейм в дискорде не соответствует игровому.");
-					}
-				}
+	var discordList = [];
+	var discordPsnList = [];
+	var gameList = [];
+	
+	discordMembers.forEach(function (discordMember) {
+		if (gameMembers.filter(gameMember => discordMember.displayName.startsWith(gameMember.destinyUserInfo.LastSeenDisplayName)).length == 0) {
+			if (discordMember.roles.cache.find(role => role.name === "PSN")) {
+				discordPsnList.push("<@" + discordMember.id + ">");
+			} else {
+				discordList.push("<@" + discordMember.id + ">");
 			}
-			xhr_clan1.send();
 		}
-	}
-	xhr_clan.send();
+	});
+	
+	gameMembers.forEach(function (gameMember) {
+		if (discordMembers.filter(discordMember => discordMember.displayName.startsWith(gameMember.destinyUserInfo.LastSeenDisplayName)).length == 0) {
+			gameList.push(gameMember.destinyUserInfo.LastSeenDisplayName);
+		}
+	});
+
+	const embed = new MessageEmbed()
+		.setAuthor("Aurora")
+		.setColor(0x00AE86)
+		.setFooter("Horobot", "https://cdn.discordapp.com/avatars/543342030768832524/7da47eaca948d9874b66fc5884ca2d00.png")
+		.setTimestamp()
+	if (discordPsnList.length > 0)
+		embed.addField("PSN: " + discordPsnList.length + "/" + discordMembers.length, discordPsnList.join("\n"), true)
+	if (discordList.length > 0)
+		embed.addField("Дискорд: " + discordList.length + "/" + discordMembers.length, discordList.join("\n"), true)
+	if (gameList.length > 0)
+		embed.addField("Игра: " + gameList.length + "/" + gameMembers.length, gameList.join("\n"), true)
+
+	if (!isReminder) channel.send({ embed });
+	else if (discordList.length > 0) 
+		channel.send(discordList.join(", ") + "\n\nОбращаю ваше внимание, что ваш никнейм в дискорде не соответствует игровому.");
 }
 
 
@@ -177,7 +112,7 @@ export async function ClanTime(channel, days, modificators) {
 			iterator++;
 
 			if (iterator % 20 == 0 || iterator == members.length) {
-				msg.edit(FormClanTimeEmbed(clanMembers, modificators+(iterator == members.length ? ' final' : '')));
+				msg.edit(FormClanTimeEmbed(clanMembers, modificators + (iterator == members.length ? ' final' : '')));
 			}
 		});
 	});
@@ -209,7 +144,7 @@ function FormClanTimeEmbed(clanMembers, modificators) {
 
 	if (!modificators.includes("final")) return embed;
 
-	var discordMembers = getFullDiscordClanMemberList(guild);
+	var discordMembers = GetFullDiscordClanMemberList(guild);
 	var left = "";
 	discordMembers.forEach(function (member) {
 		if (clanMembers.filter(m => member.displayName.startsWith(m.displayName)).length == 0) {
@@ -217,7 +152,7 @@ function FormClanTimeEmbed(clanMembers, modificators) {
 		}
 	});
 	if (left.length > 0) embed.addField("Неверный ник [в дискорде]", left, true)
-	
+
 	return embed;
 }
 
@@ -226,7 +161,7 @@ function filterClanMembersData(clanMembers) {
 
 	var discordNotFound = filteredMembers.filter(m => !m.discordMemberExists).sort(byGameTime);
 	filteredMembers = filteredMembers.filter(e => !discordNotFound.includes(e));
-	
+
 	var filteredMembers = filteredMembers.filter(m => m.joined >= 7);
 
 	var isAway = filteredMembers.filter(m => m.HasDiscordRole(config.roles.afk)).sort(byGameTime);
@@ -234,7 +169,7 @@ function filterClanMembersData(clanMembers) {
 
 	var noData = filteredMembers.filter(m => !m.access && !m.HasDiscordRole(config.roles.newbie)).sort(byVoiceTime);
 	filteredMembers = filteredMembers.filter(e => !noData.includes(e));
-	
+
 	var zeroGame = filteredMembers.filter(m => m.isZeroGame).sort(byVoiceTime);
 	filteredMembers = filteredMembers.filter(e => !zeroGame.includes(e));
 
@@ -251,11 +186,11 @@ function filterClanMembersData(clanMembers) {
 	filteredMembers = filteredMembers.filter(e => !goodNewbie.includes(e));
 
 	var weForgotToKik = filteredMembers.filter(m => m.HasDiscordRole(config.roles.guest));
-	
-	function byGameTime(a, b) { return a.gameOnline < b.gameOnline ? 1 : a.gameOnline > b.gameOnline ? -1 : 0;}
-	function byVoiceTime(a, b) { return a.voiceOnline < b.voiceOnline ? 1 : a.voiceOnline > b.voiceOnline ? -1 : 0;}
-	function byJoinDate(a, b) { return a.joined < b.joined ? 1 : a.joined > b.joined ? -1 : 0;}
-	function byPercentage(a, b) { return a.percentage < b.percentage ? 1 : a.percentage > b.percentage ? -1 : 0;}
+
+	function byGameTime(a, b) { return a.gameOnline < b.gameOnline ? 1 : a.gameOnline > b.gameOnline ? -1 : 0; }
+	function byVoiceTime(a, b) { return a.voiceOnline < b.voiceOnline ? 1 : a.voiceOnline > b.voiceOnline ? -1 : 0; }
+	function byJoinDate(a, b) { return a.joined < b.joined ? 1 : a.joined > b.joined ? -1 : 0; }
+	function byPercentage(a, b) { return a.percentage < b.percentage ? 1 : a.percentage > b.percentage ? -1 : 0; }
 
 	return { lowGame, lowVoice, zeroGame, zeroVoice, goodNewbie, isAway, noData, weForgotToKik, discordNotFound };
 }
@@ -263,10 +198,10 @@ function filterClanMembersData(clanMembers) {
 function addField(embed, embed_header, members, linePattern, separator, show_if_empty, semicolumn, show) {
 	if (!show) return;
 	if (members.length == 0 && !show_if_empty) return;
-	if (members.map(m => createLine(m, linePattern)).join(separator).length > 1010){
-		embed.addField(embed_header, members.filter((_,i) => i <  members.length/2).map(m => createLine(m, linePattern)).join(separator), semicolumn);
-		embed.addField(embed_header, members.filter((_,i) => i >= members.length/2).map(m => createLine(m, linePattern)).join(separator). semicolumn);
-	}else{
+	if (members.map(m => createLine(m, linePattern)).join(separator).length > 1010) {
+		embed.addField(embed_header, members.filter((_, i) => i < members.length / 2).map(m => createLine(m, linePattern)).join(separator), semicolumn);
+		embed.addField(embed_header, members.filter((_, i) => i >= members.length / 2).map(m => createLine(m, linePattern)).join(separator).semicolumn);
+	} else {
 		var prefix = show_if_empty ? '\u200B' : "";
 		embed.addField(embed_header, prefix + members.map(m => createLine(m, linePattern)).join(separator), semicolumn);
 	}
@@ -303,7 +238,7 @@ function SendMessages(members) {
 		"_Это автоматическое сообщение, пожалуйста, не отвечайте на него._";
 	const zeroVoice = "Последнюю неделю вы не заходили в голосовые каналы дискорда. Если в ближайшие дни ситуация не изменится, вы будете исключены из клана.\n" +
 		"_Это автоматическое сообщение, пожалуйста, не отвечайте на него._";
-	const lowVoice = "Ваше присутсвие в голосовом чате за последнюю неделю составило $percentage% от вашего игрового времени. "+
+	const lowVoice = "Ваше присутсвие в голосовом чате за последнюю неделю составило $percentage% от вашего игрового времени. " +
 		"Если в течении недели ситуация не изменится, вас исключат из клана.\n" +
 		"_Это автоматическое сообщение, пожалуйста, не отвечайте на него._";
 	const lowGame = "Ваш онлайн в игре составил $gameOnline. Если в течении недели ваш онлайн не увеличится, вас исключат из клана.\n" +

@@ -1,7 +1,7 @@
 import { MessageEmbed } from "discord.js";
 import { InviteFriend, ChangeChannelCap, ChangeRegion } from "./discordFeatures.js"
 import { ShowNewbieList, ShowQueueList, ShowQueueReqestsList } from "./discordGuildMasterFeatures.js"
-import { ClanSize, ClanTime, SetRoles } from "./clan.js"
+import { ClanSize, ClanTime, Nicknames, SetRoles } from "./clan.js"
 import { Roles } from "./roles.js"
 import { newAuthToken } from "./httpCore.js"
 import { GetClanMemberOnlineTime } from "./clanMember.js";
@@ -202,7 +202,9 @@ export class CommandManager{
         this.AddCommand("guildmaster", 0, "n", "!n", "список новичков в клане;", function(args, message){
             ShowNewbieList(message);
         });
-        this.AddCommand("guildmaster", 2, "nicknames", "!nicknames", "проверка никнеймов стражей;", function(args, message){});
+        this.AddCommand("guildmaster", 0, "nicknames", "!nicknames", "проверка никнеймов стражей;", function(args, message){
+            Nicknames(message.channel);
+        });
         this.AddCommand("guildmaster", 2, "pmspam", "!pmspam", "спам говном в личку по роли; НЕ ЮЗАТЬ;", function(args, message){});
         this.AddCommand("guildmaster", 2, "pvpdrop", "!pvpdrop", "снять все пвп роли;", function(args, message){});
         this.AddCommand("guildmaster", 0, "q", "!q", "список стражей в очереди;", function(args, message){

@@ -2,7 +2,7 @@ import { MessageEmbed } from "discord.js";
 import config from "./config.json";
 
 export function ClanMedalsSummary(channel) {
-    var members = getFullDiscordClanMemberList(channel.guild);
+    var members = GetFullDiscordClanMemberList(channel.guild);
 
     var sorted = [];
     for (let i = 0; i < 36; i++) {
@@ -31,7 +31,7 @@ export function ClanMedalsSummary(channel) {
     channel.send({ embed });
 }				
 
-export function getFullDiscordClanMemberList(guild){
+export function GetFullDiscordClanMemberList(guild){
 	var members = [];
 	guild.roles.cache.find(r => r.id == config.roles.guildleader).members.forEach(m => members.push(m));
 	guild.roles.cache.find(r => r.id == config.roles.guildmaster).members.forEach(m => members.push(m));
