@@ -5,6 +5,7 @@ import { GetShowAndSetRoles } from "./roles.js";
 import { ClanMember, GetAllActivities } from "./clanMember.js";
 import { GetClanVoiceSummary } from "./sql.js";
 import { GetFullDiscordClanMemberList } from "./discordCommunityFeatures.js";
+import { SendPrivateMessagesToArray } from "./sendMessage.js";
 
 async function GetFullGameClanMemberList() {
 	var members = [];
@@ -94,7 +95,6 @@ export async function Nicknames(channel, isReminder) {
 		channel.send(discordList.join(", ") + "\n\nОбращаю ваше внимание, что ваш никнейм в дискорде не соответствует игровому.");
 }
 
-
 export async function ClanTime(channel, days, modificators) {
 	var clanMembers = [];
 	var clanVoiceSummary = await GetClanVoiceSummary(days);
@@ -113,6 +113,9 @@ export async function ClanTime(channel, days, modificators) {
 
 			if (iterator % 20 == 0 || iterator == members.length) {
 				msg.edit(FormClanTimeEmbed(clanMembers, modificators + (iterator == members.length ? ' final' : '')));
+			}
+			if (iterator == members.length && modificators.includes("pm")) {
+				SendPrivateMessagesToArray(GetArrayOfMembersWithPMText(clanMembers));
 			}
 		});
 	});
@@ -154,6 +157,26 @@ function FormClanTimeEmbed(clanMembers, modificators) {
 	if (left.length > 0) embed.addField("Неверный ник [в дискорде]", left, true)
 
 	return embed;
+}
+
+function GetArrayOfMembersWithPMText(clanMembers) {
+	const zeroGameMessage = "Последнюю неделю вы не заходили в игру. Если в ближайшие дни ситуация не изменится, вы будете исключены из клана.\n" +
+		"_Это автоматическое сообщение, пожалуйста, не отвечайте на него._";
+	const zeroVoiceMessage = "Последнюю неделю вы не заходили в голосовые каналы дискорда. Если в ближайшие дни ситуация не изменится, вы будете исключены из клана.\n" +
+		"_Это автоматическое сообщение, пожалуйста, не отвечайте на него._";
+	const lowVoiceMessage = "Ваше присутсвие в голосовом чате за последнюю неделю составило $percent от вашего игрового времени. " +
+		"Если в течении недели ситуация не изменится, вас исключат из клана.\n" +
+		"_Это автоматическое сообщение, пожалуйста, не отвечайте на него._";
+	const lowGameMessage = "Ваш онлайн в игре составил $game. Если в течении недели ваш онлайн не увеличится, вас исключат из клана.\n" +
+		"_Это автоматическое сообщение, пожалуйста, не отвечайте на него._";
+
+	var textedMembers = [];
+	var { lowGame, lowVoice, zeroGame, zeroVoice } = filterClanMembersData(clanMembers);
+	//lowGame.forEach(member => {textedMembers.push({discordMember: member.discordMember, text: createLine(member, lowGameMessage)});})
+	lowVoice.forEach(member => {textedMembers.push({discordMember: member.discordMember, text: createLine(member, lowVoiceMessage)});})
+	zeroVoice.forEach(member => {textedMembers.push({discordMember: member.discordMember, text: createLine(member, zeroVoiceMessage)});})
+	zeroGame.forEach(member => {textedMembers.push({discordMember: member.discordMember, text: createLine(member, zeroGameMessage)});})
+	return textedMembers;
 }
 
 function filterClanMembersData(clanMembers) {
@@ -232,38 +255,6 @@ function getRoleMark(clanMember) {
 	if (clanMember.HasDiscordRole(config.roles.raidleader)) return "🎓";
 	return "❌";
 }
-
-function SendMessages(members) {
-	const zeroGame = "Последнюю неделю вы не заходили в игру. Если в ближайшие дни ситуация не изменится, вы будете исключены из клана.\n" +
-		"_Это автоматическое сообщение, пожалуйста, не отвечайте на него._";
-	const zeroVoice = "Последнюю неделю вы не заходили в голосовые каналы дискорда. Если в ближайшие дни ситуация не изменится, вы будете исключены из клана.\n" +
-		"_Это автоматическое сообщение, пожалуйста, не отвечайте на него._";
-	const lowVoice = "Ваше присутсвие в голосовом чате за последнюю неделю составило $percentage% от вашего игрового времени. " +
-		"Если в течении недели ситуация не изменится, вас исключат из клана.\n" +
-		"_Это автоматическое сообщение, пожалуйста, не отвечайте на него._";
-	const lowGame = "Ваш онлайн в игре составил $gameOnline. Если в течении недели ваш онлайн не увеличится, вас исключат из клана.\n" +
-		"_Это автоматическое сообщение, пожалуйста, не отвечайте на него._"
-
-	i = 0;
-	var sending = function () {
-		if (i < members.length) {
-			var member = bot_msg.client.users.get(members[i].discordMemberId);
-			try {
-				var member_message_text = "SELECT TEXT";
-				member.send(member_message_text);
-
-				console.log("pm " + voice0[i].displayName);
-				logging.log(bot_msg.client, "__Игроку <@" + members[i].discordMemberId + "> [" + members[i].displayName + "] отправлено сообщение:__\n" + member_message_text);
-			} catch (e) {
-				logging.log(bot_msg.client, "<@149245139389251584>\nИгрок <@" + members[i].discordMemberId + "> [" + members[i].displayName + "] отключил ЛС.");
-			}
-			i++;
-			setTimeout(sending, 2000);
-		}
-	}
-	sending();
-}
-
 
 //var iconv = require('iconv-lite');
 // redundant
