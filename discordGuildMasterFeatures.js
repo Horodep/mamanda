@@ -2,10 +2,70 @@ import { MessageEmbed } from "discord.js";
 import config from "./config.json";
 import { CatchError } from "./catcherror.js";
 
+export function DropPvpRole(guild) {
+	var topPvpRole = guild.roles.find(role => role.id == config.roles.medals.category_first_role.crucible);
 
-export function ForumTime(){}
+	for(var rolePosition = topPvpRole.position+1; rolePosition < topPvpRole.position+7; rolePosition++){
+		var role = guild.roles.find(role => role.position == rolePosition);
+		var list = [];
+		role.members.forEach(member => { list.push(member); });
 
+		var i = 0;
+		var dropRole = function () {
+			if (i < list.length) {
+				list[i].roles.remove(role);
+				i++;
+				setTimeout(dropRole, 1000);
+			}
+		}
+		dropRole();
+	}
+}
 
+export function GiveForumRole(message) {
+	userlist = [];
+	message.guild.roles.find(role => role.id == config.roles.separators.footer).members.
+		forEach(user => { userlist.push(user); });
+
+	var seaker = message.guild.roles.find(role => role.id == config.roles.forum_tag);
+	var i = 0;
+	var giverole = function () {
+		if (i < userlist.length) {
+			userlist[i].roles.add(seaker);
+			i++;
+			if (i == userlist.length) message.channel.send("роли выданы!");
+			setTimeout(giverole, 400);
+		}
+	}
+	giverole();
+}
+
+export function SaveForumLinkAndPublish(link) {
+	fs.writeFile('forumlink.txt', link, function (error) {
+		if (error) throw error; // если возникла ошибка
+	});
+	channel_news = message.client.channels.get(config.channels.clannews);
+	channel_news.send(
+		"Не важно, <@&"+config.roles.guardians[0]+"> ты, <@&"+config.roles.guest+"> или @everyone другой, мы верим, что ты хочешь помочь клану! <@&"+config.separators.footer+">\n" +
+		"Проще всего это сделать подняв тему о наборе на форуме, нажав на стрелочку вверх.\n" +	link + "\n" + 
+		"p.s. Для того, чтобы снять роль прожмите эмоцию `🆗` под данным сообщением.").then((msg) => {
+			msg.react("🆗");
+		});
+}
+
+export function PublishDailyMessage(client){
+	var channel = client.channels.get(config.channels.flood);
+	fs.readFile("forumlink.txt", 'utf8', function(err, data) {
+		if (err) throw err;
+		channel.send(
+			"Уважаемые Стражи! А точнее те из вас, кто <@&"+config.roles.forum_tag+">\n"+
+			"Пожалуйста, сделайте это! Это очень важно для клана!\n\n"+
+			"p.s. Для того, чтобы снять роль прожмите эмоцию `🆗` под данным сообщением.\n"+
+			data).then((msg)=>{
+			msg.react("🆗");
+		});
+	})
+}
 
 export function ShowNewbieList(message) {
 	var newbieList = [];
@@ -51,7 +111,7 @@ export function ShowQueueReqestsList(message) {
 							counterOfReactsOnMessage[requestMessage.id] = 0;
 							requestBody += requestMessage.content;
 
-							requestMessage.reactions.cache.each(async function(reaction){
+							requestMessage.reactions.cache.each(async function (reaction) {
 								counterOfReactsOnMessage[requestMessage.id]++;
 								emojis += ` ${reaction.emoji}`;
 								var users = await reaction.users.fetch();
@@ -60,7 +120,7 @@ export function ShowQueueReqestsList(message) {
 								}
 								message.channel.send(headerText + emojis + "```" + requestBody + " ```");
 							})
-							if (counterOfReactsOnMessage[requestMessage.id] == 0) 
+							if (counterOfReactsOnMessage[requestMessage.id] == 0)
 								message.channel.send(headerText + emojis + "```" + requestBody + " ```");
 						} catch (e) {
 							CatchError(e, message.channel);

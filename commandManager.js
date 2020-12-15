@@ -1,5 +1,5 @@
 import { MessageEmbed } from "discord.js";
-import { ShowNewbieList, ShowQueueList, ShowQueueReqestsList } from "./discordGuildMasterFeatures.js"
+import { DropPvpRole, GiveForumRole, SaveForumLinkAndPublish, ShowNewbieList, ShowQueueList, ShowQueueReqestsList } from "./discordGuildMasterFeatures.js"
 import { ClanSize, ClanTime, Nicknames, SetRoles } from "./clan.js"
 import { Roles } from "./roles.js"
 import { newAuthToken } from "./httpCore.js"
@@ -189,8 +189,12 @@ export class CommandManager {
             SetRoles(message.channel);
         });
         this.AddCommand("guildmaster", 2, "engreset", "!engreset", "генерация ссылок на англоязычные изображения еженедельного ресета в текущий канал;", function (args, message) { });
-        this.AddCommand("guildmaster", 2, "forum", "!forum LINKTEXT", "опубликовать объявление о наборе в канал новостей;", function (args, message) { });
-        this.AddCommand("guildmaster", 2, "forumtime", "!forumtime", "выдать всем стражам роли перед объявлением о наборе;", function (args, message) { });
+        this.AddCommand("guildmaster", 0, "forum", "!forum LINKTEXT", "опубликовать объявление о наборе в канал новостей;", function (args, message) { 
+            GiveForumRole(message);
+        });
+        this.AddCommand("guildmaster", 0, "forumtime", "!forumtime", "выдать всем стражам роли перед объявлением о наборе;", function (args, message) { 
+            SaveForumLinkAndPublish(message.content.slice(7));
+        });
         this.AddCommand("guildmaster", 0, "gmhelp", "!gmhelp", "список доступных ГМ-ских команд;", function (args, message) {
             message.channel.send(CommandManager.GetRestrictedHelp());
         });
@@ -206,10 +210,12 @@ export class CommandManager {
         this.AddCommand("guildmaster", 0, "nicknames", "!nicknames", "проверка никнеймов стражей;", function (args, message) {
             Nicknames(message.channel);
         });
-        this.AddCommand("guildmaster", 0, "pmspam", "!pmspam", "спам говном в личку по роли; НЕ ЮЗАТЬ;", function (args, message) {
+        this.AddCommand("guildmaster", 0, "pmspam", "!pmspam", "спам говном в личку по роли;", function (args, message) {
             SendPrivateMessageByRole(message.guild, args);
         });
-        this.AddCommand("guildmaster", 2, "pvpdrop", "!pvpdrop", "снять все пвп роли;", function (args, message) { });
+        this.AddCommand("guildmaster", 0, "pvpdrop", "!pvpdrop", "снять все пвп роли;", function (args, message) { 
+            DropPvpRole(message.guild);
+        });
         this.AddCommand("guildmaster", 0, "q", "!q", "список стражей в очереди;", function (args, message) {
             ShowQueueList(message);
         });
@@ -244,39 +250,6 @@ GM
             message.channel.send("нет данных!");
         }
         break;
-    case 'forum':
-        fs.writeFile('forumlink.txt', message.content.slice(7), function(error){
-            if(error) throw error; // если возникла ошибка
-        });
-        channel_news = client.channels.get("479684908806307840");
-        channel_news.send(
-            "Уважаемые <@&471048548318969888>и, <@&564787660745605120>и и @everyone остальные, кому не безразлична судьба нашего клана! <@&572759337836216330>\n"+
-            "Поднимите, пожалуйста, пост о наборе нажатием на стрелочку вверх на форуме.\n"+
-            message.content.slice(7)).then((msg)=>{
-            msg.react("🆗");
-        });
-        break;
-    case 'forumtime':
-        var userlistraw = message.guild.roles.find(role => role.id == "572759337836216330").members;
-        userlist = [];
-        userlistraw.forEach(function(user1111, i, userlistraw) {
-            userlist.push(user1111);
-        });
-
-        var i = 0;
-        var seaker = message.guild.roles.find(role => role.name == "не апнул тему на форуме");
-        var giverole = function(){
-            if(i < userlist.length){
-                var member = userlist[i];
-                member.addRole(seaker);
-                console.log("setRole forum (" + i + "/" + userlist.length + ")", member.displayName);
-                i++;
-                setTimeout(giverole, 1000);
-                if (i == userlist.length) message.channel.send("роли выданы!");
-            }
-        }
-        giverole();
-        break;
     case 'testreset':
         var yyyy = date.getFullYear();
         var dd = date.getDate();
@@ -300,9 +273,6 @@ GM
         setTimeout(function (){
             reset.weeklyreset(message.channel);
         }, 2000);
-        break;
-    case 'membertime':
-        clantime.membertime(message, (args.length > 1 ? args[1].replace(/\D/g,'') : message.member.id), (args.length > 2 ? args[2] : 7), true);
         break;
     case 'copy':					raid.copy(client);					break;
     case 'raidadd':
@@ -331,25 +301,5 @@ GM
             message.channel.send('Указаны не все параметры');
         };
         break;
-    case 'nicknames':		dclan.dclan(message, true, message.channel);								break;
-    case 'pvpdrop':
-        var t1 = message.guild.roles.find(role => role.name == "💠 Левая рука Шакса");
-        t1.members.forEach(function(member) {
-            setTimeout(function (){
-                member.removeRole(t1);
-            }, 5000);
-        });
-        var t2 = message.guild.roles.find(role => role.name == "💠💠 Правая рука Шакса");
-        t2.members.forEach(function(member) {
-            setTimeout(function (){
-                member.removeRole(t2);
-            }, 5000);
-        });
-        var t3 = message.guild.roles.find(role => role.name == "💠💠💠 Машина");
-        t3.members.forEach(function(member) {
-            setTimeout(function (){
-                member.removeRole(t3);
-            }, 5000);
-        });
-        break;
+
 }*/
