@@ -1,4 +1,4 @@
-import config from "./config.json";
+import config from "../config.json";
 
 export function MessageReactionAdd(reaction, user) {
 	console.log(user.username + " set reaction.");

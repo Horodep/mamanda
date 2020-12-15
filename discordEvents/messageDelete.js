@@ -1,4 +1,4 @@
-import config from "./config.json";
+import config from "../config.json";
 
 export function MessageDelete(message) {
 	console.log("messageDeleted");
@@ -15,6 +15,6 @@ export function MessageDelete(message) {
 				}
 		}
 	} catch(e) {
-		require('./catcherror').catcherror(e);
+		require('../catcherror').catcherror(e);
 	}
 }

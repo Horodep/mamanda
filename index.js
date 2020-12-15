@@ -1,10 +1,10 @@
 // https://discordjs.guide/additional-info/changes-in-v12.html
 import Discord from "discord.js";
 import config from "./config.json";
-import {Message} from "./message.js";
-import {MessageDelete} from "./messageDelete.js";
-import {MessageReactionAdd} from "./messageReactionAdd.js";
-import {MessageReactionRemove} from "./messageReactionRemove.js";
+import {Message} from "./discordEvents/message.js";
+import {MessageDelete} from "./discordEvents/messageDelete.js";
+import {MessageReactionAdd} from "./discordEvents/messageReactionAdd.js";
+import {MessageReactionRemove} from "./discordEvents/messageReactionRemove.js";
 import { CommandManager } from "./commandManager.js";
 
 const client = new Discord.Client();

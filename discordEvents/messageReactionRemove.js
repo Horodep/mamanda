@@ -1,4 +1,4 @@
-import config from "./config.json";
+import config from "../config.json";
 
 export function MessageReactionRemove(reaction, user) {
 	if(reaction.message.channel.type == "text" && reaction.message.member.user.id == config.users.bot){

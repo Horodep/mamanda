@@ -1,6 +1,6 @@
-import config from "./config.json";
-import { CatchError } from "./catcherror.js";
-import { CommandManager } from "./commandManager.js";
+import config from "../config.json";
+import { CatchError } from "../catcherror.js";
+import { CommandManager } from "../commandManager.js";
 
 export function Message(message){
 	try {
