@@ -1,12 +1,11 @@
 import { MessageEmbed } from "discord.js";
-import { InviteFriend, ChangeChannelCap, ChangeRegion } from "./discordFeatures.js"
 import { ShowNewbieList, ShowQueueList, ShowQueueReqestsList } from "./discordGuildMasterFeatures.js"
 import { ClanSize, ClanTime, Nicknames, SetRoles } from "./clan.js"
 import { Roles } from "./roles.js"
 import { newAuthToken } from "./httpCore.js"
 import { GetClanMemberOnlineTime } from "./clanMember.js";
 import { CatchError } from "./catcherror.js";
-import { ClanMedalsSummary } from "./discordCommunityFeatures.js";
+import { InviteFriend, ChangeChannelCap, ChangeRegion, ClanMedalsSummary } from "./discordCommunityFeatures.js";
 
 export class CommandManager{
     static commandList = [];
