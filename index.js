@@ -11,7 +11,11 @@ const client = new Discord.Client();
 client.login(config.credentials.discordApiKey);
 CommandManager.Init();
 
-client.on("ready", () => {console.log("ready!");});
+client.on("ready", () => {
+	client.user.setActivity("на Летописца 9 из 10", { type: 'WATCHING' });
+
+	console.log("ready!");
+});
 client.on("guildMemberAdd", (member) => NewMember(member));
 client.on("message", (_message) => Message(_message));
 client.on("messageDelete", (message) => MessageDelete(message));
