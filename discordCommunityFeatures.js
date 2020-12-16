@@ -80,7 +80,7 @@ export function ClanMedalsSummary(channel) {
         .setFooter("Horobot", "https://cdn.discordapp.com/avatars/543342030768832524/7da47eaca948d9874b66fc5884ca2d00.png")
         .setTimestamp()
 
-    for (let i = 35; i > 6; i--) {
+    for (let i = 35; i >= 6; i--) {
         var text =  sorted[i].map(m => "<@"+m+">").join("\n");
         var symbol = i < 7 ? "`📘`" : i < 16 ? "`📒`" : i < 24 ? "`📙`" : "`📕`";
 

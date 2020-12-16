@@ -5,7 +5,7 @@ import { CatchError } from "./catcherror.js";
 export function DropPvpRole(guild) {
 	var topPvpRole = guild.roles.find(role => role.id == config.roles.medals.category_first_role.crucible);
 
-	for(var rolePosition = topPvpRole.position+1; rolePosition < topPvpRole.position+7; rolePosition++){
+	for(var rolePosition = topPvpRole.position-1; rolePosition > topPvpRole.position-7; rolePosition--){
 		var role = guild.roles.find(role => role.position == rolePosition);
 		var list = [];
 		role.members.forEach(member => { list.push(member); });
