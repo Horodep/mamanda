@@ -83,7 +83,9 @@ async function GetRolesData(membershipType, membershipId) {
 		legacy_seals: {},
 		legacy_triumphs: {},
 		season: {},
-		extra: {}
+		extra: {
+			legacy:{}
+		}
 	};
 	var characterDetails = BungieApiLogic.get_character_details(response);
 
@@ -129,6 +131,10 @@ async function GetRolesData(membershipType, membershipId) {
 	data.season.triumphs = BungieApiLogic.get_season_triumphs(response, characterPresentationNodes, 2255100699,
 		[91071118, 1951157616, 4186991151, 3518211070, 975308347, 25634498], "Триумфы");
 	data.extra.poi = BungieApiLogic.get_poi(response);
+	data.extra.legacy.season8 = BungieApiLogic.get_character_node_data(characterPresentationNodes, 955166374, "Undying");
+	data.extra.legacy.season9 = BungieApiLogic.get_character_node_data(characterPresentationNodes, 955166375, "Dawn");
+	data.extra.legacy.season10 = BungieApiLogic.get_character_node_data(characterPresentationNodes, 1321008461, "Almighty");
+	data.extra.legacy.season11 = BungieApiLogic.get_character_node_data(characterPresentationNodes, 1321008460, "Arrivals");
 	//data.extra.solo = BungieApiLogic.get_all_nodes(response, [3841336511, 3899996566]);
 	//data.extra.soloflawless = BungieApiLogic.get_all_nodes(response, [3950599483, 3205009787]);
 
@@ -195,6 +201,7 @@ function SetRoles(clanMember, characterDetails, medals) {
 	CheckAndProcessRoleBlock(discordMember, config.roles.medals.category_first_role.triumphs, 3, medals.triumphs);
 	CheckAndProcessRoleBlock(discordMember, config.roles.medals.category_first_role.legacy_triumphs, 3, medals.legacy_triumphs);
 	CheckAndProcessRoleBlock(discordMember, config.roles.medals.category_first_role.season, 2, medals.season);
+	CheckAndProcessRoleBlock(discordMember, config.roles.medals.category_first_role.extralegacy, 4, medals.extra.legacy);
 
 	if (discordMember.roles.cache.find(role => role.id == config.roles.guildleader) != null) return;
 	if (discordMember.roles.cache.find(role => role.id == config.roles.guildmaster) != null) return;
