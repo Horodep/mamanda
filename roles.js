@@ -129,8 +129,8 @@ async function GetRolesData(membershipType, membershipId) {
 	data.season.triumphs = BungieApiLogic.get_season_triumphs(response, characterPresentationNodes, 2255100699,
 		[91071118, 1951157616, 4186991151, 3518211070, 975308347, 25634498], "Триумфы");
 	data.extra.poi = BungieApiLogic.get_poi(response);
-	data.extra.solo = BungieApiLogic.get_all_nodes(response, [3841336511, 3899996566]);
-	data.extra.soloflawless = BungieApiLogic.get_all_nodes(response, [3950599483, 3205009787]);
+	//data.extra.solo = BungieApiLogic.get_all_nodes(response, [3841336511, 3899996566]);
+	//data.extra.soloflawless = BungieApiLogic.get_all_nodes(response, [3950599483, 3205009787]);
 
 	return { characterDetails: characterDetails, medals: data };
 }
@@ -184,9 +184,9 @@ function SetRoles(clanMember, characterDetails, medals) {
 	if (medals == null) return;
 
 	CheckAndProcessRole(discordMember, config.roles.medals.specific.day1, medals.raids.day1.state, false);
-	CheckAndProcessRole(discordMember, config.roles.medals.specific.solo, medals.extra.solo.state, medals.extra.soloflawless.state);
-	CheckAndProcessRole(discordMember, config.roles.medals.specific.soloflawless, medals.extra.soloflawless.state, false);
 	CheckAndProcessRole(discordMember, config.roles.medals.specific.poi, medals.extra.poi.state, false);
+	//CheckAndProcessRole(discordMember, config.roles.medals.specific.solo, medals.extra.solo.state, medals.extra.soloflawless.state);
+	//CheckAndProcessRole(discordMember, config.roles.medals.specific.soloflawless, medals.extra.soloflawless.state, false);
 
 	CheckAndProcessRoleBlock(discordMember, config.roles.medals.category_first_role.raids, 4, medals.raids);
 	CheckAndProcessRoleBlock(discordMember, config.roles.medals.category_first_role.seals, 5, medals.seals);
