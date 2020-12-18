@@ -1,5 +1,5 @@
 import config from "../config.json";
-import { CancelRaid, KickRaidMember, RemoveRaidMember } from "../raid";
+import { CancelRaid, KickRaidMember, RemoveRaidMember } from "../raid.js";
 
 export async function MessageReactionAdd(reaction, user) {
 	if (reaction.partial) {
