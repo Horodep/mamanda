@@ -7,7 +7,7 @@ import { GetClanMemberOnlineTime } from "./clanMember.js";
 import { CatchError } from "./catcherror.js";
 import { InviteFriend, ChangeChannelCap, ChangeRegion, ClanMedalsSummary } from "./discordCommunityFeatures.js";
 import { SendCustomMessage, SendPrivateMessageByRole } from "./sendMessage.js";
-import { AddRaidMember, ClearRaidList, CreateRaid, KickRaidMember } from "./raid.js"
+import { ClearRaidList, CreateRaid, ForcedAddRaidMember, ForcedRemoveRaidMember } from "./raid.js"
 
 export class CommandManager {
     static commandList = [];
@@ -168,7 +168,7 @@ export class CommandManager {
         this.AddCommand("restricted", 2, "triumph", "!triumph TRIUMPH_HASH", "отобразить стражей клана, получивших конкретный триумф;", function (args, message) { });
         this.AddCommand("restricted", 2, "triumphs", "!triumphs", "топ 15 стражей клана по очкам триумфов текстом;", function (args, message) { });
         this.AddCommand("restricted", 2, "triumphs 1", "!triumphs gimmeimageplz", "топ 15 стражей клана по очкам триумфов графиком;", function (args, message) { });
-        this.AddCommand("restricted", 1, "сбор", "!сбор ДД.ММ ЧЧ:ММ название активности, комментарии", "создание сбора на активность на 6 человек;", function (args, message) {
+        this.AddCommand("restricted", 0, "сбор", "!сбор ДД.ММ ЧЧ:ММ название активности, комментарии", "создание сбора на активность на 6 человек;", function (args, message) {
             CreateRaid(message, args);
         });
         this.AddCommand("restricted", 2, "", "!сбор ДД.ММ ЧЧ:ММ [N] название активности", "создание сбора на активность на N человек;", function (args, message) { });
@@ -227,11 +227,11 @@ export class CommandManager {
         this.AddCommand("guildmaster", 0, "qq", "!qq", "список анкет стражей в очереди;", function (args, message) {
             ShowQueueReqestsList(message);
         });
-        this.AddCommand("guildmaster", 1, "raidadd", "!raidadd message_id member_id", "добавление в рейд стража;", function (args, message) { 
-            AddRaidMember(message, args);
+        this.AddCommand("guildmaster", 0, "raidadd", "!raidadd message_id member_id", "добавление в рейд стража;", function (args, message) { 
+            ForcedAddRaidMember(message, args);
         });
-        this.AddCommand("guildmaster", 1, "raidkick", "!raidkick message_id member_id", "исключение из рейда стража, пример: https://media.discordapp.net/attachments/515244455033438209/626795525710020638/unknown.png;", function (args, message) { 
-            KickRaidMember(message, args);
+        this.AddCommand("guildmaster", 0, "raidkick", "!raidkick message_id member_id", "исключение из рейда стража, пример: https://media.discordapp.net/attachments/515244455033438209/626795525710020638/unknown.png;", function (args, message) { 
+            ForcedRemoveRaidMember(message, args);
         });
         this.AddCommand("guildmaster", 2, "reset", "!reset", "генерация текстового еженедельного ресета в текущий канал;", function (args, message) { });
         this.AddCommand("guildmaster", 2, "setmaxtriumphs", "!setmaxtriumphs NUMBER", "обновить значение максимального количества триумфов;", function (args, message) { });
@@ -283,32 +283,4 @@ GM
             reset.weeklyreset(message.channel);
         }, 2000);
         break;
-    case 'copy':					raid.copy(client);					break;
-    case 'raidadd':
-        if(args.length > 2){
-            var chan = client.channels.get("626432384643891220");
-            chan.fetchMessage(args[1]).then(msg => {
-                raid.yes(msg, client.users.get(args[2]), null);
-                setTimeout(function (){
-                    message.delete();
-                }, 5000);
-            });
-        }else{
-            message.channel.send('Указаны не все параметры');
-        };
-        break;
-    case 'raidkick':
-        if(args.length > 2){
-            var chan = client.channels.get("626432384643891220");
-            chan.fetchMessage(args[1]).then(msg => {
-                raid.no(msg, client.users.get(args[2]), null);
-                setTimeout(function (){
-                    message.delete();
-                }, 5000);
-            });
-        }else{
-            message.channel.send('Указаны не все параметры');
-        };
-        break;
-
 }*/

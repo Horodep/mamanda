@@ -1,11 +1,11 @@
-import { CatchError } from "./catcherror.js";
+import { CatchError, CatchErrorWithTimeout } from "./catcherror.js";
 import config from "./config.json";
 import { MessageEmbed } from "discord.js";
 import { SendPrivateMessage } from "./sendMessage.js";
 
 export function CreateRaid(message, args) {
     try {
-        var data = ParseCommandAndFormData(args);
+        var data = ParseCommandAndGetData(args, message.member);
         data.fields[0] = data.fields[0].replace("слот свободен", "<@" + message.member.id + ">");
 
         var embed = CreateRaidEmbed(data, message);
@@ -32,27 +32,121 @@ export function CreateRaid(message, args) {
     }
 }
 
-export function AddRaidMember(message, user, reaction) {
+export function AddRaidMember(message, user) {
+    try {
+        var data = GetDataFromEmbed(message.embeds[0]);
 
+        if (!data.fields[0].includes(user.id) && !data.fields[1].includes(user.id)) {
+            if (data.fields[0].includes("слот свободен")) {
+                data.fields[0] = data.fields[0].replace("слот свободен", "<@" + user.id + ">");
+            } else if (data.fields[1].includes("слот свободен")) {
+                data.fields[1] = data.fields[1].replace("слот свободен", "<@" + user.id + ">");
+            }
+        }
+
+        var regexpUserId = new RegExp("\`.*?\` <@" + user.id + ">");
+        data.left = data.left.replace(regexpUserId, '').replace('\n\n', '\n');
+
+        message.edit(CreateRaidEmbed(data, message));
+    } catch (e) {
+        CatchErrorWithTimeout(e, message.channel, 15000);
+    }
 }
 
-export function RemoveRaidMember(message, user, reaction) {
+export function RemoveRaidMember(message, user, showAsLeaver) {
+    try {
+        var data = GetDataFromEmbed(message.embeds[0]);
 
+        data.fields[0] = data.fields[0].replace("<@" + user.id + ">", "слот свободен");
+        data.fields[1] = data.fields[1].replace("<@" + user.id + ">", "слот свободен");
+
+        if (!data.left.includes(user.id) && showAsLeaver) {
+            var tzoffset = (new Date()).getTimezoneOffset() * 60000;
+            var leaver = "\n`" + (new Date(Date.now() - tzoffset)).toISOString().replace(/T/, ' ').replace(/\..+/, '').substring(5, 16) + "` <@" + user.id + ">";
+            data.left += leaver;
+        }
+
+        message.edit(CreateRaidEmbed(data, message));
+    } catch (e) {
+        CatchErrorWithTimeout(e, message.channel, 15000);
+    }
 }
 
 export function KickRaidMember(message, user, reaction) {
+    var author_id = message.embeds[0].footer.text.split('id: ')[1];
+    if (author_id != user.id) {
+        user.send("Вы не являетесь автором сбора. Вы не можете его отменить.");
+        return;
+    }
+    var data = GetDataFromEmbed(message.embeds[0]);
+    var linesInFirstField = (data.fields[0].match(/\n/g) || []).length + 1;
+    var kickPosition = reaction._emoji.name.charAt(0);
+    var line = "";
 
+    if (kickPosition > linesInFirstField) {
+        line = data.fields[1].split('\n')[kickPosition - linesInFirstField - 1];
+        data.fields[1] = data.fields[1].replace(line, "слот свободен");
+    } else {
+        line = data.fields[0].split('\n')[kickPosition - 1];
+        data.fields[0] = data.fields[0].replace(line, "слот свободен");
+    }
+
+    var discord_id = line.replace(/\D/g, '');
+    if (discord_id.length > 0) {
+        var member = message.guild.members.cache.find(user => user.id == discord_id);
+        SendPrivateMessage(member, FormCancelationMessage(data, "Рейд лидер отказался от вашего участия в рейде, в который вы записывались."));
+    }
+    message.edit(CreateRaidEmbed(data, message));
 }
 
 export function CancelRaid(message, user, reaction) {
+    var author_id = message.embeds[0].footer.text.split('id: ')[1];
+    if (author_id != user.id) {
+        user.send("Вы не являетесь автором сбора. Вы не можете его отменить.");
+        return;
+    }
+    var data = GetDataFromEmbed(message.embeds[0]);
+    var list = (data.fields[0] + '\n' + data.fields[1]).split('\n');
+    list.forEach(function (text) {
+        var discord_id = text.replace(/\D/g, '');
+        if (discord_id.length > 0) {
+            var member = message.guild.members.cache.find(user => user.id == discord_id);
+            SendPrivateMessage(member, FormCancelationMessage(data, "Рейд на который вы записывались был отменен рейд лидером."));
+        }
+    });
+    message.delete();
+}
 
+export function ForcedAddRaidMember(message, args){
+    if(args.length < 3){
+        message.channel.send('Указаны не все параметры');
+        return;
+    }
+    message.channel.messages.fetch(args[1]).then(msg => {
+        AddRaidMember(msg, {id: args[2]});
+        setTimeout(() => { message.delete(); }, 5000);
+    });
+}
+
+export function ForcedRemoveRaidMember(message, args){
+    if(args.length < 3){
+        message.channel.send('Указаны не все параметры');
+        return;
+    }
+    message.channel.messages.fetch(args[1]).then(msg => {
+        RemoveRaidMember(msg, {id: args[2]});
+        var member = message.guild.members.cache.find(user => user.id == args[2]);
+        setTimeout(() => { message.delete(); }, 5000);
+        var data = GetDataFromEmbed(msg.embeds[0]);
+        SendPrivateMessage(member, FormCancelationMessage(data, "Гильдмастер отказался от вашего участия в рейде, в который вы записывались."));
+    });
 }
 
 export function ClearRaidList() {
 
 }
 
-function ParseCommandAndFormData(args) {
+function ParseCommandAndGetData(args, member) {
     //0    1     2     3   4 
     //сбор 22.09 18:00 [3] кс, рандомный комент
     var today = new Date();
@@ -87,9 +181,28 @@ function ParseCommandAndFormData(args) {
         description: description,
         descriptionWithoutRoleTag: descriptionWithoutRoleTag,
         fields: [field0, field1],
+        left: "",
         numberOfPlaces: numberOfPlaces,
-        roleTag: roleTag
+        roleTag: roleTag,
+        footerText: "Собрал: " + member.displayName + " | id: " + member.id,
+        iconURL: member.user.avatarURL
     }
+}
+
+function GetDataFromEmbed(embed) {
+    return {
+        header: embed.author.name,
+        description: embed.description,
+        descriptionWithoutRoleTag: embed.description,
+        fields: [
+            embed.fields[0].value,
+            embed.fields[1].value],
+        left: embed.fields.length > 2 ? embed.fields[2].value : "",
+        numberOfPlaces: 6,
+        roleTag: "",
+        footerText: embed.footer.text,
+        iconURL: embed.footer.iconURL
+    };
 }
 
 function CreateRaidEmbed(data, message) {
@@ -106,10 +219,18 @@ function CreateRaidEmbed(data, message) {
         .setThumbnail('https://images-ext-2.discordapp.net/external/SfRL0Sj2a3O9vtAYpaC2OUG0r0vDipe2h8LeeZnFdf4/https/i.imgur.com/KBiRw8F.png')
         .addField("Идут:", data.fields[0], true)
         .addField("Идут:", data.fields[1], true)
-        .setFooter("Собрал: " + message.member.displayName + " | id: " + message.member.id, message.member.user.avatarURL)
+        .setFooter(data.footerText, data.iconURL)
     if (data.description != null && data.descriptionWithoutRoleTag != '') embed.setDescription(data.description);
+    if (data.left.length > 8) embed.addField("Отменили запись:", data.left)
 
     return embed;
+}
+
+function FormCancelationMessage(data, message) {
+    return `${message}
+> Рейд: **${data.header.split('Активность: ')[1]}**
+> Дата проведения: **${data.header.split('Активность: ')[0]}**
+> Рейд лидер: **${data.footerText.split('|')[0].replace("Собрал: ", "")}**`;
 }
 
 function weekday(num) {

@@ -1,5 +1,5 @@
 import config from "../config.json";
-import { CancelRaid, KickRaidMember, RemoveRaidMember } from "../raid.js";
+import { AddRaidMember, RemoveRaidMember, KickRaidMember, CancelRaid } from "../raid.js";
 
 export async function MessageReactionAdd(reaction, user) {
 	if(user.bot) return;
@@ -30,18 +30,27 @@ function HandleOther(reaction, user) {
 function HandleRaids(reaction, user) {
 	switch (reaction._emoji.name) {
 		case "yes":
-			AddRaidMember(reaction.message, user, reaction);
+			AddRaidMember(reaction.message, user);
 			reaction.users.remove(user);
 			break;
 		case "no":
-			RemoveRaidMember(reaction.message, user, reaction);
+			RemoveRaidMember(reaction.message, user);
 			reaction.users.remove(user);
 			break;
 		case "🚫":
-			CancelRaid(reaction.message, user, reaction);
+			CancelRaid(reaction.message, user);
 			if (typeof (reaction.message) != "undefined") reaction.users.remove(user);
 			break;
-		default:
+		case "1️⃣":
+		case "2️⃣":
+		case "3️⃣":
+		case "4️⃣":
+		case "5️⃣":
+		case "6️⃣":
+		case "7️⃣":
+		case "8️⃣":
+		case "9️⃣":
+		case "0️⃣":
 			KickRaidMember(reaction.message, user, reaction);
 			reaction.users.remove(user);
 			break;
