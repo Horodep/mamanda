@@ -2,6 +2,7 @@ import config from "../config.json";
 import { CancelRaid, KickRaidMember, RemoveRaidMember } from "../raid.js";
 
 export async function MessageReactionAdd(reaction, user) {
+	if(user.bot) return;
 	if (reaction.partial) {
 		try {
 			await reaction.fetch();
@@ -28,21 +29,21 @@ function HandleOther(reaction, user) {
 
 function HandleRaids(reaction, user) {
 	switch (reaction._emoji.name) {
-		case ":yes:769922757592612874":
+		case "yes":
 			AddRaidMember(reaction.message, user, reaction);
-			reaction.remove(user);
+			reaction.users.remove(user);
 			break;
-		case ":no:769922772549632031":
+		case "no":
 			RemoveRaidMember(reaction.message, user, reaction);
-			reaction.remove(user);
+			reaction.users.remove(user);
 			break;
 		case "🚫":
 			CancelRaid(reaction.message, user, reaction);
-			if (typeof (reaction.message) != "undefined") reaction.remove(user);
+			if (typeof (reaction.message) != "undefined") reaction.users.remove(user);
 			break;
 		default:
 			KickRaidMember(reaction.message, user, reaction);
-			reaction.remove(user);
+			reaction.users.remove(user);
 			break;
 	}
 }

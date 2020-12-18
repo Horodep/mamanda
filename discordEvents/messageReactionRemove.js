@@ -1,6 +1,7 @@
 import config from "../config.json";
 
 export async function MessageReactionRemove(reaction, user) {
+	if(user.bot) return;
 	if (reaction.partial) {
 		try {
 			await reaction.fetch();
