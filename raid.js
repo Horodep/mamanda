@@ -32,19 +32,19 @@ export function CreateRaid(message, args) {
     }
 }
 
-export function AddRaidMember() {
+export function AddRaidMember(message, user, reaction) {
 
 }
 
-export function RemoveRaidMember() {
+export function RemoveRaidMember(message, user, reaction) {
 
 }
 
-export function KickRaidMember() {
+export function KickRaidMember(message, user, reaction) {
 
 }
 
-export function CancelRaid() {
+export function CancelRaid(message, user, reaction) {
 
 }
 

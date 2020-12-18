@@ -1,75 +1,73 @@
 import config from "../config.json";
+import { CancelRaid, KickRaidMember, RemoveRaidMember } from "../raid";
 
-export function MessageReactionAdd(reaction, user) {
-	console.log(user.username + " set reaction.");
-	
-	if(reaction.message.member.user.id == config.users.boss){
-		if(reaction.message.content.startsWith("Хочу быть ГМ-ом")){
-			var suggestions = client.channels.cache.get(config.channels.suggestions);
-			suggestions.send("<@"+user.id+"> хочет стать ГМ-ом.");
-		}else
-		if(reaction.message.content.startsWith("Хочу быть Наставником")){
-			var suggestions = client.channels.cache.get(config.channels.suggestions);
-			suggestions.send("<@"+user.id+"> хочет стать Наставником.");
+export async function MessageReactionAdd(reaction, user) {
+	if (reaction.partial) {
+		try {
+			await reaction.fetch();
+		} catch (error) {
+			console.error('Something went wrong when fetching the message: ', error);
+			return;
 		}
 	}
-	
-	if(reaction.message.channel.type == "text" && reaction.message.member.user.id == config.users.bot){
-		var member = reaction.message.member.guild.members.find(mmbr => mmbr.user.id === user.id);
-		switch(reaction.message.content){
-			case "Хочу Петраран (ПЖ без смертей)":
-				var petrarun = member.guild.roles.find(role => role.name === "Хочу Петраран");
-				console.log(user.username + " wants petrarun.");
-				member.roles.add(petrarun);
-				break;
-			case "Хочу Алмаз (ИП без смертей)":
-				var diamond = member.guild.roles.find(role => role.name === "Хочу Алмаз");
-				console.log(user.username + " wants diamond.");
-				member.roles.add(diamond);
-				break;
-			case "Хочу Корону (КС без смертей)":
-				var crown = member.guild.roles.find(role => role.name === "Хочу Корону");
-				console.log(user.username + " wants crown.");
-				member.roles.add(crown);
-				break;
-			case "Хочу Совершенство (СС без смертей)":
-				var garden = member.guild.roles.find(role => role.name === "Хочу Совершенство");
-				console.log(user.username + " wants garden.");
-				member.roles.add(garden);
-				break;
-			case "Хочу Ниобу (лаборатория ниоба)":
-				var nioba = member.guild.roles.find(role => role.name === "Хочу Ниобу");
-				console.log(user.username + " wants nioba.");
-				member.roles.add(nioba);
-				break;
-			case "":
-				if(!user.bot &&
-					reaction.message.embeds[0] != null &&
-					reaction.message.embeds[0].footer.text.startsWith("Собрал")) {
-					if(reaction._emoji.name == "✅"){ // white_check_mark
-						raid.yes(reaction.message, user, reaction);
-						reaction.remove(user);
-					}else if(reaction._emoji.name == "❌"){ // x
-						raid.no(reaction.message, user, reaction);
-						reaction.remove(user);
-					}else if(reaction._emoji.name == "🚫"){ // cancel
-						raid.cancel(reaction.message, user, reaction, client);
-						if(typeof(reaction.message) != "undefined") reaction.remove(user);
-					}else{
-						raid.kick_position(reaction.message, user, reaction, client);
-						reaction.remove(user);
-					}
-				}
-				break;
-			default: 								// any message
-				if(!user.bot) {				    	// with user reaction
-					if(reaction._emoji.name == "🆗"){ // OK
-						var seaker = member.guild.roles.find(role => role.name == "не апнул тему на форуме");
-						member.removeRole(seaker);
-						console.log(user.username + " set OK to bot message.");
-					}
-				}
-				break;
-		}
-	}
+	console.log(`${user.username} set reaction ${reaction._emoji.name}.`);
+
+	if (reaction.message.channel.id == config.channels.wishes) HandleWishes(reaction, user);
+	else if (reaction.message.embeds[0]?.footer.text.startsWith("Собрал")) HandleRaids(reaction, user);
+	else HandleOther(reaction, user);
 };
+
+function HandleOther(reaction, user) {
+	switch (reaction._emoji.name) {
+		case "🆗":
+			member.removeRole(config.roles.forum_tag);
+			console.log(user.username + " set OK to bot message.");
+			break;
+	}
+}
+
+function HandleRaids(reaction, user) {
+	switch (reaction._emoji.name) {
+		case ":yes:769922757592612874":
+			AddRaidMember(reaction.message, user, reaction);
+			reaction.remove(user);
+			break;
+		case ":no:769922772549632031":
+			RemoveRaidMember(reaction.message, user, reaction);
+			reaction.remove(user);
+			break;
+		case "🚫":
+			CancelRaid(reaction.message, user, reaction);
+			if (typeof (reaction.message) != "undefined") reaction.remove(user);
+			break;
+		default:
+			KickRaidMember(reaction.message, user, reaction);
+			reaction.remove(user);
+			break;
+	}
+}
+
+function HandleWishes(reaction, user) {
+	var member = reaction.message.guild.members.cache.find(m => m.user.id === user.id);
+	var suggestionsChannel = user.client.channels.cache.get(config.channels.suggestions);
+	var firstLine = reaction.message.content.split('\n');
+	console.log(firstLine[0]);
+
+	switch (firstLine[0]) {
+		case "Хочу Петраран (Последнее Желание без смертей)":
+			member.roles.add(config.roles.wishes.lw);
+			break;
+		case "Хочу Совершенство (Сад Спасения без смертей)":
+			member.roles.add(config.roles.wishes.gos);
+			break;
+		case "Хочу Выжить (Склеп Глубокого Камня без смертей)":
+			member.roles.add(config.roles.wishes.dsc);
+			break;
+		case "Хочу быть ГМ-ом. ":
+			suggestionsChannel.send("<@" + user.id + "> хочет стать ГМ-ом.");
+			break;
+		case "Хочу быть рейд лидером.":
+			suggestionsChannel.send("<@" + user.id + "> хочет стать рейд лидером.");
+			break;
+	}
+}
