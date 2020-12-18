@@ -30,7 +30,7 @@ export function SendPrivateMessagesToArray(textedMembers){
 	sending();
 }
 
-function SendPrivateMessage(discordMember, text){
+export function SendPrivateMessage(discordMember, text){
     discordMember.send(text);
     console.log("pm " + discordMember.displayName);
     Logging(discordMember, text);

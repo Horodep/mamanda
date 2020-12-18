@@ -7,6 +7,7 @@ import { GetClanMemberOnlineTime } from "./clanMember.js";
 import { CatchError } from "./catcherror.js";
 import { InviteFriend, ChangeChannelCap, ChangeRegion, ClanMedalsSummary } from "./discordCommunityFeatures.js";
 import { SendCustomMessage, SendPrivateMessageByRole } from "./sendMessage.js";
+import { AddRaidMember, ClearRaidList, CreateRaid, KickRaidMember } from "./raid.js"
 
 export class CommandManager {
     static commandList = [];
@@ -167,7 +168,9 @@ export class CommandManager {
         this.AddCommand("restricted", 2, "triumph", "!triumph TRIUMPH_HASH", "отобразить стражей клана, получивших конкретный триумф;", function (args, message) { });
         this.AddCommand("restricted", 2, "triumphs", "!triumphs", "топ 15 стражей клана по очкам триумфов текстом;", function (args, message) { });
         this.AddCommand("restricted", 2, "triumphs 1", "!triumphs gimmeimageplz", "топ 15 стражей клана по очкам триумфов графиком;", function (args, message) { });
-        this.AddCommand("restricted", 2, "сбор", "!сбор ДД.ММ ЧЧ:ММ название активности, комментарии", "создание сбора на активность на 6 человек;", function (args, message) { });
+        this.AddCommand("restricted", 1, "сбор", "!сбор ДД.ММ ЧЧ:ММ название активности, комментарии", "создание сбора на активность на 6 человек;", function (args, message) {
+            CreateRaid(message, args);
+        });
         this.AddCommand("restricted", 2, "", "!сбор ДД.ММ ЧЧ:ММ [N] название активности", "создание сбора на активность на N человек;", function (args, message) { });
 
 
@@ -184,7 +187,9 @@ export class CommandManager {
         this.AddCommand("guildmaster", 0, "clankickpub", "!clankickpub %days%", "выборка активности **самых** малоактивных стражей;\n_по умолчанию — 7 дней_;", function (args, message) {
             ClanTime(message.channel, (args.length > 1 ? args[1] : 7));
         });
-        this.AddCommand("guildmaster", 2, "copy", "!copy", "ручной запуск переноса в архив старых сборов рейдов;", function (args, message) { });
+        this.AddCommand("guildmaster", 1, "copy", "!copy", "ручной запуск переноса в архив старых сборов рейдов;", function (args, message) { 
+            ClearRaidList();
+         });
         this.AddCommand("guildmaster", 0, "csr", "!csr", "ручной запуск выдачи ролей всему клану;", function (args, message) {
             SetRoles(message.channel);
         });
@@ -222,8 +227,12 @@ export class CommandManager {
         this.AddCommand("guildmaster", 0, "qq", "!qq", "список анкет стражей в очереди;", function (args, message) {
             ShowQueueReqestsList(message);
         });
-        this.AddCommand("guildmaster", 2, "raidadd", "!raidadd message_id member_id", "добавление в рейд стража;", function (args, message) { });
-        this.AddCommand("guildmaster", 2, "raidkick", "!raidkick message_id member_id", "исключение из рейда стража, пример: https://media.discordapp.net/attachments/515244455033438209/626795525710020638/unknown.png;", function (args, message) { });
+        this.AddCommand("guildmaster", 1, "raidadd", "!raidadd message_id member_id", "добавление в рейд стража;", function (args, message) { 
+            AddRaidMember(message, args);
+        });
+        this.AddCommand("guildmaster", 1, "raidkick", "!raidkick message_id member_id", "исключение из рейда стража, пример: https://media.discordapp.net/attachments/515244455033438209/626795525710020638/unknown.png;", function (args, message) { 
+            KickRaidMember(message, args);
+        });
         this.AddCommand("guildmaster", 2, "reset", "!reset", "генерация текстового еженедельного ресета в текущий канал;", function (args, message) { });
         this.AddCommand("guildmaster", 2, "setmaxtriumphs", "!setmaxtriumphs NUMBER", "обновить значение максимального количества триумфов;", function (args, message) { });
         this.AddCommand("guildmaster", 0, "size", "!size", "количество стражей в составах;", function (args, message) {
