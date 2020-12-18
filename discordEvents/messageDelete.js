@@ -2,19 +2,17 @@ import config from "../config.json";
 
 export function MessageDelete(message) {
 	console.log("messageDeleted");
-	try{
-		client = message.client;
-		if(!message.author.bot &&
-			message.channel.id != config.channels.raids &&
-			message.channel.id != config.channels.lfg){
-				channel_deleted = client.channels.cashe.get(config.channels.deleted);
-				console.log(message.content, message.content.split("@").join(""));
-				channel_deleted.send("<@"+message.author.id+">: "+message.content.split("@").join(""));
-				for (var value of message.attachments.values()) {
-					channel_deleted.send("Вложение:", {files: [value.proxyURL]});
-				}
+	try {
+		if (message.author.bot) return;
+		if (message.channel.id == config.channels.raids) return;
+		if (message.channel.id == config.channels.lfg) return;
+
+		var channelDeleted = message.client.channels.cache.get(config.channels.deleted);
+		channelDeleted.send("<@" + message.author.id + ">: " + message.content.split("@").join(""));
+		for (var value of message.attachments.values()) {
+			channelDeleted.send("Вложение:", { files: [value.proxyURL] });
 		}
-	} catch(e) {
+	} catch (e) {
 		require('../catcherror').catcherror(e);
 	}
 }
