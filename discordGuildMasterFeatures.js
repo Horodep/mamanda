@@ -27,11 +27,10 @@ export function GiveForumRole(message) {
 	message.guild.roles.find(role => role.id == config.roles.separators.footer).members.
 		forEach(user => { userlist.push(user); });
 
-	var seaker = message.guild.roles.find(role => role.id == config.roles.forum_tag);
 	var i = 0;
 	var giverole = function () {
 		if (i < userlist.length) {
-			userlist[i].roles.add(seaker);
+			userlist[i].roles.add(config.roles.forum_tag);
 			i++;
 			if (i == userlist.length) message.channel.send("роли выданы!");
 			setTimeout(giverole, 400);
