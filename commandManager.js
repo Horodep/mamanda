@@ -38,9 +38,8 @@ export class CommandManager {
     static GetStatus() {
         var embed = new MessageEmbed()
             .setAuthor("Статус")
-            .setColor(0x00AE86)
-            .setFooter("That was a h̶a̶n̶d̶o̶u̶t̶  hangover.")
-            .setTimestamp()
+            .setColor(0x11de1b)//0x00AE86
+            .setDescription("[Issues tracker](https://github.com/Horodep/mamanda-issues-tracker/issues)")
         var restricted = [];
         var guildmaster = [];
         this.commandList.forEach(command => {
@@ -76,6 +75,7 @@ export class CommandManager {
     static GetRestrictedHelp() {
         var embed = new MessageEmbed()
             .setAuthor("Horobot :: Список доступных команд:")
+            .setDescription("[Issues tracker](https://github.com/Horodep/mamanda-issues-tracker/issues)")
             .setColor(0x00AE86)
             .setThumbnail('https://images-ext-1.discordapp.net/external/veZptUu_KDKmwtUJX5QT3QxESYCaRp4_k0XUwEQxubo/https/i.imgur.com/e9DIB8e.png')
             .setFooter("Horobot", "https://cdn.discordapp.com/avatars/543342030768832524/7da47eaca948d9874b66fc5884ca2d00.png")
@@ -88,6 +88,7 @@ export class CommandManager {
     static GetGuildMasterHelp() {
         var embed = new MessageEmbed()
             .setAuthor("Horobot :: Список ГМ-ских команд:")
+            .setDescription("[Issues tracker](https://github.com/Horodep/mamanda-issues-tracker/issues)")
             .setColor(0x00AE86)
             .setThumbnail('https://images-ext-1.discordapp.net/external/veZptUu_KDKmwtUJX5QT3QxESYCaRp4_k0XUwEQxubo/https/i.imgur.com/e9DIB8e.png')
             .setFooter("Horobot", "https://cdn.discordapp.com/avatars/543342030768832524/7da47eaca948d9874b66fc5884ca2d00.png")
@@ -144,7 +145,7 @@ export class CommandManager {
             ChangeChannelCap(message, (args.length > 1 ? args[1] : 0));
         });
         this.AddCommand("restricted", 0, "help", "!help", "список доступных команд;", function (args, message) {
-            message.channel.send(CommandManager.GetRestrictedHelp());
+            if (args.length == 1) message.channel.send(CommandManager.GetRestrictedHelp());
         });
         this.AddCommand("restricted", 0, "invitefriend", "!invitefriend @DiscordTag", "выдача роли 'Странник' вместо роли 'Очередь';\n_доступна опытным стражам_;", function (args, message) {
             InviteFriend(message, (args.length > 1 ? args[1] : ""));
@@ -171,7 +172,7 @@ export class CommandManager {
         this.AddCommand("restricted", 0, "сбор", "!сбор ДД.ММ ЧЧ:ММ название активности, комментарии", "создание сбора на активность на 6 человек;", function (args, message) {
             CreateRaid(message, args);
         });
-        this.AddCommand("restricted", 2, "", "!сбор ДД.ММ ЧЧ:ММ [N] название активности", "создание сбора на активность на N человек;", function (args, message) { });
+        this.AddCommand("restricted", 0, "", "!сбор ДД.ММ ЧЧ:ММ [N] название активности, комментарии", "создание сбора на активность на N человек;", function (args, message) { });
 
 
         this.AddCommand("guildmaster", 2, "checksync", "!______________", "_______________;", function (args, message) { });
