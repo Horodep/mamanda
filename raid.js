@@ -8,7 +8,7 @@ export function CreateRaid(message, args) {
     try {
         var data = ParseCommandAndGetData(args, message.member);
         data.AddRaidMember(message.member.id);
-        var embed = CreateRaidEmbed(data, message);
+        var embed = CreateRaidEmbed(data);
 
         if (message.channel.id == config.channels.raids || data.roleTag != null)
             message.channel.send(data.roleTag != null ? data.roleTag.join(' ') : "@here");
@@ -37,7 +37,7 @@ export function AddRaidMember(message, user) {
         var data = GetDataFromEmbed(message.embeds[0]);
         data.AddRaidMember(user.id);
         data.RemoveFromLeftField(user.id);
-        message.edit(CreateRaidEmbed(data, message));
+        message.edit(CreateRaidEmbed(data));
     } catch (e) {
         CatchErrorWithTimeout(e, message.channel, 15000);
     }
@@ -48,7 +48,7 @@ export function RemoveRaidMember(message, user, showAsLeaver) {
         var data = GetDataFromEmbed(message.embeds[0]);
         data.RemoveRaidMember(user.id);
         if (showAsLeaver) data.AddToLeftField(user.id);
-        message.edit(CreateRaidEmbed(data, message));
+        message.edit(CreateRaidEmbed(data));
     } catch (e) {
         CatchErrorWithTimeout(e, message.channel, 15000);
     }
@@ -68,7 +68,7 @@ export function KickRaidMember(message, user, reaction) {
         var member = message.guild.members.cache.find(user => user.id == userId);
         SendPrivateMessage(member, FormCancelationMessage(data, "Рейд лидер отказался от вашего участия в рейде, в который вы записывались."));
     }
-    message.edit(CreateRaidEmbed(data, message));
+    message.edit(CreateRaidEmbed(data));
 }
 
 export function CancelRaid(message, user, reaction) {
@@ -114,8 +114,38 @@ export function ForcedRemoveRaidMember(message, args){
     });
 }
 
-export function ClearRaidList() {
-
+export function ClearRaidList(client) {
+	var raid_channel = client.channels.cache.get(config.channels.raids); 
+    var history_channel = client.channels.cache.get(config.channels.raid_history);
+    
+	raid_channel.messages.fetch({ limit: 50 }).then(messages => {
+		var today = new Date();
+		var lastMessage;
+		messages.sort(function(a, b) {
+			return a.id > b.id ? 1 : -1
+		}).forEach(message => {
+			if(message.pinned) return;
+            if(!message.author.bot) {
+                message.delete();
+                return;
+            }
+            if(message.content != ""){
+                lastMessage = message;
+            }else{
+                var data = GetDataFromEmbed(message.embeds[0]);
+                var date = data.GetRaidDate();
+                
+                console.log(date, today, data.header);
+                if(date < today){
+                    console.log("have to be moved");
+                    
+                    history_channel.send(CreateRaidEmbed(data, message.createdAt));
+                    message.delete();
+                    lastMessage.delete();
+                }
+            }
+		});
+	})
 }
 
 function ParseCommandAndGetData(args, member) {
@@ -177,7 +207,7 @@ function GetDataFromEmbed(embed) {
     });
 }
 
-function CreateRaidEmbed(data, message) {
+function CreateRaidEmbed(data, customTimestamp) {
     if (data.header.length > 256)
         throw ({ message: 'Длина заголовка сбора не может быть больше 256 символов.' });
     else if (data.description != null && data.description.length > 2048)
@@ -192,6 +222,7 @@ function CreateRaidEmbed(data, message) {
         .addField("Идут:", data.fields[0], true)
         .addField("Идут:", data.fields[1], true)
         .setFooter(data.footerText, data.iconURL)
+    if (customTimestamp != null) embed.setTimestamp(customTimestamp);
     if (data.description != null && data.descriptionWithoutRoleTag != '') embed.setDescription(data.description);
     if (data.left.length > 8) embed.addField("Отменили запись:", data.left)
 

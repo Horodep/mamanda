@@ -59,4 +59,10 @@ export class RaidData {
         }
         return line.replace(/\D/g, '');
     }
+
+    GetRaidDate(){
+        return new Date(Number(this.header.split('.')[2].split(',')[0]),
+						Number(this.header.split('.')[1]-1), 
+						Number(this.header.split('.')[0])+1);
+    }
 }

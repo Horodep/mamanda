@@ -188,8 +188,8 @@ export class CommandManager {
         this.AddCommand("guildmaster", 0, "clankickpub", "!clankickpub %days%", "выборка активности **самых** малоактивных стражей;\n_по умолчанию — 7 дней_;", function (args, message) {
             ClanTime(message.channel, (args.length > 1 ? args[1] : 7));
         });
-        this.AddCommand("guildmaster", 1, "copy", "!copy", "ручной запуск переноса в архив старых сборов рейдов;", function (args, message) { 
-            ClearRaidList();
+        this.AddCommand("guildmaster", 0, "copy", "!copy", "ручной запуск переноса в архив старых сборов рейдов;", function (args, message) { 
+            ClearRaidList(message.client);
          });
         this.AddCommand("guildmaster", 0, "csr", "!csr", "ручной запуск выдачи ролей всему клану;", function (args, message) {
             SetRoles(message.channel);
