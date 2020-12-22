@@ -76,9 +76,10 @@ export function ShowNewbieList(message) {
 	newbieList.sort();
 	message.channel.send(newbieList.join('\n'));
 }
-export function ShowQueueList(message) {
+export async function ShowQueueList(message) {
 	var queueList = [];
-	message.guild.roles.cache.find(role => role.id == config.roles.queue).members.forEach(function (member) {
+	await message.guild.members.fetch();
+	message.guild.members.cache.filter(m => m.roles.cache.size == 1).forEach(function (member) {
 		var secondsOnServer = Date.now() - member.joinedTimestamp;
 		var daysOnServer = Math.round(secondsOnServer / (1000 * 60 * 60 * 24));
 		queueList.push("`" + daysOnServer + "d` <@" + member.user.id + ">");
@@ -86,10 +87,11 @@ export function ShowQueueList(message) {
 	queueList.sort();
 	message.channel.send(queueList.join('\n'));
 }
-export function ShowQueueReqestsList(message) {
+export async function ShowQueueReqestsList(message) {
 	var counterOfMessagesByUser = [];
 	var counterOfReactsOnMessage = [];
-	message.guild.roles.cache.find(role => role.id == config.roles.queue).members
+	await message.guild.members.fetch();
+	message.guild.members.cache.filter(m => m.roles.cache.size == 1)
 		.sort(function (a, b) { return a.joinedTimestamp > b.joinedTimestamp ? 1 : -1 })
 		.forEach(function (member) {
 			var secondsOnServer = Date.now() - member.joinedTimestamp;
