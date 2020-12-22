@@ -54,6 +54,42 @@ export function SetRoles(channel) {
 	});
 }
 
+export async function ShowRecordStat(channel, triumphId) {
+	if (triumphId == 0){
+		message.channel.send("Вы не обозначили искомый триумф.");
+		return;
+	}
+	let manifest = JSON.parse(fs.readFileSync('destiny2.json'));
+	try{
+		var a = manifest.Record[triumphId].displayProperties.name;
+	} catch(e) {
+		message.channel.send("Триумф не найден.");
+		return;
+	}
+
+	var iterator = 0;
+	var finalList = [];
+	channel.send(new MessageEmbed()).then((msg) => {
+		ExecuteForEveryMember(500, async function (member, i, members) {
+			var clanMember = new ClanMember(member);
+			if(clanMember.recordDataState()) finalList.push(clanMember);
+
+			if (iterator % 20 == 0 || iterator == members.length) {
+				const embed = new Discord.RichEmbed()
+				//	.setAuthor(manifest.Record[triumphid].displayProperties.name + (isLast ? "" : " — request in progress: [" + counter + "/" + size + "]"))
+					.setColor(0x00AE86)
+				//	.setThumbnail('https://www.bungie.net' + manifest.Record[triumphid].displayProperties.icon)
+				//	.setFooter(manifest.Record[triumphid].displayProperties.description, "https://cdn.discordapp.com/avatars/543342030768832524/7da47eaca948d9874b66fc5884ca2d00.png")
+
+				if (finalList.length > 0) embed.addField("1 - " + Math.round(finalList.length / 2), finalList.sort().filter((_, i) => i < finalList.length / 2).map(member => member.displayName).join("\n"), true)
+				if (finalList.length > 1) embed.addField((Math.round(finalList.length / 2) + 1) + " - " + finalList.length, finalList.sort().filter((_, i) => i >= finalList.length / 2).map(member => member.displayName).join("\n"), true)
+
+				bot_msg.edit({ embed });
+			}
+		});
+	});
+}
+
 export async function Nicknames(channel, isReminder) {
 	var gameMembers = await GetFullGameClanMemberList();
 	var discordMembers = GetFullDiscordClanMemberList(channel.guild);
@@ -61,7 +97,7 @@ export async function Nicknames(channel, isReminder) {
 	var discordList = [];
 	var discordPsnList = [];
 	var gameList = [];
-	
+
 	discordMembers.forEach(function (discordMember) {
 		if (gameMembers.filter(gameMember => discordMember.displayName.startsWith(gameMember.destinyUserInfo.LastSeenDisplayName)).length == 0) {
 			if (discordMember.roles.cache.find(role => role.name === "PSN")) {
@@ -71,7 +107,7 @@ export async function Nicknames(channel, isReminder) {
 			}
 		}
 	});
-	
+
 	gameMembers.forEach(function (gameMember) {
 		if (discordMembers.filter(discordMember => discordMember.displayName.startsWith(gameMember.destinyUserInfo.LastSeenDisplayName)).length == 0) {
 			gameList.push(gameMember.destinyUserInfo.LastSeenDisplayName);
@@ -91,7 +127,7 @@ export async function Nicknames(channel, isReminder) {
 		embed.addField("Игра: " + gameList.length + "/" + gameMembers.length, gameList.join("\n"), true)
 
 	if (!isReminder) channel.send({ embed });
-	else if (discordList.length > 0) 
+	else if (discordList.length > 0)
 		channel.send(discordList.join(", ") + "\n\nОбращаю ваше внимание, что ваш никнейм в дискорде не соответствует игровому.");
 }
 
@@ -173,9 +209,9 @@ function GetArrayOfMembersWithPMText(clanMembers) {
 	var textedMembers = [];
 	var { lowGame, lowVoice, zeroGame, zeroVoice } = filterClanMembersData(clanMembers);
 	//lowGame.forEach(member => {textedMembers.push({discordMember: member.discordMember, text: createLine(member, lowGameMessage)});})
-	lowVoice.forEach(member => {textedMembers.push({discordMember: member.discordMember, text: createLine(member, lowVoiceMessage)});})
-	zeroVoice.forEach(member => {textedMembers.push({discordMember: member.discordMember, text: createLine(member, zeroVoiceMessage)});})
-	zeroGame.forEach(member => {textedMembers.push({discordMember: member.discordMember, text: createLine(member, zeroGameMessage)});})
+	lowVoice.forEach(member => { textedMembers.push({ discordMember: member.discordMember, text: createLine(member, lowVoiceMessage) }); })
+	zeroVoice.forEach(member => { textedMembers.push({ discordMember: member.discordMember, text: createLine(member, zeroVoiceMessage) }); })
+	zeroGame.forEach(member => { textedMembers.push({ discordMember: member.discordMember, text: createLine(member, zeroGameMessage) }); })
 	return textedMembers;
 }
 
