@@ -34,7 +34,7 @@ function HandleRaids(reaction, user) {
 			reaction.users.remove(user);
 			break;
 		case "no":
-			RemoveRaidMember(reaction.message, user);
+			RemoveRaidMember(reaction.message, user, true);
 			reaction.users.remove(user);
 			break;
 		case "🚫":

@@ -2,13 +2,13 @@ import { CatchError, CatchErrorWithTimeout } from "./catcherror.js";
 import config from "./config.json";
 import { MessageEmbed } from "discord.js";
 import { SendPrivateMessage } from "./sendMessage.js";
+import { RaidData } from "./raidData.js";
 
 export function CreateRaid(message, args) {
     try {
         var data = ParseCommandAndGetData(args, message.member);
-        data.fields[0] = data.fields[0].replace("слот свободен", "<@" + message.member.id + ">");
-
-        var embed = CreateRaidEmbed(data, message);
+        data.AddRaidMember(message.member.id);
+        var embed = CreateRaidEmbed(data);
 
         if (message.channel.id == config.channels.raids || data.roleTag != null)
             message.channel.send(data.roleTag != null ? data.roleTag.join(' ') : "@here");
@@ -35,19 +35,9 @@ export function CreateRaid(message, args) {
 export function AddRaidMember(message, user) {
     try {
         var data = GetDataFromEmbed(message.embeds[0]);
-
-        if (!data.fields[0].includes(user.id) && !data.fields[1].includes(user.id)) {
-            if (data.fields[0].includes("слот свободен")) {
-                data.fields[0] = data.fields[0].replace("слот свободен", "<@" + user.id + ">");
-            } else if (data.fields[1].includes("слот свободен")) {
-                data.fields[1] = data.fields[1].replace("слот свободен", "<@" + user.id + ">");
-            }
-        }
-
-        var regexpUserId = new RegExp("\`.*?\` <@" + user.id + ">");
-        data.left = data.left.replace(regexpUserId, '').replace('\n\n', '\n');
-
-        message.edit(CreateRaidEmbed(data, message));
+        data.AddRaidMember(user.id);
+        data.RemoveFromLeftField(user.id);
+        message.edit(CreateRaidEmbed(data));
     } catch (e) {
         CatchErrorWithTimeout(e, message.channel, 15000);
     }
@@ -56,17 +46,9 @@ export function AddRaidMember(message, user) {
 export function RemoveRaidMember(message, user, showAsLeaver) {
     try {
         var data = GetDataFromEmbed(message.embeds[0]);
-
-        data.fields[0] = data.fields[0].replace("<@" + user.id + ">", "слот свободен");
-        data.fields[1] = data.fields[1].replace("<@" + user.id + ">", "слот свободен");
-
-        if (!data.left.includes(user.id) && showAsLeaver) {
-            var tzoffset = (new Date()).getTimezoneOffset() * 60000;
-            var leaver = "\n`" + (new Date(Date.now() - tzoffset)).toISOString().replace(/T/, ' ').replace(/\..+/, '').substring(5, 16) + "` <@" + user.id + ">";
-            data.left += leaver;
-        }
-
-        message.edit(CreateRaidEmbed(data, message));
+        data.RemoveRaidMember(user.id);
+        if (showAsLeaver) data.AddToLeftField(user.id);
+        message.edit(CreateRaidEmbed(data));
     } catch (e) {
         CatchErrorWithTimeout(e, message.channel, 15000);
     }
@@ -79,24 +61,14 @@ export function KickRaidMember(message, user, reaction) {
         return;
     }
     var data = GetDataFromEmbed(message.embeds[0]);
-    var linesInFirstField = (data.fields[0].match(/\n/g) || []).length + 1;
-    var kickPosition = reaction._emoji.name.charAt(0);
-    var line = "";
+    var userId = data.GetUserIdByPosition(reaction._emoji.name.charAt(0));
+    data.RemoveRaidMember(userId);
 
-    if (kickPosition > linesInFirstField) {
-        line = data.fields[1].split('\n')[kickPosition - linesInFirstField - 1];
-        data.fields[1] = data.fields[1].replace(line, "слот свободен");
-    } else {
-        line = data.fields[0].split('\n')[kickPosition - 1];
-        data.fields[0] = data.fields[0].replace(line, "слот свободен");
-    }
-
-    var discord_id = line.replace(/\D/g, '');
-    if (discord_id.length > 0) {
-        var member = message.guild.members.cache.find(user => user.id == discord_id);
+    if (userId.length > 0) {
+        var member = message.guild.members.cache.find(user => user.id == userId);
         SendPrivateMessage(member, FormCancelationMessage(data, "Рейд лидер отказался от вашего участия в рейде, в который вы записывались."));
     }
-    message.edit(CreateRaidEmbed(data, message));
+    message.edit(CreateRaidEmbed(data));
 }
 
 export function CancelRaid(message, user, reaction) {
@@ -142,8 +114,38 @@ export function ForcedRemoveRaidMember(message, args){
     });
 }
 
-export function ClearRaidList() {
-
+export function ClearRaidList(client) {
+	var raid_channel = client.channels.cache.get(config.channels.raids); 
+    var history_channel = client.channels.cache.get(config.channels.raid_history);
+    
+	raid_channel.messages.fetch({ limit: 50 }).then(messages => {
+		var today = new Date();
+		var lastMessage;
+		messages.sort(function(a, b) {
+			return a.id > b.id ? 1 : -1
+		}).forEach(message => {
+			if(message.pinned) return;
+            if(!message.author.bot) {
+                message.delete();
+                return;
+            }
+            if(message.content != ""){
+                lastMessage = message;
+            }else{
+                var data = GetDataFromEmbed(message.embeds[0]);
+                var date = data.GetRaidDate();
+                
+                console.log(date, today, data.header);
+                if(date < today){
+                    console.log("have to be moved");
+                    
+                    history_channel.send(CreateRaidEmbed(data, message.createdAt));
+                    message.delete();
+                    lastMessage.delete();
+                }
+            }
+		});
+	})
 }
 
 function ParseCommandAndGetData(args, member) {
@@ -176,7 +178,7 @@ function ParseCommandAndGetData(args, member) {
     var field0 = "слот свободен\n".repeat(Math.round(numberOfPlaces / 2));
     var field1 = "слот свободен\n".repeat((numberOfPlaces / 2) % 1 == 0.5 ? (numberOfPlaces / 2) - 0.5 : (numberOfPlaces / 2));
 
-    return {
+    return new RaidData({
         header: header,
         description: description,
         descriptionWithoutRoleTag: descriptionWithoutRoleTag,
@@ -186,11 +188,11 @@ function ParseCommandAndGetData(args, member) {
         roleTag: roleTag,
         footerText: "Собрал: " + member.displayName + " | id: " + member.id,
         iconURL: member.user.avatarURL
-    }
+    });
 }
 
 function GetDataFromEmbed(embed) {
-    return {
+    return new RaidData({
         header: embed.author.name,
         description: embed.description,
         descriptionWithoutRoleTag: embed.description,
@@ -202,10 +204,10 @@ function GetDataFromEmbed(embed) {
         roleTag: "",
         footerText: embed.footer.text,
         iconURL: embed.footer.iconURL
-    };
+    });
 }
 
-function CreateRaidEmbed(data, message) {
+function CreateRaidEmbed(data, customTimestamp) {
     if (data.header.length > 256)
         throw ({ message: 'Длина заголовка сбора не может быть больше 256 символов.' });
     else if (data.description != null && data.description.length > 2048)
@@ -220,6 +222,7 @@ function CreateRaidEmbed(data, message) {
         .addField("Идут:", data.fields[0], true)
         .addField("Идут:", data.fields[1], true)
         .setFooter(data.footerText, data.iconURL)
+    if (customTimestamp != null) embed.setTimestamp(customTimestamp);
     if (data.description != null && data.descriptionWithoutRoleTag != '') embed.setDescription(data.description);
     if (data.left.length > 8) embed.addField("Отменили запись:", data.left)
 
