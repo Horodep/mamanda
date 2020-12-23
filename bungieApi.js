@@ -21,15 +21,15 @@ async function GetMemberData(membershipType, membershipId, componentsArray) {
 }
 
 export async function GetCoreMemberData(membershipType, membershipId) {
-	return GetMemberData(membershipType, membershipId, ['Records', 'Collectibles']);
+	return await GetMemberData(membershipType, membershipId, ['Records', 'Collectibles']);
 }
 
 export async function GetFullMemberData(membershipType, membershipId) {
-	return GetMemberData(membershipType, membershipId, ['Profiles', 'Characters', 'CharacterProgressions', 'PresentationNodes', 'Records', 'Collectibles']);
+	return await GetMemberData(membershipType, membershipId, ['Profiles', 'Characters', 'CharacterProgressions', 'PresentationNodes', 'Records', 'Collectibles']);
 }
 
 export async function GetProfileData(membershipType, membershipId) {
-	return GetMemberData(membershipType, membershipId, ['Profiles'])?.profile;
+	return (await GetMemberData(membershipType, membershipId, ['Profiles']))?.profile;
 }
 
 export async function GetActivitiesFromApi(membershipType, membershipId, characterId, page, mode) {
