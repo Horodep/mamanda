@@ -7,6 +7,7 @@ import { GetClanVoiceSummary } from "./sql.js";
 import { GetFullDiscordClanMemberList } from "./discordCommunityFeatures.js";
 import { SendPrivateMessagesToArray } from "./sendMessage.js";
 import { ManifestManager } from "./manifest.js";
+import { FormClanTimeEmbed } from "./embeds/clanTimeEmbed.js";
 
 async function GetFullGameClanMemberList() {
 	var members = [];
@@ -181,44 +182,6 @@ export async function ClanTime(channel, days, modificators) {
 	});
 }
 
-function FormClanTimeEmbed(clanMembers, modificators) {
-	var guild = clanMembers[0].discordMember.guild;
-	var embed = new MessageEmbed()
-		.setAuthor("Clankick " + (modificators.includes("final") ? "" : clanMembers.length))
-		.setColor(0x00AE86)
-		.setFooter("Horobot", "https://cdn.discordapp.com/avatars/543342030768832524/7da47eaca948d9874b66fc5884ca2d00.png")
-		.setTimestamp()
-
-	var { lowGame, lowVoice, zeroGame, zeroVoice, goodNewbie, isAway, noData, weForgotToKik, discordNotFound } = filterClanMembersData(clanMembers);
-
-	var isFull = modificators.includes("full");
-
-	//       embed | field title | array | pattern | separator | show_if_empty | semicolumn | condition
-	addField(embed, "Меньше 5 часов", lowGame, null, "\n", false, false, isFull);
-	addField(embed, "Меньше 15%", lowVoice, null, "\n", false, false, true);
-	addField(embed, "0 в игре [в войсе]", zeroGame, "`$voice$role`$tag", "\n", false, true, true);
-	addField(embed, "0 в войсе [в игре]", zeroVoice, "`$game$role`$tag", "\n", false, true, true);
-	addField(embed, "Очернить стража", goodNewbie, null, "\n", true, false, true);
-	addField(embed, "В отпуске [в игре]", isAway, "$tag ($game)", "\n", false, true, isFull);
-	addField(embed, "Профиль закрыт [в войсе]", noData, "`$voice$role`$tag", "\n", false, true, isFull);
-	addField(embed, '\u200B', [], "", "", true, false, true)
-	addField(embed, "Недокикнуты [в игре]", weForgotToKik, "$name ($game)", "\n", false, true, true);
-	addField(embed, "Неверный ник [в игре]", discordNotFound, "$name ($game)", "\n", false, true, true);
-
-	if (!modificators.includes("final")) return embed;
-
-	var discordMembers = GetFullDiscordClanMemberList(guild);
-	var left = "";
-	discordMembers.forEach(function (member) {
-		if (clanMembers.filter(m => member.displayName.startsWith(m.displayName)).length == 0) {
-			left += "<@" + member.user.id + ">\n"
-		}
-	});
-	if (left.length > 0) embed.addField("Неверный ник [в дискорде]", left, true)
-
-	return embed;
-}
-
 function GetArrayOfMembersWithPMText(clanMembers) {
 	const zeroGameMessage = "Последнюю неделю вы не заходили в игру. Если в ближайшие дни ситуация не изменится, вы будете исключены из клана.\n" +
 		"_Это автоматическое сообщение, пожалуйста, не отвечайте на него._";
@@ -232,14 +195,14 @@ function GetArrayOfMembersWithPMText(clanMembers) {
 
 	var textedMembers = [];
 	var { lowGame, lowVoice, zeroGame, zeroVoice } = filterClanMembersData(clanMembers);
-	//lowGame.forEach(member => {textedMembers.push({discordMember: member.discordMember, text: createLine(member, lowGameMessage)});})
-	lowVoice.forEach(member => { textedMembers.push({ discordMember: member.discordMember, text: createLine(member, lowVoiceMessage) }); })
-	zeroVoice.forEach(member => { textedMembers.push({ discordMember: member.discordMember, text: createLine(member, zeroVoiceMessage) }); })
-	zeroGame.forEach(member => { textedMembers.push({ discordMember: member.discordMember, text: createLine(member, zeroGameMessage) }); })
+	//lowGame.forEach(member => {textedMembers.push({discordMember: member.discordMember, text: member.FillStringWithData(lowGameMessage)});})
+	lowVoice.forEach(member => { textedMembers.push({ discordMember: member.discordMember, text: member.FillStringWithData(lowVoiceMessage) }); })
+	zeroVoice.forEach(member => { textedMembers.push({ discordMember: member.discordMember, text: member.FillStringWithData(zeroVoiceMessage) }); })
+	zeroGame.forEach(member => { textedMembers.push({ discordMember: member.discordMember, text: member.FillStringWithData(zeroGameMessage) }); })
 	return textedMembers;
 }
 
-function filterClanMembersData(clanMembers) {
+export function filterClanMembersData(clanMembers) {
 	var filteredMembers = clanMembers;
 
 	var discordNotFound = filteredMembers.filter(m => !m.discordMemberExists).sort(byGameTime);
@@ -276,42 +239,4 @@ function filterClanMembersData(clanMembers) {
 	function byPercentage(a, b) { return a.percentage < b.percentage ? 1 : a.percentage > b.percentage ? -1 : 0; }
 
 	return { lowGame, lowVoice, zeroGame, zeroVoice, goodNewbie, isAway, noData, weForgotToKik, discordNotFound };
-}
-
-function addField(embed, embed_header, members, linePattern, separator, show_if_empty, semicolumn, show) {
-	if (!show) return;
-	if (members.length == 0 && !show_if_empty) return;
-	if (members.map(m => createLine(m, linePattern)).join(separator).length > 1010) {
-		embed.addField(embed_header, members.filter((_, i) => i < members.length / 2).map(m => createLine(m, linePattern)).join(separator), semicolumn);
-		embed.addField(embed_header, members.filter((_, i) => i >= members.length / 2).map(m => createLine(m, linePattern)).join(separator).semicolumn);
-	} else {
-		var prefix = show_if_empty ? '\u200B' : "";
-		embed.addField(embed_header, prefix + members.map(m => createLine(m, linePattern)).join(separator), semicolumn);
-	}
-}
-
-function createLine(clanMember, pattern) {
-	if (!pattern) pattern = "`$percent $voice $game $role`$tag";
-	return pattern
-		.replace("$name", clanMember.displayName)
-		.replace("$tag", clanMember.discordTag)
-		.replace("$role", getRoleMark(clanMember))
-		.replace("$game", clanMember.GetGameTimeLine())
-		.replace("$voice", clanMember.GetVoiceTimeLine())
-		.replace("$percent", clanMember.GetPercentageLine())
-}
-
-function getRoleMark(clanMember) {
-	if (clanMember.HasDiscordRole(config.roles.newbie)) {
-		var days = Math.round((Date.now() - clanMember.discordMember.joinedTimestamp) / (1000 * 60 * 60 * 24));
-		return "📗" + days + "d";
-	}
-	if (clanMember.HasDiscordRole(config.roles.guardians[0])) return "📘";
-	if (clanMember.HasDiscordRole(config.roles.guardians[1])) return "📒";
-	if (clanMember.HasDiscordRole(config.roles.guardians[2])) return "📙";
-	if (clanMember.HasDiscordRole(config.roles.guardians[3])) return "📕";
-	if (clanMember.HasDiscordRole(config.roles.guildmaster)) return "👑";
-	if (clanMember.HasDiscordRole(config.roles.afk)) return "💤";
-	if (clanMember.HasDiscordRole(config.roles.raidleader)) return "🎓";
-	return "❌";
 }
