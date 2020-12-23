@@ -40,7 +40,7 @@ export function GiveForumRole(message) {
 }
 
 export function SaveForumLinkAndPublish(link) {
-	fs.writeFile('./data/forumlink.txt', link, function (error) {
+	fs.writeFile('./.data/forumlink.txt', link, function (error) {
 		if (error) throw error; // если возникла ошибка
 	});
 	channel_news = message.client.channels.get(config.channels.clannews);
@@ -54,7 +54,7 @@ export function SaveForumLinkAndPublish(link) {
 
 export function PublishDailyMessage(client) {
 	var channel = client.channels.get(config.channels.flood);
-	fs.readFile("./data/forumlink.txt", 'utf8', function (err, data) {
+	fs.readFile("./.data/forumlink.txt", 'utf8', function (err, data) {
 		if (err) throw err;
 		channel.send(
 			"Уважаемые Стражи! А точнее те из вас, кто <@&" + config.roles.forum_tag + ">\n" +

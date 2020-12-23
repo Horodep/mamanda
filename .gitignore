@@ -2,8 +2,7 @@
 config.json
 
 #data
-forumlink.txt
-data
+.data
 
 # Debug
 .vscode

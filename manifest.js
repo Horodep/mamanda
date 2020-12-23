@@ -9,12 +9,12 @@ export class ManifestManager {
         var uri = "https://www.d2checklist.com/assets/destiny2.zip";
         var filename = 'manifest.zip';
 
-        const file = fs.createWriteStream(`./data/${filename}`);
+        const file = fs.createWriteStream(`./.data/${filename}`);
         https.get(uri, response => {
             response.pipe(file)
                 .on("finish", function () {
-                    var zip = new AdmZip(`./data/${filename}`);
-                    zip.extractAllTo("./data/", /*overwrite*/true);
+                    var zip = new AdmZip(`./.data/${filename}`);
+                    zip.extractAllTo("./.data/", /*overwrite*/true);
                     ManifestManager.LoadData();
                     console.log("Manifest refreshed!");
                 });
@@ -22,7 +22,7 @@ export class ManifestManager {
     }
 
     static LoadData() {
-        this.manifest = JSON.parse(fs.readFileSync('./data/destiny2.json'));
+        this.manifest = JSON.parse(fs.readFileSync('./.data/destiny2.json'));
     }
 
     static GetRecordData(triumphId) {
