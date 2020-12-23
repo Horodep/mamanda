@@ -6,10 +6,12 @@ import { MessageDelete } from "./discordEvents/messageDelete.js";
 import { MessageReactionAdd } from "./discordEvents/messageReactionAdd.js";
 import { MessageReactionRemove } from "./discordEvents/messageReactionRemove.js";
 import { CommandManager } from "./commandManager.js";
+import { ManifestManager } from "./manifest.js";
 
 const client = new Discord.Client({ partials: ['MESSAGE', 'CHANNEL', 'REACTION'] });
 client.login(config.credentials.discordApiKey);
 CommandManager.Init();
+ManifestManager.Refresh();
 
 client.on("ready", () => {
 	client.user.setActivity("на Летописца 9 из 10", { type: 'WATCHING' });
@@ -23,6 +25,6 @@ client.on("messageReactionRemove", (reaction, user) => MessageReactionRemove(rea
 
 function NewMember(member) {
 	var queueRole = member.guild.roles.cache.find(role => role.id == config.roles.queue);
-	member.roles.add(queueRole);
+	//member.roles.add(queueRole);
 	console.log("NEW MEMBER " + member.displayName);
 }

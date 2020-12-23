@@ -5,7 +5,7 @@ import { CatchError } from "./catcherror.js";
 export function DropPvpRole(guild) {
 	var topPvpRole = guild.roles.find(role => role.id == config.roles.medals.category_first_role.crucible);
 
-	for(var rolePosition = topPvpRole.position-1; rolePosition > topPvpRole.position-7; rolePosition--){
+	for (var rolePosition = topPvpRole.position - 1; rolePosition > topPvpRole.position - 7; rolePosition--) {
 		var role = guild.roles.find(role => role.position == rolePosition);
 		var list = [];
 		role.members.forEach(member => { list.push(member); });
@@ -40,29 +40,29 @@ export function GiveForumRole(message) {
 }
 
 export function SaveForumLinkAndPublish(link) {
-	fs.writeFile('forumlink.txt', link, function (error) {
+	fs.writeFile('./data/forumlink.txt', link, function (error) {
 		if (error) throw error; // если возникла ошибка
 	});
 	channel_news = message.client.channels.get(config.channels.clannews);
 	channel_news.send(
-		"Не важно, <@&"+config.roles.guardians[0]+"> ты, <@&"+config.roles.guest+"> или @everyone другой, мы верим, что ты хочешь помочь клану! <@&"+config.separators.footer+">\n" +
-		"Проще всего это сделать подняв тему о наборе на форуме, нажав на стрелочку вверх.\n" +	link + "\n" + 
+		"Не важно, <@&" + config.roles.guardians[0] + "> ты, <@&" + config.roles.guest + "> или @everyone другой, мы верим, что ты хочешь помочь клану! <@&" + config.separators.footer + ">\n" +
+		"Проще всего это сделать подняв тему о наборе на форуме, нажав на стрелочку вверх.\n" + link + "\n" +
 		"p.s. Для того, чтобы снять роль прожмите эмоцию `🆗` под данным сообщением.").then((msg) => {
 			msg.react("🆗");
 		});
 }
 
-export function PublishDailyMessage(client){
+export function PublishDailyMessage(client) {
 	var channel = client.channels.get(config.channels.flood);
-	fs.readFile("forumlink.txt", 'utf8', function(err, data) {
+	fs.readFile("./data/forumlink.txt", 'utf8', function (err, data) {
 		if (err) throw err;
 		channel.send(
-			"Уважаемые Стражи! А точнее те из вас, кто <@&"+config.roles.forum_tag+">\n"+
-			"Пожалуйста, сделайте это! Это очень важно для клана!\n\n"+
-			"p.s. Для того, чтобы снять роль прожмите эмоцию `🆗` под данным сообщением.\n"+
-			data).then((msg)=>{
-			msg.react("🆗");
-		});
+			"Уважаемые Стражи! А точнее те из вас, кто <@&" + config.roles.forum_tag + ">\n" +
+			"Пожалуйста, сделайте это! Это очень важно для клана!\n\n" +
+			"p.s. Для того, чтобы снять роль прожмите эмоцию `🆗` под данным сообщением.\n" +
+			data).then((msg) => {
+				msg.react("🆗");
+			});
 	})
 }
 
