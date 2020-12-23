@@ -1,11 +1,11 @@
-import Discord from "discord.js";
 import config from "./config.json";
 import { CatchError } from "./catcherror.js";
 import { GetFullMemberData, GetProfileData } from "./bungieApi.js";
 import { GetMemberByDiscordName } from "./clan.js";
-import * as BungieApiLogic from "./coreLogic/bungieApiDataLogic.js";
-import { LogRolesGranting, CheckAndProcessRole, CheckAndProcessRoleBlock, SumMedals, EmbedFormField } from "./coreLogic/rolesLogic.js";
+import * as BungieApiLogic from "./coreLogic/bungieApiData.js";
+import { LogRolesGranting, CheckAndProcessRole, CheckAndProcessRoleBlock, SumMedals } from "./coreLogic/rolesLogic.js";
 import { ClanMember } from "./clanMember.js";
+import { FormRolesEmbed } from "./embeds/rolesEmbed.js";
 
 export function Roles(message, args) {
 	if (args.length == 1) {
@@ -63,7 +63,7 @@ export async function GetShowAndSetRoles(clanMember, channel) {
 		var rolesData = await GetRolesData(clanMember.membershipType, clanMember.membershipId);
 
 		console.log(rolesData);
-		SendRolesMessage(channel, clanMember, rolesData);
+		if (channel != null) channel.send(FormRolesEmbed(clanMember, rolesData));
 		SetRoles(clanMember, rolesData.characterDetails, rolesData.medals);
 	} catch (e) {
 		CatchError(e, channel);
@@ -139,35 +139,6 @@ async function GetRolesData(membershipType, membershipId) {
 	//data.extra.soloflawless = BungieApiLogic.get_all_nodes(response, [3950599483, 3205009787]);
 
 	return { characterDetails: characterDetails, medals: data };
-}
-
-function SendRolesMessage(channel, clanMember, rolesData) {
-	if (channel == null) return;
-	if (rolesData.medals == null) {
-		channel.send('Данные профиля не были получены. Вероятно профиль закрыт настройками приватности.\n' +
-			'Настройки приватности: https://www.bungie.net/ru/Profile/Settings/?category=Privacy');
-	} else {
-		var medalsSum = SumMedals(clanMember.discordMemberObject, rolesData.medals)
-		const embed = new Discord.MessageEmbed()
-			.setAuthor(clanMember.displayName + " 💠" + medalsSum + "💠")
-			.setColor(0x00AE86)
-			.setFooter("ПВП медали выдают гм-ы; ранжирование ролей: 7/16/24 • id: " + clanMember.discordMemberId,
-				"https://cdn.discordapp.com/avatars/543342030768832524/7da47eaca948d9874b66fc5884ca2d00.png")
-			.addField("Рейды", EmbedFormField(rolesData.medals.raids), true)
-			.addField("Печати", EmbedFormField(rolesData.medals.seals), true)
-			.addField("Наследные печати", EmbedFormField(rolesData.medals.legacy_seals), true)
-			.addField("Планеты", EmbedFormField(rolesData.medals.locations), true)
-			.addField("Триумфы", EmbedFormField(rolesData.medals.triumphs), true)
-			.addField("Наследные триумфы", EmbedFormField(rolesData.medals.legacy_triumphs), true)
-			.addField("Горнило", EmbedFormField(rolesData.medals.crucible), true)
-			.addField("Сезон 12", EmbedFormField(rolesData.medals.season), true)
-			.addField('\u200B', '\u200B', true)
-			.addField("Ссылки", "[Raid Report](https://raid.report/pc/" + clanMember.membershipId + ")"
-				+ " | [Braytech](https://beta.braytech.org/" + clanMember.membershipType + "/" + clanMember.membershipId + "/" + rolesData.characterDetails.GetBestCharacterId() + "/)"
-				+ " | [D2 Checklist](https://www.d2checklist.com/" + clanMember.membershipType + "/" + clanMember.membershipId + "/triumphs)"
-				+ " | [Destiny Tracker](https://destinytracker.com/destiny-2/profile/steam/" + clanMember.membershipId + "/overview)")
-		channel.send({ embed });
-	}
 }
 
 function SetRoles(clanMember, characterDetails, medals) {

@@ -9,6 +9,7 @@ export function LogRolesGranting(displayName, isDiscordMemberFound, medals) {
 		console.log(displayName + ' '.repeat(40 - displayName.length), "set roles and it's details");
 	}
 }
+
 export function CheckAndProcessRole(discord_member, roleId, grantRole, grantNextRole, role) {
 	if (role == null)
 		role = discord_member.guild.roles.cache.find(r => r.id == roleId);
@@ -24,6 +25,7 @@ export function CheckAndProcessRole(discord_member, roleId, grantRole, grantNext
 		}
 	}
 }
+
 export function CheckAndProcessRoleBlock(discord_member, firstRoleId, blockSize, data) {
 	var role = discord_member.guild.roles.cache.find(r => r.id == firstRoleId);
 	if (role == null)
@@ -37,7 +39,7 @@ export function CheckAndProcessRoleBlock(discord_member, firstRoleId, blockSize,
 		i++;
 	}
 }
-;
+
 export function SumMedals(discord_member, medals) {
 	var sum = 0;
 	for (let subcategoryName of Object.keys(medals)) {
@@ -46,6 +48,7 @@ export function SumMedals(discord_member, medals) {
 	};
 	return sum + SumCrucible(discord_member);
 }
+
 function SumSubcategory(subcategory) {
 	var sum = 0;
 	for (let child of Object.values(subcategory)) {
@@ -53,6 +56,7 @@ function SumSubcategory(subcategory) {
 	};
 	return sum;
 }
+
 function SumCrucible(discord_member) {
 	if (discord_member == null)
 		return 0;
@@ -64,18 +68,4 @@ function SumCrucible(discord_member) {
 		(discord_member.roles.cache.find(role => role.position == (pvp_top_role.position - 4)) != null ? 2 : 0) +
 		(discord_member.roles.cache.find(role => role.position == (pvp_top_role.position - 5)) != null ? 3 : 0) +
 		(discord_member.roles.cache.find(role => role.position == (pvp_top_role.position - 6)) != null ? 4 : 0);
-}
-export function EmbedFormField(data) {
-	var field = "";
-	for (let child of Object.values(data)) {
-		field = field + "\n" + EmbedFormLine(child);
-	};
-	return field;
-}
-function EmbedFormLine(data) {
-	try {
-		return (data.state ? "🔶 " : "🔷 ") + data.text;
-	} catch {
-		return "🔷 not defined";
-	}
 }
