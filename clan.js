@@ -6,6 +6,7 @@ import { ClanMember, GetAllActivities } from "./clanMember.js";
 import { GetClanVoiceSummary } from "./sql.js";
 import { GetFullDiscordClanMemberList } from "./discordCommunityFeatures.js";
 import { SendPrivateMessagesToArray } from "./sendMessage.js";
+import { ManifestManager } from "./manifest.js";
 
 async function GetFullGameClanMemberList() {
 	var members = [];
@@ -55,36 +56,36 @@ export function SetRoles(channel) {
 }
 
 export async function ShowRecordStat(channel, triumphId) {
-	if (triumphId == 0){
+	if (triumphId == null) {
 		message.channel.send("Вы не обозначили искомый триумф.");
 		return;
 	}
-	let manifest = JSON.parse(fs.readFileSync('destiny2.json'));
-	try{
-		var a = manifest.Record[triumphId].displayProperties.name;
-	} catch(e) {
+	ManifestManager.LoadData();
+	var recordData = ManifestManager.GetRecordData(triumphId);
+	if (recordData == null) {
 		message.channel.send("Триумф не найден.");
 		return;
 	}
 
 	var iterator = 0;
-	var finalList = [];
+	var membersSucceeded = [];
 	channel.send(new MessageEmbed()).then((msg) => {
-		ExecuteForEveryMember(500, async function (member, i, members) {
+		ExecuteForEveryMember(300, async function (member, i, members) {
 			var clanMember = new ClanMember(member);
-			if(clanMember.recordDataState()) finalList.push(clanMember);
+			if (await clanMember.GetRecordDataState(triumphId)) membersSucceeded.push(clanMember);
 
-			if (iterator % 20 == 0 || iterator == members.length) {
-				const embed = new Discord.RichEmbed()
-				//	.setAuthor(manifest.Record[triumphid].displayProperties.name + (isLast ? "" : " — request in progress: [" + counter + "/" + size + "]"))
+			iterator++;
+			if (iterator % 15 == 0 || iterator == members.length) {
+				const embed = new MessageEmbed()
+					.setAuthor(recordData.name + (iterator == members.length ? "" : " [" + iterator + "/" + members.length + "]"))
 					.setColor(0x00AE86)
-				//	.setThumbnail('https://www.bungie.net' + manifest.Record[triumphid].displayProperties.icon)
-				//	.setFooter(manifest.Record[triumphid].displayProperties.description, "https://cdn.discordapp.com/avatars/543342030768832524/7da47eaca948d9874b66fc5884ca2d00.png")
+					.setThumbnail('https://www.bungie.net' + recordData.icon)
+					.setFooter(recordData.description, "https://cdn.discordapp.com/avatars/543342030768832524/7da47eaca948d9874b66fc5884ca2d00.png")
 
-				if (finalList.length > 0) embed.addField("1 - " + Math.round(finalList.length / 2), finalList.sort().filter((_, i) => i < finalList.length / 2).map(member => member.displayName).join("\n"), true)
-				if (finalList.length > 1) embed.addField((Math.round(finalList.length / 2) + 1) + " - " + finalList.length, finalList.sort().filter((_, i) => i >= finalList.length / 2).map(member => member.displayName).join("\n"), true)
+				if (membersSucceeded.length > 0) embed.addField("1 - " + Math.round(membersSucceeded.length / 2), membersSucceeded.sort().filter((_, i) => i < membersSucceeded.length / 2).map(member => member.displayName).join("\n"), true)
+				if (membersSucceeded.length > 1) embed.addField((Math.round(membersSucceeded.length / 2) + 1) + " - " + membersSucceeded.length, membersSucceeded.sort().filter((_, i) => i >= membersSucceeded.length / 2).map(member => member.displayName).join("\n"), true)
 
-				bot_msg.edit({ embed });
+				msg.edit({ embed });
 			}
 		});
 	});

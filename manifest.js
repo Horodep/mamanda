@@ -13,17 +13,20 @@ export class ManifestManager {
         https.get(uri, response => {
             response.pipe(file)
                 .on("finish", function () {
-                    console.log("done");
                     var zip = new AdmZip(`./data/${filename}`);
                     zip.extractAllTo("./data/", /*overwrite*/true);
-                    let rawdata = fs.readFileSync('./data/destiny2.json');
-                    manifest = JSON.parse(rawdata);
+                    ManifestManager.LoadData();
+                    console.log("Manifest refreshed!");
                 });
         });
     }
 
-    static GetRecordData(triumphId){
-        return manifest?.Record[triumphId]?.displayProperties; // name, icon, description
+    static LoadData() {
+        this.manifest = JSON.parse(fs.readFileSync('./data/destiny2.json'));
+    }
+
+    static GetRecordData(triumphId) {
+        return this.manifest?.Record[triumphId]?.displayProperties; // name, icon, description
     }
 }
 

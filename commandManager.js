@@ -166,13 +166,13 @@ export class CommandManager {
         this.AddCommand("restricted", 0, "roles id:", "!roles id:type/id", "отображение и выдача заслуженных медалей по bungie id;", function (args, message) {
             Roles(message, args);
         });
-        this.AddCommand("restricted", 1, "record", "!record TRIUMPH_HASH", "отобразить стражей клана, получивших конкретный триумф или предмет;", function (args, message) { 
-            ShowRecordStat(message.channel, args)
+        this.AddCommand("restricted", 0, "record", "!record TRIUMPH_HASH", "отобразить стражей клана, получивших конкретный триумф или предмет;", function (args, message) { 
+            ShowRecordStat(message.channel, args.length > 1 ? args[1] : null)
         });
         this.AddCommand("restricted", 2, "toptriumphs", "!triumphs", "топ 15 стражей клана по очкам триумфов текстом;", function (args, message) { });
         this.AddCommand("restricted", 2, "toptriumphs 1", "!triumphs gimmeimageplz", "топ 15 стражей клана по очкам триумфов графиком;", function (args, message) { });
         this.AddCommand("restricted", 0, "сбор", "!сбор ДД.ММ ЧЧ:ММ название активности, комментарии", "создание сбора на активность на 6 человек;", function (args, message) {
-            CreateRaid(message, args.length > 1 ? args[1] : null);
+            CreateRaid(message, args);
         });
         this.AddCommand("restricted", 0, "", "!сбор ДД.ММ ЧЧ:ММ [N] название активности, комментарии", "создание сбора на активность на N человек;", function (args, message) { });
 

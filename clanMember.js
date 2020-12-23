@@ -81,26 +81,10 @@ export class ClanMember {
         return this.#voiceOnline == 0;
     }
 
-    async get recordDataState(triumphId){
+    async GetRecordDataState(triumphId){
         var coreData = await GetCoreMemberData(this.#destinyUserInfo.membershipType, this.#destinyUserInfo.membershipId);
         
-        try{
-            if (coreData.profileRecords.data.records[triumphId].state%2 == 1) return true;
-            console.log('first  check OK - counter: '+counter+' size: '+size+' name: '+displayName);
-        } catch(e) {
-            try{
-                var character;
-                Object.keys(coreData.characterRecords.data).forEach(function(key) {
-                    character = coreData.characterRecords.data[key];
-                });
-                if (character.records[triumphId].state%2 == 1) return true;
-                console.log('second check OK - counter: '+counter+' size: '+size+' name: '+displayName);
-            } catch(e) {
-                return false;
-                console.log('all checks FAIL - counter: '+counter+' size: '+size+' name: '+displayName);
-            }
-        }
-        return false;
+        return coreData?.profileRecords?.data?.records[triumphId]?.state%2 == 1;
     }
 
     async FetchCharacterIds() {
