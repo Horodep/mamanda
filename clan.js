@@ -91,6 +91,29 @@ export async function ShowRecordStat(channel, triumphId) {
 	});
 }
 
+export async function ShowTopTriumphScore(channel, modificators){
+	var iterator = 0;
+	var objectMembers = [];
+	channel.send(new MessageEmbed()).then((msg) => {
+		ExecuteForEveryMember(50, async (member, i, members) => {
+			var clanMember = new ClanMember(member);
+			await clanMember.FetchActiveScore();
+			objectMembers.push(clanMember);
+
+			iterator++;
+			if (iterator % 15 == 0 || iterator == members.length) {
+				const embed = new MessageEmbed()
+					.setAuthor("Triumphs score [top 15]:")
+					.setColor(0x00AE86)
+					.setDescription(objectMembers.sort((a, b) => (a.activeScore > b.activeScore ? -1 : 1)).filter((_, i) => i < 15).map(m => "`" + m.activeScore + "` " + m.displayName).join('\n'))
+					.setFooter("Horobot", "https://cdn.discordapp.com/avatars/543342030768832524/7da47eaca948d9874b66fc5884ca2d00.png")
+					.setTimestamp()
+				msg.edit({ embed });
+			}
+		});
+	})
+}
+
 export async function Nicknames(channel, isReminder) {
 	var gameMembers = await GetFullGameClanMemberList();
 	var discordMembers = GetFullDiscordClanMemberList(channel.guild);

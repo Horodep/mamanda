@@ -1,6 +1,6 @@
 import { MessageEmbed } from "discord.js";
 import { DropPvpRole, GiveForumRole, SaveForumLinkAndPublish, ShowNewbieList, ShowQueueList, ShowQueueReqestsList } from "./discordGuildMasterFeatures.js"
-import { ClanSize, ClanTime, Nicknames, SetRoles, ShowRecordStat } from "./clan.js"
+import { ClanSize, ClanTime, Nicknames, SetRoles, ShowRecordStat, ShowTopTriumphScore } from "./clan.js"
 import { Roles } from "./roles.js"
 import { newAuthToken } from "./httpCore.js"
 import { GetClanMemberOnlineTime } from "./clanMember.js";
@@ -136,11 +136,6 @@ export class CommandManager {
             message.channel.send('🤡');
         });
 
-        //case 'сбор':			raid.create_raid(message, args);							break;
-        //case 'triumph':		seals.triumph(message, (args.length > 1 ? args[1] : 0));	break;
-        //case 'triumphs':		triumphs.triumphs(message, (args.length > 1 ? 1 : null));	break;
-        //case 'rl':			raidleader.rl(message.channel, (args.length > 1 ? args[1] : message.member.user.id), (args.length > 2 ? args[2] : 7));	break;
-
         this.AddCommand("restricted", 0, "cap", "!cap NUMBER", "ограничение комнаты до NUMBER мест;", function (args, message) {
             ChangeChannelCap(message, (args.length > 1 ? args[1] : 0));
         });
@@ -159,7 +154,9 @@ export class CommandManager {
         this.AddCommand("restricted", 0, "region", "!region", "смена региона сервера;", function (args, message) {
             ChangeRegion(message);
         });
-        this.AddCommand("restricted", 2, "rl", "!rl / !rl @DiscordTag", "отчет по стражу на пригодность в качестве наставника;", function (args, message) { });
+        this.AddCommand("restricted", 2, "rl", "!rl / !rl @DiscordTag", "отчет по стражу на пригодность в качестве наставника;", function (args, message) { 
+            //raidleader.rl(message.channel, (args.length > 1 ? args[1] : message.member.user.id), (args.length > 2 ? args[2] : 7));	break;
+        });
         this.AddCommand("restricted", 0, "roles", "!roles / !roles @DiscordTag", "отображение и выдача стражу заслуженных медалей;", function (args, message) {
             Roles(message, args);
         });
@@ -169,8 +166,10 @@ export class CommandManager {
         this.AddCommand("restricted", 0, "record", "!record TRIUMPH_HASH", "отобразить стражей клана, получивших конкретный триумф или предмет;", function (args, message) { 
             ShowRecordStat(message.channel, args.length > 1 ? args[1] : null)
         });
-        this.AddCommand("restricted", 2, "toptriumphs", "!triumphs", "топ 15 стражей клана по очкам триумфов текстом;", function (args, message) { });
-        this.AddCommand("restricted", 2, "toptriumphs 1", "!triumphs gimmeimageplz", "топ 15 стражей клана по очкам триумфов графиком;", function (args, message) { });
+        this.AddCommand("restricted", 0, "toptriumphs", "!triumphs", "топ 15 стражей клана по очкам триумфов текстом;", function (args, message) { 
+            ShowTopTriumphScore(message.channel, args.length > 1 ? args[1] : "")
+        });
+        this.AddCommand("restricted", 1, "toptriumphs 1", "!triumphs gimmeimageplz", "топ 15 стражей клана по очкам триумфов графиком;", function (args, message) { });
         this.AddCommand("restricted", 0, "сбор", "!сбор ДД.ММ ЧЧ:ММ название активности, комментарии", "создание сбора на активность на 6 человек;", function (args, message) {
             CreateRaid(message, args);
         });

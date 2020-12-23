@@ -18,6 +18,8 @@ export class ClanMember {
     #voiceOnline = 0;
     #gameOnline = 0;
     access = true;
+    
+    #activeScore = 0;
 
     constructor(member) {
         this.#destinyUserInfo = member.destinyUserInfo ?? member.userInfo;
@@ -80,6 +82,9 @@ export class ClanMember {
     get isZeroVoice() {
         return this.#voiceOnline == 0;
     }
+    get activeScore() {
+        return this.#activeScore;
+    }
 
     async GetRecordDataState(triumphId){
         var coreData = await GetCoreMemberData(this.#destinyUserInfo.membershipType, this.#destinyUserInfo.membershipId);
@@ -90,6 +95,10 @@ export class ClanMember {
     async FetchCharacterIds() {
         var profileWithCharacters = await GetProfileData(this.#destinyUserInfo.membershipType, this.#destinyUserInfo.membershipId);
         this.#characterIds = profileWithCharacters.data.characterIds;
+    }
+    async FetchActiveScore() {
+        var coreMemberData = await GetCoreMemberData(this.#destinyUserInfo.membershipType, this.#destinyUserInfo.membershipId);
+        this.#activeScore = coreMemberData?.profileRecords?.data["activeScore"] ?? 0;
     }
 
     SetDiscordMember(_discordMember) {
