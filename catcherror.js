@@ -22,6 +22,6 @@ export function CatchErrorWithTimeout(e, channel, timeout){
 		"\n Попробуйте еще раз. Если ошибка повторится, обратитесь к <@" + config.users.developer + "> " + 
 		"\n```js\n" + e.stack + "```";
 	channel.send(line).then((msg) => {
-		setTimeout(() => { msg.delete(); }, 15000);
+		setTimeout(() => { msg.delete(); }, timeout);
 	});
 }
