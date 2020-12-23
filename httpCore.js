@@ -35,7 +35,12 @@ export async function makeRequestWithPromise(method, url, setAuth) {
 			    if (xhr.status >= 300) {
 				    reject("Error, status code = " + xhr.status)
 			    } else {
-				    resolve(JSON.parse(xhr.responseText));
+                    try{
+                        resolve(JSON.parse(xhr.responseText));
+                    }catch(e){
+                        console.log(e);
+                        reject("Error name = " + e.name)
+                    }
 			    }
 			}
 		  }
