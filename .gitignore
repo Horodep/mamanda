@@ -1,6 +1,9 @@
 # Config
 config.json
+
+#data
 forumlink.txt
+data
 
 # Debug
 .vscode
