@@ -24,7 +24,6 @@ client.on("messageReactionAdd", (reaction, user) => MessageReactionAdd(reaction,
 client.on("messageReactionRemove", (reaction, user) => MessageReactionRemove(reaction, user));
 
 function NewMember(member) {
-	var queueRole = member.guild.roles.cache.find(role => role.id == config.roles.queue);
-	//member.roles.add(queueRole);
+	//member.roles.add(config.roles.queue);
 	console.log("NEW MEMBER " + member.displayName);
 }
