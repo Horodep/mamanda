@@ -2,7 +2,8 @@
 config.json
 
 #data
-.data
+.data/*.*
+.data/images
 
 # Debug
 .vscode
