@@ -14,12 +14,8 @@ export function InviteFriend(message, discordMention) {
 			return;
 		}
 		
-		if(discordMember.roles.cache.find(role => role.id == config.roles.queue)){
-			var role_old = message.guild.roles.cache.find(role => role.id == config.roles.queue);
-			var role_new = message.guild.roles.cache.find(role => role.id == config.roles.guest);
-			discordMember.roles.add(role_new);
-			discordMember.roles.remove(role_old);
-
+		if(discordMember.roles.cache.size == 1){
+			discordMember.roles.add(config.roles.guest);
 			message.channel.send(`Стража <@${discordId}> пустили на сервер.`);
 		}
 	}else{
