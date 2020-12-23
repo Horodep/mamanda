@@ -8,6 +8,7 @@ import { GetFullDiscordClanMemberList } from "./discordCommunityFeatures.js";
 import { SendPrivateMessagesToArray } from "./sendMessage.js";
 import { ManifestManager } from "./manifest.js";
 import { FormClanTimeEmbed } from "./embeds/clanTimeEmbed.js";
+import { ShowRecordStatEmbed } from "./embeds/showRecordStatEmbed.js";
 
 async function GetFullGameClanMemberList() {
 	var members = [];
@@ -56,6 +57,20 @@ export function SetRoles(channel) {
 	});
 }
 
+export async function SendAndUpdateEmbed(channel, requestTimeout, updateFrequency, formData, embed){
+	var iterator = 0;
+	var arrayWithData = [];
+	channel.send(new MessageEmbed()).then((msg) => {
+		ExecuteForEveryMember(requestTimeout, async function (member, i, members) {
+			arrayWithData.push(formData(member));
+			iterator++;
+			if (iterator % updateFrequency == 0 || iterator == members.length) {
+				msg.edit(embed(arrayWithData, iterator, members.length));
+			}
+		});
+	});
+}
+
 export async function ShowRecordStat(channel, triumphId) {
 	if (triumphId == null) {
 		message.channel.send("Вы не обозначили искомый триумф.");
@@ -68,28 +83,15 @@ export async function ShowRecordStat(channel, triumphId) {
 		return;
 	}
 
-	var iterator = 0;
-	var membersSucceeded = [];
-	channel.send(new MessageEmbed()).then((msg) => {
-		ExecuteForEveryMember(300, async function (member, i, members) {
+	SendAndUpdateEmbed(channel, 300, 15, 
+		async (member, array) => {
 			var clanMember = new ClanMember(member);
-			if (await clanMember.GetRecordDataState(triumphId)) membersSucceeded.push(clanMember);
-
-			iterator++;
-			if (iterator % 15 == 0 || iterator == members.length) {
-				const embed = new MessageEmbed()
-					.setAuthor(recordData.name + (iterator == members.length ? "" : " [" + iterator + "/" + members.length + "]"))
-					.setColor(0x00AE86)
-					.setThumbnail('https://www.bungie.net' + recordData.icon)
-					.setFooter(recordData.description, "https://cdn.discordapp.com/avatars/543342030768832524/7da47eaca948d9874b66fc5884ca2d00.png")
-
-				if (membersSucceeded.length > 0) embed.addField("1 - " + Math.round(membersSucceeded.length / 2), membersSucceeded.sort().filter((_, i) => i < membersSucceeded.length / 2).map(member => member.displayName).join("\n"), true)
-				if (membersSucceeded.length > 1) embed.addField((Math.round(membersSucceeded.length / 2) + 1) + " - " + membersSucceeded.length, membersSucceeded.sort().filter((_, i) => i >= membersSucceeded.length / 2).map(member => member.displayName).join("\n"), true)
-
-				msg.edit({ embed });
-			}
-		});
-	});
+			if (await clanMember.GetRecordDataState(triumphId)) return clanMember;
+			return null;
+		}, 
+		(array, i, size) => {
+			return ShowRecordStatEmbed(recordData, i, size, array);
+		})
 }
 
 export async function ShowTopTriumphScore(channel, modificators){
