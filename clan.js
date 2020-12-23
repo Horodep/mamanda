@@ -62,7 +62,7 @@ export async function SendAndUpdateEmbed(channel, requestTimeout, updateFrequenc
 	var arrayWithData = [];
 	channel.send(new MessageEmbed()).then((msg) => {
 		ExecuteForEveryMember(requestTimeout, async function (member, i, members) {
-			arrayWithData.push(formData(member));
+			arrayWithData.push(await formData(member));
 			iterator++;
 			if (iterator % updateFrequency == 0 || iterator == members.length) {
 				msg.edit(embed(arrayWithData, iterator, members.length));
