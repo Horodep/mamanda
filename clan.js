@@ -86,11 +86,10 @@ export async function ShowRecordStat(channel, triumphId) {
 	SendAndUpdateEmbed(channel, 300, 15, 
 		async (member, array) => {
 			var clanMember = new ClanMember(member);
-			if (await clanMember.GetRecordDataState(triumphId)) return clanMember;
-			return null;
+			return (await clanMember.GetRecordDataState(triumphId)) ? clanMember : null;
 		}, 
 		(array, i, size) => {
-			return ShowRecordStatEmbed(recordData, i, size, array);
+			return ShowRecordStatEmbed(array, i, size, recordData);
 		})
 }
 
