@@ -2,6 +2,7 @@ import { MessageEmbed } from "discord.js";
 import { GetActivitiesFromApi, GetCoreMemberData, GetProfileData } from "./bungieApi.js";
 import { GetMemberByDiscordName } from "./clan.js";
 import { GetClanVoiceSummary, GetMemberDetailedVoice } from "./sql.js"
+import config from "./config.json";
 /*
 #crossSaveOverride;
 #applicableMembershipTypes;
@@ -98,7 +99,7 @@ export class ClanMember {
     }
     async FetchActiveScore() {
         var coreMemberData = await GetCoreMemberData(this.#destinyUserInfo.membershipType, this.#destinyUserInfo.membershipId);
-        this.#activeScore = coreMemberData?.profileRecords?.data["activeScore"] ?? 0;
+        this.#activeScore = coreMemberData?.profileRecords?.data?.activeScore ?? 0;
     }
 
     SetDiscordMember(_discordMember) {
@@ -125,6 +126,7 @@ export class ClanMember {
         if (percentage < 10) { percentage = "0" + percentage; }
         return percentage + "%";
     }
+
     GetTimeLine(seconds) {
         var hours = Math.floor(seconds / 3600);
         var minutes = Math.floor((seconds % 3600) / 60);
@@ -132,12 +134,15 @@ export class ClanMember {
         if (minutes < 10) { minutes = "0" + minutes; }
         return hours + ":" + minutes;
     }
+
     GetGameTimeLine() {
         return this.access ? this.GetTimeLine(this.#gameOnline) : "--:--";
     }
+
     GetVoiceTimeLine() {
         return this.GetTimeLine(this.#voiceOnline);
     }
+
     GetMemberTimeString() {
         if (this.access == false)
             return "**" + this.displayName + "** :: профиль закрыт; в войсе — " + this.GetVoiceTimeLine();
@@ -146,6 +151,7 @@ export class ClanMember {
                 this.GetVoiceTimeLine() + " / " +
                 this.GetGameTimeLine() + " = " + this.percentage + "%";
     }
+
     FormLinesForDetailedVoice(results) {
         var lines = []
         results.rows.forEach((row) => {
@@ -158,6 +164,30 @@ export class ClanMember {
         }
         return lines;
     }
+
+    FillStringWithData(stringLine) {
+        if (!stringLine) stringLine = "`$percent $voice $game $role`$tag";
+        return stringLine
+            .replace("$name", this.displayName)
+            .replace("$tag", this.discordTag)
+            .replace("$role", this.GetRoleMark())
+            .replace("$game", this.GetGameTimeLine())
+            .replace("$voice", this.GetVoiceTimeLine())
+            .replace("$percent", this.GetPercentageLine())
+    }
+
+    GetRoleMark() {
+        if (this.HasDiscordRole(config.roles.newbie)) return "📗" + this.joined + "d";
+        if (this.HasDiscordRole(config.roles.guardians[0])) return "📘";
+        if (this.HasDiscordRole(config.roles.guardians[1])) return "📒";
+        if (this.HasDiscordRole(config.roles.guardians[2])) return "📙";
+        if (this.HasDiscordRole(config.roles.guardians[3])) return "📕";
+        if (this.HasDiscordRole(config.roles.guildmaster)) return "👑";
+        if (this.HasDiscordRole(config.roles.afk)) return "💤";
+        if (this.HasDiscordRole(config.roles.raidleader)) return "🎓";
+        return "❌";
+    }
+
     GetMemberTimeEmbed(detailedLines) {
         const embed = new MessageEmbed()
             .setAuthor(this.displayName + " — " + this.percentage + "%")

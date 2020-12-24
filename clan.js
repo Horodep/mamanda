@@ -7,6 +7,10 @@ import { GetClanVoiceSummary } from "./sql.js";
 import { GetFullDiscordClanMemberList } from "./discordCommunityFeatures.js";
 import { SendPrivateMessagesToArray } from "./sendMessage.js";
 import { ManifestManager } from "./manifest.js";
+import { FormClanTimeEmbed } from "./embeds/clanTimeEmbed.js";
+import { FromRecordStatEmbed } from "./embeds/recordStatEmbed.js";
+import { FormTopTriumphScoreEmbed } from "./embeds/topTriumphScoreEmbed.js";
+import { FormNicknamesEmbed } from "./embeds/nicknamesEmbed";
 
 async function GetFullGameClanMemberList() {
 	var members = [];
@@ -55,6 +59,21 @@ export function SetRoles(channel) {
 	});
 }
 
+export async function SendAndUpdateEmbed(channel, requestTimeout, updateFrequency, formData, createEmbed, finalAction) {
+	var iterator = 0;
+	var arrayWithData = [];
+	channel.send(new MessageEmbed()).then((msg) => {
+		ExecuteForEveryMember(requestTimeout, async function (member, i, members) {
+			arrayWithData.push(await formData(member));
+			iterator++;
+			if (iterator % updateFrequency == 0 || iterator == members.length) {
+				msg.edit(createEmbed(arrayWithData.filter(m => m != null), iterator, members.length));
+			}
+			if (iterator == members.length && finalAction != null) finalAction(arrayWithData.filter(m => m != null));
+		});
+	});
+}
+
 export async function ShowRecordStat(channel, triumphId) {
 	if (triumphId == null) {
 		message.channel.send("Вы не обозначили искомый триумф.");
@@ -67,156 +86,48 @@ export async function ShowRecordStat(channel, triumphId) {
 		return;
 	}
 
-	var iterator = 0;
-	var membersSucceeded = [];
-	channel.send(new MessageEmbed()).then((msg) => {
-		ExecuteForEveryMember(300, async function (member, i, members) {
+	SendAndUpdateEmbed(channel, 300, 15,
+		async (member) => {
 			var clanMember = new ClanMember(member);
-			if (await clanMember.GetRecordDataState(triumphId)) membersSucceeded.push(clanMember);
-
-			iterator++;
-			if (iterator % 15 == 0 || iterator == members.length) {
-				const embed = new MessageEmbed()
-					.setAuthor(recordData.name + (iterator == members.length ? "" : " [" + iterator + "/" + members.length + "]"))
-					.setColor(0x00AE86)
-					.setThumbnail('https://www.bungie.net' + recordData.icon)
-					.setFooter(recordData.description, "https://cdn.discordapp.com/avatars/543342030768832524/7da47eaca948d9874b66fc5884ca2d00.png")
-
-				if (membersSucceeded.length > 0) embed.addField("1 - " + Math.round(membersSucceeded.length / 2), membersSucceeded.sort().filter((_, i) => i < membersSucceeded.length / 2).map(member => member.displayName).join("\n"), true)
-				if (membersSucceeded.length > 1) embed.addField((Math.round(membersSucceeded.length / 2) + 1) + " - " + membersSucceeded.length, membersSucceeded.sort().filter((_, i) => i >= membersSucceeded.length / 2).map(member => member.displayName).join("\n"), true)
-
-				msg.edit({ embed });
-			}
-		});
-	});
+			return (await clanMember.GetRecordDataState(triumphId)) ? clanMember : null;
+		},
+		(array, i, size) => {
+			return FromRecordStatEmbed(array, i, size, recordData);
+		})
 }
 
-export async function ShowTopTriumphScore(channel, modificators){
-	var iterator = 0;
-	var objectMembers = [];
-	channel.send(new MessageEmbed()).then((msg) => {
-		ExecuteForEveryMember(50, async (member, i, members) => {
+export async function ShowTopTriumphScore(channel) {
+	SendAndUpdateEmbed(channel, 50, 15,
+		async (member) => {
 			var clanMember = new ClanMember(member);
 			await clanMember.FetchActiveScore();
-			objectMembers.push(clanMember);
-
-			iterator++;
-			if (iterator % 15 == 0 || iterator == members.length) {
-				const embed = new MessageEmbed()
-					.setAuthor("Triumphs score [top 15]:")
-					.setColor(0x00AE86)
-					.setDescription(objectMembers.sort((a, b) => (a.activeScore > b.activeScore ? -1 : 1)).filter((_, i) => i < 15).map(m => "`" + m.activeScore + "` " + m.displayName).join('\n'))
-					.setFooter("Horobot", "https://cdn.discordapp.com/avatars/543342030768832524/7da47eaca948d9874b66fc5884ca2d00.png")
-					.setTimestamp()
-				msg.edit({ embed });
-			}
-		});
-	})
-}
-
-export async function Nicknames(channel, isReminder) {
-	var gameMembers = await GetFullGameClanMemberList();
-	var discordMembers = GetFullDiscordClanMemberList(channel.guild);
-
-	var discordList = [];
-	var discordPsnList = [];
-	var gameList = [];
-
-	discordMembers.forEach(function (discordMember) {
-		if (gameMembers.filter(gameMember => discordMember.displayName.startsWith(gameMember.destinyUserInfo.LastSeenDisplayName)).length == 0) {
-			if (discordMember.roles.cache.find(role => role.name === "PSN")) {
-				discordPsnList.push("<@" + discordMember.id + ">");
-			} else {
-				discordList.push("<@" + discordMember.id + ">");
-			}
-		}
-	});
-
-	gameMembers.forEach(function (gameMember) {
-		if (discordMembers.filter(discordMember => discordMember.displayName.startsWith(gameMember.destinyUserInfo.LastSeenDisplayName)).length == 0) {
-			gameList.push(gameMember.destinyUserInfo.LastSeenDisplayName);
-		}
-	});
-
-	const embed = new MessageEmbed()
-		.setAuthor("Aurora")
-		.setColor(0x00AE86)
-		.setFooter("Horobot", "https://cdn.discordapp.com/avatars/543342030768832524/7da47eaca948d9874b66fc5884ca2d00.png")
-		.setTimestamp()
-	if (discordPsnList.length > 0)
-		embed.addField("PSN: " + discordPsnList.length + "/" + discordMembers.length, discordPsnList.join("\n"), true)
-	if (discordList.length > 0)
-		embed.addField("Дискорд: " + discordList.length + "/" + discordMembers.length, discordList.join("\n"), true)
-	if (gameList.length > 0)
-		embed.addField("Игра: " + gameList.length + "/" + gameMembers.length, gameList.join("\n"), true)
-
-	if (!isReminder) channel.send({ embed });
-	else if (discordList.length > 0)
-		channel.send(discordList.join(", ") + "\n\nОбращаю ваше внимание, что ваш никнейм в дискорде не соответствует игровому.");
+			return clanMember;
+		},
+		(array, i, size) => {
+			return FormTopTriumphScoreEmbed(array, i, size);
+		})
 }
 
 export async function ClanTime(channel, days, modificators) {
-	var clanMembers = [];
 	var clanVoiceSummary = await GetClanVoiceSummary(days);
-	var iterator = 0;
-	channel.send(new MessageEmbed()).then((msg) => {
-		ExecuteForEveryMember(500, async function (member, i, members) {
+	SendAndUpdateEmbed(channel, 500, 20,
+		async (member) => {
 			var clanMember = new ClanMember(member);
 			await clanMember.FetchCharacterIds();
 			clanMember.FetchDiscordMember(channel.guild);
 			clanMember.AddToVoiceOnline(clanVoiceSummary[clanMember.discordMemberId]);
 			var activities = await GetAllActivities(clanMember, days);
 			activities.forEach(a => clanMember.AddToGameOnline(a.values.timePlayedSeconds.basic.value))
-
-			clanMembers.push(clanMember);
-			iterator++;
-
-			if (iterator % 20 == 0 || iterator == members.length) {
-				msg.edit(FormClanTimeEmbed(clanMembers, modificators + (iterator == members.length ? ' final' : '')));
+			return clanMember;
+		},
+		(array, i, size) => {
+			return FormClanTimeEmbed(array, modificators + (i == size ? ' final' : ''));
+		},
+		array => {
+			if (modificators.includes("pm")) {
+				SendPrivateMessagesToArray(GetArrayOfMembersWithPMText(array));
 			}
-			if (iterator == members.length && modificators.includes("pm")) {
-				SendPrivateMessagesToArray(GetArrayOfMembersWithPMText(clanMembers));
-			}
-		});
-	});
-}
-
-function FormClanTimeEmbed(clanMembers, modificators) {
-	var guild = clanMembers[0].discordMember.guild;
-	var embed = new MessageEmbed()
-		.setAuthor("Clankick " + (modificators.includes("final") ? "" : clanMembers.length))
-		.setColor(0x00AE86)
-		.setFooter("Horobot", "https://cdn.discordapp.com/avatars/543342030768832524/7da47eaca948d9874b66fc5884ca2d00.png")
-		.setTimestamp()
-
-	var { lowGame, lowVoice, zeroGame, zeroVoice, goodNewbie, isAway, noData, weForgotToKik, discordNotFound } = filterClanMembersData(clanMembers);
-
-	var isFull = modificators.includes("full");
-
-	//       embed | field title | array | pattern | separator | show_if_empty | semicolumn | condition
-	addField(embed, "Меньше 5 часов", lowGame, null, "\n", false, false, isFull);
-	addField(embed, "Меньше 15%", lowVoice, null, "\n", false, false, true);
-	addField(embed, "0 в игре [в войсе]", zeroGame, "`$voice$role`$tag", "\n", false, true, true);
-	addField(embed, "0 в войсе [в игре]", zeroVoice, "`$game$role`$tag", "\n", false, true, true);
-	addField(embed, "Очернить стража", goodNewbie, null, "\n", true, false, true);
-	addField(embed, "В отпуске [в игре]", isAway, "$tag ($game)", "\n", false, true, isFull);
-	addField(embed, "Профиль закрыт [в войсе]", noData, "`$voice$role`$tag", "\n", false, true, isFull);
-	addField(embed, '\u200B', [], "", "", true, false, true)
-	addField(embed, "Недокикнуты [в игре]", weForgotToKik, "$name ($game)", "\n", false, true, true);
-	addField(embed, "Неверный ник [в игре]", discordNotFound, "$name ($game)", "\n", false, true, true);
-
-	if (!modificators.includes("final")) return embed;
-
-	var discordMembers = GetFullDiscordClanMemberList(guild);
-	var left = "";
-	discordMembers.forEach(function (member) {
-		if (clanMembers.filter(m => member.displayName.startsWith(m.displayName)).length == 0) {
-			left += "<@" + member.user.id + ">\n"
-		}
-	});
-	if (left.length > 0) embed.addField("Неверный ник [в дискорде]", left, true)
-
-	return embed;
+		})
 }
 
 function GetArrayOfMembersWithPMText(clanMembers) {
@@ -232,14 +143,14 @@ function GetArrayOfMembersWithPMText(clanMembers) {
 
 	var textedMembers = [];
 	var { lowGame, lowVoice, zeroGame, zeroVoice } = filterClanMembersData(clanMembers);
-	//lowGame.forEach(member => {textedMembers.push({discordMember: member.discordMember, text: createLine(member, lowGameMessage)});})
-	lowVoice.forEach(member => { textedMembers.push({ discordMember: member.discordMember, text: createLine(member, lowVoiceMessage) }); })
-	zeroVoice.forEach(member => { textedMembers.push({ discordMember: member.discordMember, text: createLine(member, zeroVoiceMessage) }); })
-	zeroGame.forEach(member => { textedMembers.push({ discordMember: member.discordMember, text: createLine(member, zeroGameMessage) }); })
+	//lowGame.forEach(member => {textedMembers.push({discordMember: member.discordMember, text: member.FillStringWithData(lowGameMessage)});})
+	lowVoice.forEach(member => { textedMembers.push({ discordMember: member.discordMember, text: member.FillStringWithData(lowVoiceMessage) }); })
+	zeroVoice.forEach(member => { textedMembers.push({ discordMember: member.discordMember, text: member.FillStringWithData(zeroVoiceMessage) }); })
+	zeroGame.forEach(member => { textedMembers.push({ discordMember: member.discordMember, text: member.FillStringWithData(zeroGameMessage) }); })
 	return textedMembers;
 }
 
-function filterClanMembersData(clanMembers) {
+export function filterClanMembersData(clanMembers) {
 	var filteredMembers = clanMembers;
 
 	var discordNotFound = filteredMembers.filter(m => !m.discordMemberExists).sort(byGameTime);
@@ -278,40 +189,31 @@ function filterClanMembersData(clanMembers) {
 	return { lowGame, lowVoice, zeroGame, zeroVoice, goodNewbie, isAway, noData, weForgotToKik, discordNotFound };
 }
 
-function addField(embed, embed_header, members, linePattern, separator, show_if_empty, semicolumn, show) {
-	if (!show) return;
-	if (members.length == 0 && !show_if_empty) return;
-	if (members.map(m => createLine(m, linePattern)).join(separator).length > 1010) {
-		embed.addField(embed_header, members.filter((_, i) => i < members.length / 2).map(m => createLine(m, linePattern)).join(separator), semicolumn);
-		embed.addField(embed_header, members.filter((_, i) => i >= members.length / 2).map(m => createLine(m, linePattern)).join(separator).semicolumn);
-	} else {
-		var prefix = show_if_empty ? '\u200B' : "";
-		embed.addField(embed_header, prefix + members.map(m => createLine(m, linePattern)).join(separator), semicolumn);
-	}
-}
+export async function Nicknames(channel, isReminder) {
+	var gameMembers = await GetFullGameClanMemberList();
+	var discordMembers = GetFullDiscordClanMemberList(channel.guild);
 
-function createLine(clanMember, pattern) {
-	if (!pattern) pattern = "`$percent $voice $game $role`$tag";
-	return pattern
-		.replace("$name", clanMember.displayName)
-		.replace("$tag", clanMember.discordTag)
-		.replace("$role", getRoleMark(clanMember))
-		.replace("$game", clanMember.GetGameTimeLine())
-		.replace("$voice", clanMember.GetVoiceTimeLine())
-		.replace("$percent", clanMember.GetPercentageLine())
-}
+	var discordList = [];
+	var discordPsnList = [];
+	var gameList = [];
 
-function getRoleMark(clanMember) {
-	if (clanMember.HasDiscordRole(config.roles.newbie)) {
-		var days = Math.round((Date.now() - clanMember.discordMember.joinedTimestamp) / (1000 * 60 * 60 * 24));
-		return "📗" + days + "d";
-	}
-	if (clanMember.HasDiscordRole(config.roles.guardians[0])) return "📘";
-	if (clanMember.HasDiscordRole(config.roles.guardians[1])) return "📒";
-	if (clanMember.HasDiscordRole(config.roles.guardians[2])) return "📙";
-	if (clanMember.HasDiscordRole(config.roles.guardians[3])) return "📕";
-	if (clanMember.HasDiscordRole(config.roles.guildmaster)) return "👑";
-	if (clanMember.HasDiscordRole(config.roles.afk)) return "💤";
-	if (clanMember.HasDiscordRole(config.roles.raidleader)) return "🎓";
-	return "❌";
+	discordMembers.forEach(function (discordMember) {
+		if (gameMembers.filter(gameMember => discordMember.displayName.startsWith(gameMember.destinyUserInfo.LastSeenDisplayName)).length == 0) {
+			if (discordMember.roles.cache.find(role => role.name === "PSN")) {
+				discordPsnList.push("<@" + discordMember.id + ">");
+			} else {
+				discordList.push("<@" + discordMember.id + ">");
+			}
+		}
+	});
+
+	gameMembers.forEach(function (gameMember) {
+		if (discordMembers.filter(discordMember => discordMember.displayName.startsWith(gameMember.destinyUserInfo.LastSeenDisplayName)).length == 0) {
+			gameList.push(gameMember.destinyUserInfo.LastSeenDisplayName);
+		}
+	});
+
+	if (!isReminder) channel.send(FormNicknamesEmbed(discordPsnList, discordList, gameList, gameMembers.length));
+	else if (discordList.length > 0)
+		channel.send(discordList.join(", ") + "\n\nОбращаю ваше внимание, что ваш никнейм в дискорде не соответствует игровому.");
 }
