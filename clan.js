@@ -10,7 +10,7 @@ import { ManifestManager } from "./manifest.js";
 import { FormClanTimeEmbed } from "./embeds/clanTimeEmbed.js";
 import { FromRecordStatEmbed } from "./embeds/recordStatEmbed.js";
 import { FormTopTriumphScoreEmbed } from "./embeds/topTriumphScoreEmbed.js";
-import { FormNicknamesEmbed } from "./embeds/nicknamesEmbed";
+import { FormNicknamesEmbed } from "./embeds/nicknamesEmbed.js";
 
 async function GetFullGameClanMemberList() {
 	var members = [];
