@@ -1,6 +1,6 @@
 import { MessageEmbed } from "discord.js";
 
-export function ShowRecordStatEmbed(membersSucceeded, i, size, recordData) {
+export function FromRecordStatEmbed(membersSucceeded, i, size, recordData) {
 	const embed = new MessageEmbed()
 		.setAuthor(recordData.name + (i == size ? "" : " [" + i + "/" + size + "]"))
 		.setColor(0x00AE86)

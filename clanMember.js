@@ -99,7 +99,7 @@ export class ClanMember {
     }
     async FetchActiveScore() {
         var coreMemberData = await GetCoreMemberData(this.#destinyUserInfo.membershipType, this.#destinyUserInfo.membershipId);
-        this.#activeScore = coreMemberData?.profileRecords?.data["activeScore"] ?? 0;
+        this.#activeScore = coreMemberData?.profileRecords?.data?.activeScore ?? 0;
     }
 
     SetDiscordMember(_discordMember) {
