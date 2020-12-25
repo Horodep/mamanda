@@ -76,13 +76,13 @@ export async function SendAndUpdateEmbed(channel, requestTimeout, updateFrequenc
 
 export async function ShowRecordStat(channel, triumphId) {
 	if (triumphId == null) {
-		message.channel.send("Вы не обозначили искомый триумф.");
+		channel.send("Вы не обозначили искомый триумф.");
 		return;
 	}
 	ManifestManager.LoadData();
 	var recordData = ManifestManager.GetRecordData(triumphId);
 	if (recordData == null) {
-		message.channel.send("Триумф не найден.");
+		channel.send("Триумф не найден.");
 		return;
 	}
 
