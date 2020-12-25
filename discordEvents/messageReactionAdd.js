@@ -14,7 +14,7 @@ export async function MessageReactionAdd(reaction, user) {
 	console.log(`${user.username} set reaction ${reaction._emoji.name}.`);
 
 	if (reaction.message.channel.id == config.channels.wishes) HandleWishes(reaction, user);
-	else if (reaction.message.embeds[0]?.footer.text.startsWith("Собрал")) HandleRaids(reaction, user);
+	else if (reaction.message.embeds[0]?.footer?.text.startsWith("Собрал")) HandleRaids(reaction, user);
 	else HandleOther(reaction, user);
 };
 
