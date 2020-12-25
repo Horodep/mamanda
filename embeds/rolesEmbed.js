@@ -6,7 +6,7 @@ export function FormRolesEmbed(clanMember, rolesData) {
 		return 'Данные профиля не были получены. Вероятно профиль закрыт настройками приватности.\n' +
 			'Настройки приватности: https://www.bungie.net/ru/Profile/Settings/?category=Privacy';
 	} else {
-		var medalsSum = SumMedals(clanMember.discordMemberObject, rolesData.medals);
+		var medalsSum = SumMedals(clanMember.discordMember, rolesData.medals);
 		const embed = new MessageEmbed()
 			.setAuthor(clanMember.displayName + " 💠" + medalsSum + "💠")
 			.setColor(0x00AE86)
