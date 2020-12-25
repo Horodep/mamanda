@@ -19,6 +19,8 @@ export async function MessageReactionAdd(reaction, user) {
 };
 
 function HandleOther(reaction, user) {
+	var member = reaction.message.guild.members.cache.find(m => m.id == user.id);
+	if (member == null) return;
 	switch (reaction._emoji.name) {
 		case "🆗":
 			member.removeRole(config.roles.forum_tag);
@@ -58,6 +60,7 @@ function HandleRaids(reaction, user) {
 
 function HandleWishes(reaction, user) {
 	var member = reaction.message.guild.members.cache.find(m => m.user.id === user.id);
+	if (member == null) return;
 	var suggestionsChannel = user.client.channels.cache.get(config.channels.suggestions);
 	var firstLine = reaction.message.content.split('\n');
 	console.log(firstLine[0]);
