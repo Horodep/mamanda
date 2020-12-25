@@ -8,8 +8,8 @@ export function FetchDefaultCatchErrorChannel(client){
 
 export function CatchError(e, channel) {
 	console.log(e);
-	(channel ?? sandbox).send(`<@${config.users.developer}>`);
-	(channel ?? sandbox).send(`Ошибка ${e.name}: ${e.message}\n\n${e.stack}`, { code: 'js' });
+	(typeof(channel) == 'undefined' ? sandbox : channel).send(`<@${config.users.developer}>`);
+	(typeof(channel) == 'undefined' ? sandbox : channel).send(`Ошибка ${e.name}: ${e.message}\n\n${e.stack}`, { code: 'js' });
 }
 
 export function CatchErrorWithTimeout(e, channel, timeout){

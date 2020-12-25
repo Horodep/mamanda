@@ -1,7 +1,7 @@
 import fs from "fs";
 import { XMLHttpRequest } from "xmlhttprequest";
 import config from "./config.json";
-import { CatchError } from "../catcherror.js";
+import { CatchError } from "./catcherror.js";
 
 class AccessToken{
     static #tokenObject = null;
