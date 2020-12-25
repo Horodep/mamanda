@@ -19,7 +19,7 @@ export function CreateRaid(message, args) {
         });
         message.delete();
     } catch (e) {
-        console.log(e);
+        CatchError(e);
         if (e.stack != null) CatchError(e, message.client);
         else message.channel.send(
             "Неверный синтаксис: __" + e.message.toLowerCase() + "__\nДолжно быть:\n```!сбор ДД.ММ ЧЧ:ММ активность, комментарии```" +

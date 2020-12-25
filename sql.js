@@ -16,7 +16,7 @@ export async function GetMemberDetailedVoice(days, discordMemberId) {
         var results = await pool.query(memberVoiceDetailsQuery.replace('$2', days), [discordMemberId]);
         console.log("member voice online - ok");
     } catch (err) {
-        console.log(err.stack)
+        CatchError(err)
     }
     return results;
 }
@@ -30,7 +30,7 @@ export async function GetClanVoiceSummary(days) {
         });
         console.log("guild voice online - ok");
     } catch (err) {
-        console.log(err.stack)
+        CatchError(err)
     }
     return clanVoiceSummary;
 }
@@ -61,14 +61,14 @@ function bruh() {
         if (err) throw err;
         if (results.length == 0) {
             pool.connect().query('INSERT INTO public.members (id, name, inVoice) VALUES ($1, $2, false)', [member.id, ''], (err) => {
-                if (err) throw err;
+                if (err) CatchError(err);
                 console.log("WaitingQuery: " + pool.waitingCount + "; insert member " + member.displayName);
             });
         }
 
 
         pool.query('UPDATE public.members SET inVoice=$1 WHERE id = $2', [inVoice, member.id], (err) => {
-            if (err) throw err;
+            if (err) CatchError(err);
             console.log("WaitingQuery: " + pool.waitingCount + "; update member " + member.displayName);
         });
     });
