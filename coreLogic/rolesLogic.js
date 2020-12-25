@@ -2,7 +2,7 @@ import config from "../config.json";
 
 export function LogRolesGranting(displayName, isDiscordMemberFound, medals) {
 	if (medals == null) {
-		console.log(displayName + ' '.repeat(48 - displayName.length), "NO DATA");
+		console.log(displayName + ' '.repeat(40 - displayName.length), "NO DATA");
 	} else if (isDiscordMemberFound == false) {
 		console.log(displayName + ' '.repeat(40 - displayName.length), "DISCORD MEMBER NOT FOUND");
 	} else {

@@ -1,4 +1,5 @@
 import config from "../config.json";
+import { CatchError } from "../catcherror.js";
 
 export function MessageDelete(message) {
 	console.log("messageDeleted");
@@ -13,6 +14,6 @@ export function MessageDelete(message) {
 			channelDeleted.send("Вложение:", { files: [value.proxyURL] });
 		}
 	} catch (e) {
-		require('../catcherror').catcherror(e);
+		CatchError(e);
 	}
 }

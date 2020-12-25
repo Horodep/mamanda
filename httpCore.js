@@ -1,6 +1,7 @@
 import fs from "fs";
 import { XMLHttpRequest } from "xmlhttprequest";
 import config from "./config.json";
+import { CatchError } from "./catcherror.js";
 
 class AccessToken{
     static #tokenObject = null;
@@ -19,7 +20,7 @@ class AccessToken{
     }
     WriteFile(fileName){
         fs.writeFile(fileName, JSON.stringify(tokenObject), (err) => {
-            if (err)  console.log('error', err);
+            if (err)  CatchError(err);
         });
     }
 }
@@ -38,7 +39,7 @@ export async function makeRequestWithPromise(method, url, setAuth) {
                     try{
                         resolve(JSON.parse(xhr.responseText));
                     }catch(e){
-                        console.log(e);
+                        CatchError(e);
                         reject("Error name = " + e.name)
                     }
 			    }
@@ -62,7 +63,7 @@ export async function refreshAuthToken(){
             if(typeof(AccessToken.access_token) != 'undefined'){
                 AccessToken.WriteFile('access_token.json');
             }
-            console.log("REFRESHED!");
+            console.log("TOKEN REFRESHED!");
         }else{
             console.log(`    ${this.readyState} ${this.status} ${this.responseText}`);
         }

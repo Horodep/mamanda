@@ -7,6 +7,7 @@ import { MessageReactionAdd } from "./discordEvents/messageReactionAdd.js";
 import { MessageReactionRemove } from "./discordEvents/messageReactionRemove.js";
 import { CommandManager } from "./commandManager.js";
 import { ManifestManager } from "./manifest.js";
+import { FetchDefaultCatchErrorChannel } from "./catcherror.js";
 
 const client = new Discord.Client({ partials: ['MESSAGE', 'CHANNEL', 'REACTION'] });
 client.login(config.credentials.discordApiKey);
@@ -15,7 +16,8 @@ ManifestManager.Refresh();
 
 client.on("ready", () => {
 	client.user.setActivity("на Летописца 9 из 10", { type: 'WATCHING' });
-	console.log("ready!");
+	FetchDefaultCatchErrorChannel(client);
+	console.log("Discord client connected!");
 });
 client.on("guildMemberAdd", (member) => NewMember(member));
 client.on("message", (_message) => Message(_message));

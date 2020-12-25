@@ -22,7 +22,6 @@ function HandleOther(reaction, user) {
 	switch (reaction._emoji.name) {
 		case "🆗":
 			member.removeRole(config.roles.forum_tag);
-			console.log(user.username + " set OK to bot message.");
 			break;
 	}
 }

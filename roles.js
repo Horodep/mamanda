@@ -18,13 +18,13 @@ export function Roles(message, args) {
 }
 
 export async function RolesByDiscordMention(channel, discordMention) {
-	console.log(discordMention);
 	var discordId = discordMention.replace(/\D/g, '');
 	var discordMember = channel.guild.members.cache.find(member => member.user.id == discordId);
 	if (discordMember == null) {
 		channel.send('Дискорд профиль не найден.');
 		return;
 	}
+	console.log(discordMember.displayName);
 
 	var member = await GetMemberByDiscordName(discordMember.displayName);
 	if (member == null) {
