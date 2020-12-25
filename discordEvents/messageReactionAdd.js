@@ -23,7 +23,7 @@ function HandleOther(reaction, user) {
 	if (member == null) return;
 	switch (reaction._emoji.name) {
 		case "🆗":
-			member.removeRole(config.roles.forum_tag);
+			member.roles.remove(config.roles.forum_tag);
 			break;
 	}
 }
