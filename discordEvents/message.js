@@ -13,7 +13,7 @@ export function Message(message){
 			return;
 		}
 
-		console.log(new Date().toISOString(), (message.member != null ? message.member.displayName : message.author.username), message.content);
+		console.log((message.member != null ? message.member.displayName : message.author.username), message.content);
 		var args = message.content.substring(1).split(' ').filter(item => item);
 		var commandName = args[0];
 
