@@ -212,7 +212,6 @@ export class ClanMember {
 }
 
 export async function GetClanMemberOnlineTime(message, days, discordMention, isDetailed) {
-    console.log(new Date());
     var discordName = message.member.displayName;
     if (discordMention != null) {
         var discordId = discordMention.replace(/\D/g, '');
@@ -241,7 +240,6 @@ export async function GetClanMemberOnlineTime(message, days, discordMention, isD
         message.channel.send(clanMember.GetMemberTimeEmbed(lines));
     }
     else message.channel.send(clanMember.GetMemberTimeString());
-    console.log(new Date());
 }
 
 export async function GetAllActivities(clanMember, days) {

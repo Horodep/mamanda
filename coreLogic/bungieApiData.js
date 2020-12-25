@@ -50,7 +50,7 @@ export function get_node_data(jsondata, recordHash, textprefix) {
 				jsondata.profilePresentationNodes.data.nodes[recordHash].completionValue
 		};
 	} catch (e) {
-		console.log('Error ' + e.name + ":" + e.message + "\n" + e.stack);
+		CatchError(e);
 		return {
 			state: false,
 			text: textprefix + ": not defined"
@@ -68,7 +68,7 @@ export function get_character_node_data(characterPresentationNodes, recordHash, 
 				characterPresentationNodes[0][1].nodes[recordHash].completionValue
 		};
 	} catch (e) {
-		console.log('Error ' + e.name + ":" + e.message + "\n" + e.stack);
+		CatchError(e);
 		return {
 			state: false,
 			text: textprefix + ": not defined"
@@ -84,7 +84,7 @@ export function get_character_progression_data(characterProgressions, recordHash
 				characterProgressions[0][1].progressions[recordHash].currentProgress + "/" + neededValue
 		};
 	} catch (e) {
-		console.log('Error ' + e.name + ":" + e.message + "\n" + e.stack);
+		CatchError(e);
 		return {
 			state: false,
 			text: textprefix + ": not defined"
@@ -110,7 +110,7 @@ export function get_profile_records(jsondata, dataname, neededValue, textprefix)
 				jsondata.profileRecords.data[dataname] + "/" + (neededValue / 1000) + "k"
 		};
 	} catch (e) {
-		console.log('Error ' + e.name + ":" + e.message + "\n" + e.stack);
+		CatchError(e);
 		return {
 			state: false,
 			text: textprefix + ": not defined"
@@ -133,7 +133,7 @@ export function get_season_triumphs(jsondata, characterPresentationNodes, nodeHa
 				(characterPresentationNodes[0][1].nodes[nodeHash].completionValue - ignored)
 		};
 	} catch (e) {
-		console.log('Error ' + e.name + ":" + e.message + "\n" + e.stack);
+		CatchError(e);
 		return {
 			state: false,
 			text: textprefix + ": not defined"
@@ -155,7 +155,7 @@ export function get_day_one(jsondata, characterCollectibles) {
 				(jsondata.profileCollectibles.data.collectibles[1171206947].state % 2 != 1 ? "ПЖ " : "")
 		};
 	} catch (e) {
-		console.log('Error ' + e.name + ":" + e.message + "\n" + e.stack);
+		CatchError(e);
 		return {
 			state: false,
 			text: "Day1: not defined"
@@ -183,7 +183,7 @@ export function get_poi(jsondata) {
 			text: ""
 		};
 	} catch (e) {
-		console.log('Error ' + e.name + ":" + e.message + "\n" + e.stack);
+		CatchError(e);
 		return { state: false, text: "" };
 	}
 }
