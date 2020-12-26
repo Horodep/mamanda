@@ -7,7 +7,7 @@ export function FetchDefaultCatchErrorChannel(client){
 }
 
 export function CatchError(e, channel) {
-	console.log(e);
+	console.error(e);
 	(typeof(channel) == 'undefined' ? sandbox : channel).send(`<@${config.users.developer}>`);
 	(typeof(channel) == 'undefined' ? sandbox : channel).send(`Ошибка ${e.name}: ${e.message}\n\n${e.stack}`, { code: 'js' });
 }

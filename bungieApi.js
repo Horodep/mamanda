@@ -5,7 +5,7 @@ export async function GetClanMembers(clanId) {
 		var result = await makeRequestWithPromise('GET', `https://www.bungie.net/Platform/GroupV2/${clanId}/Members/`);
 		return result.Response.results;
 	} catch {
-		console.log("Rejected: " + result);
+		console.error("Rejected: " + result);
 	}
 }
 
@@ -16,7 +16,7 @@ async function GetMemberData(membershipType, membershipId, componentsArray) {
 			`https://www.bungie.net/Platform/Destiny2/${membershipType}/Profile/${membershipId}/?components=${components}`);
 		return result.Response;
 	} catch {
-		console.log("Rejected: " + result);
+		console.error("Rejected: " + result);
 	}
 }
 
@@ -39,7 +39,7 @@ export async function GetActivitiesFromApi(membershipType, membershipId, charact
 			`https://www.bungie.net/Platform/Destiny2/${membershipType}/Account/${membershipId}/Character/${characterId}/Stats/Activities/?mode=${mode}&count=250&page=${page}`);
 		return result.Response;
 	} catch {
-		console.log("Rejected: " + result + " id: " + membershipId);
+		console.error("Rejected: " + result + " id: " + membershipId);
 		return result;
 	}
 }
