@@ -225,7 +225,7 @@ export async function GetClanMemberOnlineTime(message, days, discordMention, isD
 
     var apiMember = await GetMemberByDiscordName(discordName);
 	if (apiMember == null) {
-		channel.send('Игровой профиль не найден.');
+		message.channel.send('Игровой профиль не найден.');
 		return;
     }
     var clanMember = new ClanMember(apiMember);
