@@ -64,7 +64,7 @@ export async function GetShowAndSetRoles(clanMember, channel) {
 
 		console.log(rolesData);
 		if (channel != null) channel.send(FormRolesEmbed(clanMember, rolesData));
-		SetRoles(clanMember, rolesData.characterDetails, rolesData.medals);
+		SetRoles(clanMember, rolesData?.characterDetails, rolesData?.medals);
 	} catch (e) {
 		CatchError(e, channel);
 	}
@@ -151,11 +151,13 @@ function SetRoles(clanMember, characterDetails, medals) {
 	CheckAndProcessRole(discordMember, config.roles.clans[0], clanMember.clanId == config.clans[0].id, false);
 	CheckAndProcessRole(discordMember, config.roles.clans[1], clanMember.clanId == config.clans[1].id, false);
 	CheckAndProcessRole(discordMember, config.roles.separators.characters, true, false);
+	CheckAndProcessRole(discordMember, config.roles.separators.medals, true, false);
+	CheckAndProcessRole(discordMember, config.roles.separators.footer, true, false);
+
+	if (characterDetails == null) return;
 	CheckAndProcessRole(discordMember, config.roles.characters.warlock, characterDetails.warlock.light >= config.minimal_light, false);
 	CheckAndProcessRole(discordMember, config.roles.characters.hunter, characterDetails.hunter.light >= config.minimal_light, false);
 	CheckAndProcessRole(discordMember, config.roles.characters.titan, characterDetails.titan.light >= config.minimal_light, false);
-	CheckAndProcessRole(discordMember, config.roles.separators.medals, true, false);
-	CheckAndProcessRole(discordMember, config.roles.separators.footer, true, false);
 
 	if (discordMember.roles.cache.find(role => role.id == config.roles.no_medals) != null) return;
 	if (medals == null) return;

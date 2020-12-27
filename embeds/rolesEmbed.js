@@ -2,7 +2,7 @@ import { MessageEmbed } from "discord.js";
 import { SumMedals } from "../coreLogic/rolesLogic.js";
 
 export function FormRolesEmbed(clanMember, rolesData) {
-	if (rolesData.medals == null) {
+	if (rolesData == null || rolesData.medals == null) {
 		return 'Данные профиля не были получены. Вероятно профиль закрыт настройками приватности.\n' +
 			'Настройки приватности: https://www.bungie.net/ru/Profile/Settings/?category=Privacy';
 	} else {
