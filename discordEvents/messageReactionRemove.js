@@ -1,4 +1,5 @@
 import config from "../config.json";
+import { CatchError } from "../catcherror.js";
 
 export async function MessageReactionRemove(reaction, user) {
 	if(user.bot) return;
@@ -6,7 +7,8 @@ export async function MessageReactionRemove(reaction, user) {
 		try {
 			await reaction.fetch();
 		} catch (error) {
-			console.error('Something went wrong when fetching the message: ', error);
+			error.name = 'Something went wrong when fetching the reaction: ' + error.name;
+			CatchError(error);
 			return;
 		}
 	}
