@@ -45,7 +45,7 @@ export function ChangeChannelCap(message, limit) {
 		message.channel.send('Вы не в голосовом канале.');
 		return;
 	}
-	if( config.channels.limited.includes(message.member.voice.channel.id)){
+	if( message.member.voice.channel.parent.id == config.categories.limited){
 		message.channel.send('Вы не можете изменить размер данной комнаты.');
 		return;
 	}
