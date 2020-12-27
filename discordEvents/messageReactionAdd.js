@@ -1,5 +1,6 @@
 import config from "../config.json";
 import { AddRaidMember, RemoveRaidMember, KickRaidMember, CancelRaid } from "../raid.js";
+import { CatchError } from "../catcherror.js";
 
 export async function MessageReactionAdd(reaction, user) {
 	if(user.bot) return;
@@ -7,7 +8,8 @@ export async function MessageReactionAdd(reaction, user) {
 		try {
 			await reaction.fetch();
 		} catch (error) {
-			console.error('Something went wrong when fetching the message: ', error);
+			error.name = 'Something went wrong when fetching the reaction: ' + error.name;
+			CatchError(error);
 			return;
 		}
 	}
