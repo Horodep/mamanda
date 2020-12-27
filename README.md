@@ -115,7 +115,10 @@ clan discord bot for two clans
         "raids"         : "000000000000000000",
         "lfg"           : "000000000000000000",
         "wishes"        : "000000000000000000"
-	}
+	},
+    "categories"    :{
+        "limited"       : "000000000000000000"
+    }
 }
 ```
 
