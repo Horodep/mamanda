@@ -52,7 +52,7 @@ export function SaveForumLinkAndPublish(link, client) {
 }
 
 export function PublishDailyMessage(client) {
-	var channel = client.channels.cache.get(760479409886330891);
+	var channel = client.channels.cache.get("760479409886330891");
 	fs.readFile("./.data/forumlink.txt", 'utf8', function (err, data) {
 		if (err) CatchError(err);
 		channel.send(
