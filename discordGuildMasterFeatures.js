@@ -1,4 +1,5 @@
 import { MessageEmbed } from "discord.js";
+import fs from "fs";
 import config from "./config.json";
 import { CatchError } from "./catcherror.js";
 
@@ -23,8 +24,8 @@ export function DropPvpRole(guild) {
 }
 
 export function GiveForumRole(message) {
-	userlist = [];
-	message.guild.roles.find(role => role.id == config.roles.separators.footer).members.
+	var userlist = [];
+	message.guild.roles.cache.find(role => role.id == config.roles.separators.footer).members.
 		forEach(user => { userlist.push(user); });
 
 	var i = 0;
@@ -39,13 +40,13 @@ export function GiveForumRole(message) {
 	giverole();
 }
 
-export function SaveForumLinkAndPublish(link) {
-	fs.writeFile('./.data/forumlink.txt', link, function (error) {
-		if (error) throw error; // если возникла ошибка
+export function SaveForumLinkAndPublish(link, client) {
+	fs.writeFile('./.data/forumlink.txt', link, function (err) {
+		if (err) CatchError(err); // если возникла ошибка
 	});
-	channel_news = message.client.channels.get(config.channels.clannews);
+	var channel_news = client.channels.cache.get(config.channels.clannews);
 	channel_news.send(
-		"Не важно, <@&" + config.roles.guardians[0] + "> ты, <@&" + config.roles.guest + "> или @everyone другой, мы верим, что ты хочешь помочь клану! <@&" + config.separators.footer + ">\n" +
+		"Не важно, <@&" + config.roles.guardians[0] + "> ты, <@&" + config.roles.guest + "> или @everyone другой, мы верим, что ты хочешь помочь клану! <@&" + config.roles.separators.footer + ">\n" +
 		"Проще всего это сделать подняв тему о наборе на форуме, нажав на стрелочку вверх.\n" + link + "\n" +
 		"p.s. Для того, чтобы снять роль прожмите эмоцию `🆗` под данным сообщением.").then((msg) => {
 			msg.react("🆗");
@@ -53,9 +54,9 @@ export function SaveForumLinkAndPublish(link) {
 }
 
 export function PublishDailyMessage(client) {
-	var channel = client.channels.get(config.channels.flood);
+	var channel = client.channels.cache.get(config.channels.flood);
 	fs.readFile("./.data/forumlink.txt", 'utf8', function (err, data) {
-		if (err) throw err;
+		if (err) CatchError(err);
 		channel.send(
 			"Уважаемые Стражи! А точнее те из вас, кто <@&" + config.roles.forum_tag + ">\n" +
 			"Пожалуйста, сделайте это! Это очень важно для клана!\n\n" +

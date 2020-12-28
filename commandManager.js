@@ -197,10 +197,10 @@ export class CommandManager {
         });
         this.AddCommand("guildmaster", 2, "engreset", "!engreset", "генерация ссылок на англоязычные изображения еженедельного ресета в текущий канал;", function (args, message) { });
         this.AddCommand("guildmaster", 0, "forum", "!forum LINKTEXT", "опубликовать объявление о наборе в канал новостей;", function (args, message) { 
-            GiveForumRole(message);
+            SaveForumLinkAndPublish(message.content.slice(7), message.client);
         });
         this.AddCommand("guildmaster", 0, "forumtime", "!forumtime", "выдать всем стражам роли перед объявлением о наборе;", function (args, message) { 
-            SaveForumLinkAndPublish(message.content.slice(7));
+            GiveForumRole(message);
         });
         this.AddCommand("guildmaster", 0, "gmhelp", "!gmhelp", "список доступных ГМ-ских команд;", function (args, message) {
             message.channel.send(CommandManager.GetRestrictedHelp());
