@@ -7,6 +7,8 @@ client.login(config.credentials.discordApiKey);
 
 client.on("ready", () => {
     PublishDailyMessage(client);
-    client.destroy();
-    process.exit();
+    setTimeout(function(){
+        client.destroy();
+        process.exit();
+    }, 150);
 });
