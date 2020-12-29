@@ -19,6 +19,7 @@ export async function MessageReactionRemove(reaction, user) {
 
 function HandleWishes(reaction, user) {
 	var member = reaction.message.member.guild.members.cache.find(m => m.user.id === user.id);
+	console.log(reaction.message.content);
 
 	switch (reaction.message.content) {
 		case "Хочу Петраран (Последнее Желание без смертей)":
