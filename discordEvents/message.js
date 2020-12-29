@@ -36,7 +36,7 @@ export function Message(message){
 			if(restrictedChannels.includes(message.channel.id) || message.author.id  == config.users.boss){
 				CommandManager.Run(args, message);
 			}else{
-				message.channel.send(restrictedAnswers[Math.floor(Math.random() * answers.length)]);
+				message.channel.send(restrictedAnswers[Math.floor(Math.random() * restrictedAnswers.length)]);
 			}
 		}
 	} catch (e) {
