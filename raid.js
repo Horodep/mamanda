@@ -172,8 +172,8 @@ function ParseCommandAndGetData(args, member) {
     var descriptionWithoutRoleTag = (description == null ? '' : description.replace(regexpRoleTag, '').replace(/\s/g, ''));
 
     var numberOfPlaces = raidInfo.match(/^\[\d+\]/);
-    var numberOfPlaces = (numberOfPlaces == null) ? 6 : numberOfPlaces[0].match(/\d+/);
     if (numberOfPlaces != null) header = header.replace(numberOfPlaces[0], "");
+    var numberOfPlaces = (numberOfPlaces == null) ? 6 : numberOfPlaces[0].match(/\d+/);
 
     var field0 = "слот свободен\n".repeat(Math.round(numberOfPlaces / 2));
     var field1 = "слот свободен\n".repeat((numberOfPlaces / 2) % 1 == 0.5 ? (numberOfPlaces / 2) - 0.5 : (numberOfPlaces / 2));
