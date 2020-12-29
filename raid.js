@@ -169,7 +169,6 @@ function ParseCommandAndGetData(args, member) {
 
     var regexpRoleTag = /<@.\d+>/g;
     var roleTag = (description == null ? null : description.match(regexpRoleTag));
-    var descriptionWithoutRoleTag = (description == null ? '' : description.replace(regexpRoleTag, '').replace(/\s/g, ''));
 
     var numberOfPlaces = raidInfo.match(/^\[\d+\]/);
     if (numberOfPlaces != null) header = header.replace(numberOfPlaces[0], "");
@@ -181,7 +180,6 @@ function ParseCommandAndGetData(args, member) {
     return new RaidData({
         header: header,
         description: description,
-        descriptionWithoutRoleTag: descriptionWithoutRoleTag,
         fields: [field0, field1],
         left: "",
         numberOfPlaces: numberOfPlaces,
@@ -195,7 +193,6 @@ function GetDataFromEmbed(embed) {
     return new RaidData({
         header: embed.author.name,
         description: embed.description,
-        descriptionWithoutRoleTag: embed.description,
         fields: [
             embed.fields[0].value,
             embed.fields[1].value],
@@ -223,7 +220,7 @@ function CreateRaidEmbed(data, customTimestamp) {
         .addField("Идут:", data.fields[1], true)
         .setFooter(data.footerText, data.iconURL)
     if (customTimestamp != null) embed.setTimestamp(customTimestamp);
-    if (data.description != null && data.descriptionWithoutRoleTag != '') embed.setDescription(data.description);
+    if (data.description != null) embed.setDescription(data.description);
     if (data.left.length > 8) embed.addField("Отменили запись:", data.left)
 
     return embed;

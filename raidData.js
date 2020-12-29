@@ -1,7 +1,6 @@
 export class RaidData {
     header;
     description;
-    descriptionWithoutRoleTag;
     fields = [];
     left;
     numberOfPlaces;
@@ -12,7 +11,6 @@ export class RaidData {
     constructor(object) {
         this.header = object.header;
         this.description = object.description;
-        this.descriptionWithoutRoleTag = object.descriptionWithoutRoleTag;
         this.fields = object.fields;
         this.left = object.left;
         this.numberOfPlaces = object.numberOfPlaces;
