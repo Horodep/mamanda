@@ -46,6 +46,7 @@ export function AddRaidMember(message, user) {
 export function RemoveRaidMember(message, user, showAsLeaver) {
     try {
         var data = GetDataFromEmbed(message.embeds[0]);
+        if (!data.members.includes(user.id)) return;
         data.RemoveRaidMember(user.id);
         if (showAsLeaver) data.AddToLeftField(user.id);
         message.edit(CreateRaidEmbed(data));
