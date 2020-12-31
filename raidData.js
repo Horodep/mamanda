@@ -1,66 +1,112 @@
 export class RaidData {
-    header;
+    raidName;
     description;
-    fields = [];
-    left;
-    numberOfPlaces;
     roleTag;
-    footerText;
-    iconURL;
+    date;
+    numberOfPlaces;
+    members = [];
+    left = [];
+    author; // .displayName , .id , .user.avatarURL
 
-    constructor(object) {
-        this.header = object.header;
-        this.description = object.description;
-        this.fields = object.fields;
-        this.left = object.left;
-        this.numberOfPlaces = object.numberOfPlaces;
-        this.roleTag = object.roleTag;
-        this.footerText = object.footerText;
-        this.iconURL = object.iconURL;
+    constructor(raidName, description, roleTag, date, numberOfPlaces, members, left, author, avatarURL) {
+        this.raidName = raidName;
+        this.description = description;
+        this.roleTag = roleTag;
+        this.date = date;
+        this.numberOfPlaces = numberOfPlaces;
+        this.members = members;
+        this.left = left;
+        this.author = author;
+        this.author.avatarURL = avatarURL;
+    }
+
+    get dateString() {
+        return "" + 
+            (this.date.getDate() < 10 ? "0" : "") + this.date.getDate() + "." +
+            (this.date.getMonth() < 9 ? "0" : "") + (this.date.getMonth() + 1) + "." +
+            this.date.getFullYear() + ", " + weekdayTranslaytor(this.date.getDay()) + " в " +
+            (this.date.getHours() < 10 ? "0" : "") + this.date.getHours() + ":" +
+            (this.date.getMinutes() < 10 ? "0" : "") + this.date.getMinutes();
+    }
+
+    get header() {
+        return this.dateString + " Активность: " + this.raidName;
+    }
+
+    get footer() {
+        return "Собрал: " + this.author.displayName + " | id: " + this.author.id;
+    }
+
+    get icon() {
+        return this.author?.avatarURL;
+    }
+
+    FormFields() {
+        var prefilter = this.AddSlotsToMembers().map(m => (m.charAt(0) == 'с' ? m : "<@" + m + ">"));
+        var field0 = prefilter.filter((_, i) => i < this.numberOfPlaces / 2).join("\n");
+        var field1 = prefilter.filter((_, i) => i >= this.numberOfPlaces / 2).join("\n");
+        var left = this.left.map(m => "`" + GetShortDate(m.date) + "` <@" + m.id + ">").join("\n");
+        return { field0, field1, left };
+    }
+
+    AddSlotsToMembers() {
+        var arr = this.members;
+        while (arr.length < this.numberOfPlaces) arr.push("слот свободен");
+        return arr;
     }
 
     AddRaidMember(userId) {
-        if (this.fields[0].includes(userId) || this.fields[1].includes(userId))
+        if (this.members.includes(userId))
             return;
-        if (this.fields[0].includes("слот свободен")) {
-            this.fields[0] = this.fields[0].replace("слот свободен", "<@" + userId + ">");
-        } else if (this.fields[1].includes("слот свободен")) {
-            this.fields[1] = this.fields[1].replace("слот свободен", "<@" + userId + ">");
-        }
+        if (this.members.length < 6)
+            this.members.push(userId);
     }
 
     RemoveRaidMember(userId) {
-        this.fields[0] = this.fields[0].replace("<@" + userId + ">", "слот свободен");
-        this.fields[1] = this.fields[1].replace("<@" + userId + ">", "слот свободен");
+        var index = this.members.indexOf(userId);
+        if (index > -1) {
+            this.members.splice(index, 1);
+        }
     }
 
     RemoveFromLeftField(userId) {
-        var regexpUserId = new RegExp("\`.*?\` <@" + userId + ">");
-        this.left = this.left.replace(regexpUserId, '').replace('\n\n', '\n');
+        var index = this.left.findIndex(m => m.id == userId);
+        if (index > -1) {
+            this.left.splice(index, 1);
+        }
     }
 
     AddToLeftField(userId) {
-        if (this.left.includes(userId))
-            return;
-        var tzoffset = (new Date()).getTimezoneOffset() * 60000;
-        var leaver = "\n`" + (new Date(Date.now() - tzoffset)).toISOString().replace(/T/, ' ').replace(/\..+/, '').substring(5, 16) + "` <@" + userId + ">";
-        this.left += leaver;
+        var index = this.left.findIndex(m => m.id == userId);
+        if (index == -1) {
+            this.left.push({
+                date: new Date(),
+                id: userId
+            });
+        }
     }
 
     GetUserIdByPosition(position) {
-        var linesInFirstField = (this.fields[0].match(/\n/g) || []).length + 1;
-        var line = "";
-        if (position > linesInFirstField) {
-            line = this.fields[1].split('\n')[position - linesInFirstField - 1];
-        } else {
-            line = this.fields[0].split('\n')[position - 1];
-        }
-        return line.replace(/\D/g, '');
+        return this.members[position - 1];
     }
+}
 
-    GetRaidDate(){
-        return new Date(Number(this.header.split('.')[2].split(',')[0]),
-						Number(this.header.split('.')[1]-1), 
-						Number(this.header.split('.')[0])+1);
+function weekdayTranslaytor(num) {
+    switch (num) {
+        case 0: return "воскресенье";
+        case 1: return "понедельник";
+        case 2: return "вторник";
+        case 3: return "среда";
+        case 4: return "четверг";
+        case 5: return "пятница";
+        case 6: return "суббота";
     }
+}
+
+function GetShortDate(date) {
+    return "" +
+        (date.getMonth() < 9 ? "0" : "") + (date.getMonth() + 1) + "-" +
+        (date.getDate() < 10 ? "0" : "") + date.getDate() + " " +
+        (date.getHours() < 10 ? "0" : "") + date.getHours() + ":" +
+        (date.getMinutes() < 10 ? "0" : "") + date.getMinutes();
 }
