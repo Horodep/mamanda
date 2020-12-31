@@ -35,6 +35,7 @@ export function CreateRaid(message, args) {
 export function AddRaidMember(message, user) {
     try {
         var data = GetDataFromEmbed(message.embeds[0]);
+        if (data.members.length == data.numberOfPlaces) return;
         data.AddRaidMember(user.id);
         data.RemoveFromLeftField(user.id);
         message.edit(CreateRaidEmbed(data));
