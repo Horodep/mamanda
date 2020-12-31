@@ -55,16 +55,15 @@ export function RemoveRaidMember(message, user, showAsLeaver) {
 }
 
 export function KickRaidMember(message, user, reaction) {
-    var author_id = message.embeds[0].footer.text.split('id: ')[1];
-    if (author_id != user.id) {
+    var data = GetDataFromEmbed(message.embeds[0]);
+    if (data.author.id != user.id) {
         user.send("Вы не являетесь автором сбора. Вы не можете его отменить.");
         return;
     }
-    var data = GetDataFromEmbed(message.embeds[0]);
     var userId = data.GetUserIdByPosition(reaction._emoji.name.charAt(0));
     data.RemoveRaidMember(userId);
 
-    if (userId.length > 0) {
+    if (userId?.length > 0) {
         var member = message.guild.members.cache.find(user => user.id == userId);
         SendPrivateMessage(member, FormCancelationMessage(data, "Рейд лидер отказался от вашего участия в рейде, в который вы записывались."));
     }
@@ -72,19 +71,14 @@ export function KickRaidMember(message, user, reaction) {
 }
 
 export function CancelRaid(message, user, reaction) {
-    var author_id = message.embeds[0].footer.text.split('id: ')[1];
-    if (author_id != user.id) {
+    var data = GetDataFromEmbed(message.embeds[0]);
+    if (data.author.id != user.id) {
         user.send("Вы не являетесь автором сбора. Вы не можете его отменить.");
         return;
     }
-    var data = GetDataFromEmbed(message.embeds[0]);
-    var list = (data.fields[0] + '\n' + data.fields[1]).split('\n');
-    list.forEach(function (text) {
-        var discord_id = text.replace(/\D/g, '');
-        if (discord_id.length > 0) {
-            var member = message.guild.members.cache.find(user => user.id == discord_id);
-            SendPrivateMessage(member, FormCancelationMessage(data, "Рейд на который вы записывались был отменен рейд лидером."));
-        }
+    data.members.forEach(function (discord_id) {
+        var member = message.guild.members.cache.find(user => user.id == discord_id);
+        SendPrivateMessage(member, FormCancelationMessage(data, "Рейд на который вы записывались был отменен рейд лидером."));
     });
     message.delete();
 }
@@ -133,10 +127,9 @@ export function ClearRaidList(client) {
                 lastMessage = message;
             }else{
                 var data = GetDataFromEmbed(message.embeds[0]);
-                var date = data.GetRaidDate();
                 
-                console.log(date, today, data.header);
-                if(date < today){
+                console.log(data.date, today, data.header);
+                if(data.date < today){
                     console.log("have to be moved");
                     
                     history_channel.send(CreateRaidEmbed(data, message.createdAt));
@@ -154,54 +147,54 @@ function ParseCommandAndGetData(args, member) {
     var today = new Date();
     var date = new Date(today.getFullYear(), args[1].split('.')[1] - 1, args[1].split('.')[0], args[2].split(':')[0], args[2].split(':')[1]);
     if (date < today) date.setFullYear(today.getFullYear() + 1);
-
     if (isNaN(date) || typeof (date) == 'underfined') throw ({ message: 'Не удалось обнаружить дату.' });
 
-    var raidInfo = args.filter((_, i) => i > 2).join(" ");
-    var raidName = raidInfo.indexOf(',') == -1 ? raidInfo : raidInfo.substr(0, raidInfo.indexOf(','));
-    var header = date.getDate() + "." + (date.getMonth() + 1) + "." + date.getFullYear() +
-        ", " + weekday(date.getDay()) +
-        " в " + args[2] +
-        " Активность: " + raidName;
+    var commandRaidInfo = args.filter((_, i) => i > 2).join(" ");
+    var raidName = commandRaidInfo.indexOf(',') == -1 ? commandRaidInfo : commandRaidInfo.substr(0, commandRaidInfo.indexOf(','));
     if (raidName == '') throw ({ message: 'Активность не определена.' });
 
-    var description = (raidInfo.indexOf(',') == -1 ? null : raidInfo.substr(raidInfo.indexOf(',') + 1));
+    var description = (commandRaidInfo.indexOf(',') == -1 ? null : commandRaidInfo.substr(commandRaidInfo.indexOf(',') + 1));
 
     var regexpRoleTag = /<@.\d+>/g;
     var roleTag = (description == null ? null : description.match(regexpRoleTag));
 
-    var numberOfPlaces = raidInfo.match(/^\[\d+\]/);
-    if (numberOfPlaces != null) header = header.replace(numberOfPlaces[0], "");
+    var numberOfPlaces = commandRaidInfo.match(/^\[\d+\]/);
+    if (numberOfPlaces != null) raidName = raidName.replace(numberOfPlaces[0], "").trim();
     var numberOfPlaces = (numberOfPlaces == null) ? 6 : numberOfPlaces[0].match(/\d+/);
 
-    var field0 = "слот свободен\n".repeat(Math.round(numberOfPlaces / 2));
-    var field1 = "слот свободен\n".repeat((numberOfPlaces / 2) % 1 == 0.5 ? (numberOfPlaces / 2) - 0.5 : (numberOfPlaces / 2));
-
-    return new RaidData({
-        header: header,
-        description: description,
-        fields: [field0, field1],
-        left: "",
-        numberOfPlaces: numberOfPlaces,
-        roleTag: roleTag,
-        footerText: "Собрал: " + member.displayName + " | id: " + member.id,
-        iconURL: member.user.avatarURL
-    });
+    return new RaidData(raidName, description, roleTag, date, numberOfPlaces, [], [], member, member.user.avatarURL());
 }
 
 function GetDataFromEmbed(embed) {
-    return new RaidData({
-        header: embed.author.name,
-        description: embed.description,
-        fields: [
-            embed.fields[0].value,
-            embed.fields[1].value],
-        left: embed.fields.length > 2 ? embed.fields[2].value : "",
-        numberOfPlaces: 6,
-        roleTag: "",
-        footerText: embed.footer.text,
-        iconURL: embed.footer.iconURL
-    });
+    var dateString = embed.author.name.split(' Активность: ')[0].replace(/,.*? в /g," ");
+    var arr = dateString.split(/[ .:]/g);
+    var date = new Date(arr[2], arr[1]-1, arr[0], arr[3], arr[4]);
+    var linesArray = (embed.fields[0].value + "\n" + embed.fields[1].value).replace(/[<@>]/g, '').split('\n');
+    var left = embed.fields.length == 2 ? [] : 
+        embed.fields[2].value.split('\n').map(function (line) {
+            try{
+                var date = new Date(line.match(new RegExp("\`.*?\`"))[0].substring(1,12));
+                var id = line.match(new RegExp("<.*?>"))[0].replace(/\D/g, '');
+                return {date: date, id: id}; 
+            }catch(e){
+                CatchError(e);
+            }
+        });
+
+    return new RaidData(
+        embed.author.name.split(' Активность: ')[1], 
+        embed.description, 
+        "", 
+        date, 
+        linesArray.length, 
+        linesArray.filter(line => line != "слот свободен"), 
+        left, 
+        {
+            displayName: embed.footer.text.split(' | ')[0].replace("Собрал: ", ""),
+            id:  embed.footer.text.split(' | ')[1].replace("id: ", "")
+        },
+        embed.footer.iconURL
+    );
 }
 
 function CreateRaidEmbed(data, customTimestamp) {
@@ -212,35 +205,25 @@ function CreateRaidEmbed(data, customTimestamp) {
     else if (data.numberOfPlaces == 1)
         throw ({ message: 'Активность можно собрать не менее, чем на двоих участников.' });
 
+    var {field0, field1, left} = data.FormFields()
     var embed = new MessageEmbed()
         .setAuthor(data.header)
         .setColor(0x00AE86)
         .setThumbnail('https://images-ext-2.discordapp.net/external/SfRL0Sj2a3O9vtAYpaC2OUG0r0vDipe2h8LeeZnFdf4/https/i.imgur.com/KBiRw8F.png')
-        .addField("Идут:", data.fields[0], true)
-        .addField("Идут:", data.fields[1], true)
-        .setFooter(data.footerText, data.iconURL)
+        .addField("Идут:", field0, true)
+        .addField("Идут:", field1, true)
+        .setFooter(data.footer, data.icon)
     if (customTimestamp != null) embed.setTimestamp(customTimestamp);
     if (data.description != null) embed.setDescription(data.description);
-    if (data.left.length > 8) embed.addField("Отменили запись:", data.left)
+    if (left.length > 8) embed.addField("Отменили запись:", left)
 
     return embed;
 }
 
 function FormCancelationMessage(data, message) {
     return `${message}
-> Рейд: **${data.header.split('Активность: ')[1]}**
-> Дата проведения: **${data.header.split('Активность: ')[0]}**
-> Рейд лидер: **${data.footerText.split('|')[0].replace("Собрал: ", "")}**`;
+> Рейд: **${data.raidName}**
+> Дата проведения: **${data.dateString}**
+> Рейд лидер: **${data.author.displayName}**`;
 }
 
-function weekday(num) {
-    switch (num) {
-        case 0: return "воскресенье"; break;
-        case 1: return "понедельник"; break;
-        case 2: return "вторник"; break;
-        case 3: return "среда"; break;
-        case 4: return "четверг"; break;
-        case 5: return "пятница"; break;
-        case 6: return "суббота"; break;
-    }
-}
