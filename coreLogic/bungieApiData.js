@@ -40,6 +40,27 @@ export function get_character_details(response) {
 	return charactersDetails;
 }
 
+export function get_node_data_with_extra_records(jsondata, recordHash, recordHashArray, textprefix) {
+	try {
+		var progress = jsondata.profilePresentationNodes.data.nodes[recordHash].progressValue;
+		var completion = jsondata.profilePresentationNodes.data.nodes[recordHash].completionValue;
+		for (let recordHash of recordHashArray) {
+			completion++;
+			progress += (jsondata.profileRecords.data.records[recordHash].state == 67 ? 1 : 0);
+		}
+		return {
+			state: progress == completion,
+			text: textprefix + ": " + progress + "/" + completion
+		};
+	} catch (e) {
+		CatchError(e);
+		return {
+			state: false,
+			text: textprefix + ": not defined"
+		};
+	}
+}
+
 export function get_node_data(jsondata, recordHash, textprefix) {
 	try {
 		return {
