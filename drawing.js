@@ -5,21 +5,22 @@ import { CatchError } from "./catcherror.js";
 
 export async function DrawTriumphs(members, channel){
     try{
+        var directory = config.credentials.directory ?? "./";
         var top = members
             .sort((a, b) => (a.activeScore > b.activeScore ? -1 : 1))
             .filter((_, i) => i < 15);
         var min = top[top.length - 1].activeScore - 100;
         var delta = maxtriumphs-min;
 
-        var image = await jimp.read('.data/templates/bg.png');
+        var image = await jimp.read(directory+'.data/templates/bg.png');
         for (var i = 0; i < top.length; i++) {
-            image = await DrawText(image, 10, 20 + 17*i-5, '.data/fonts/calibri_light_22.fnt', top[i].displayName);
-            image = await DrawText(image, 130, 20 + 17*i-5, '.data/fonts/calibri_light_22.fnt', top[i].activeScore);
+            image = await DrawText(image, 10, 20 + 17*i-5, directory+'.data/fonts/calibri_light_22.fnt', top[i].displayName);
+            image = await DrawText(image, 130, 20 + 17*i-5, directory+'.data/fonts/calibri_light_22.fnt', top[i].activeScore);
             image = await DrawWhiteRectangle(image, 185, 20 + (12+5)*i, ((top[i].activeScore-min)*170)/delta, 12);
         }
 
-        image.write('.data/images/toptriumphs.png');
-        channel.send("", {files: ['.data/images/toptriumphs.png']});
+        image.write(directory+'.data/images/toptriumphs.png');
+        channel.send("", {files: [directory+'.data/images/toptriumphs.png']});
     }catch(e){
         CatchError(e);
     }
@@ -55,7 +56,8 @@ async function DrawText(mainImage, x, y, font_url, text) {
 }
 
 async function DrawWhiteRectangle(mainImage, x, y, width, height) {
-    var filename = './.data/templates/white.png';
+    var directory = config.credentials.directory ?? "./";
+    var filename = directory+'.data/templates/white.png';
     var whiteImage;
     return jimp
         .read(filename)
