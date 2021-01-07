@@ -17,6 +17,18 @@ class CharacterDetails{
 	}
 }
 
+function GetDataAndHandleErrors(textprefix, callback) {
+	try {
+		return callback();
+	} catch (e) {
+		CatchError(e);
+		return {
+			state: false,
+			text: textprefix + ": not defined"
+		};
+	}
+}
+
 export function get_character_details(response) {
 	var charactersDetails = new CharacterDetails();
 	var characterIds = response.profile.data.characterIds;
