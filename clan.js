@@ -11,6 +11,7 @@ import { FormClanTimeEmbed } from "./embeds/clanTimeEmbed.js";
 import { FromRecordStatEmbed } from "./embeds/recordStatEmbed.js";
 import { FormTopTriumphScoreEmbed } from "./embeds/topTriumphScoreEmbed.js";
 import { FormNicknamesEmbed } from "./embeds/nicknamesEmbed.js";
+import { DrawTriumphs } from "./drawing.js";
 
 async function GetFullGameClanMemberList() {
 	var members = [];
@@ -69,7 +70,7 @@ export async function SendAndUpdateEmbed(channel, requestTimeout, updateFrequenc
 			if (iterator % updateFrequency == 0 || iterator == members.length) {
 				msg.edit(createEmbed(arrayWithData.filter(m => m != null), iterator, members.length));
 			}
-			if (iterator == members.length && finalAction != null) finalAction(arrayWithData.filter(m => m != null));
+			if (iterator == members.length && finalAction != null) finalAction(arrayWithData.filter(m => m != null), msg);
 		});
 	});
 }
@@ -96,7 +97,7 @@ export async function ShowRecordStat(channel, triumphId) {
 		})
 }
 
-export async function ShowTopTriumphScore(channel) {
+export async function ShowTopTriumphScore(channel, showImage) {
 	SendAndUpdateEmbed(channel, 50, 15,
 		async (member) => {
 			var clanMember = new ClanMember(member);
@@ -104,7 +105,13 @@ export async function ShowTopTriumphScore(channel) {
 			return clanMember;
 		},
 		(array, i, size) => {
-			return FormTopTriumphScoreEmbed(array, i, size);
+			return showImage ? Math.round(100*i/size)+"%" : FormTopTriumphScoreEmbed(array, i, size);
+		},
+		(array, message) => {
+			if (showImage) {
+				message.delete();
+				DrawTriumphs(array, channel);
+			}
 		})
 }
 
