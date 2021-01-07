@@ -1,17 +1,17 @@
-class CharacterDetails{
-	titan = {light: 0, id: null};
-	hunter = {light: 0, id: null};
-	warlock = {light: 0, id: null};
-	
-	CharactersExist(){
+class CharacterDetails {
+	titan = { light: 0, id: null };
+	hunter = { light: 0, id: null };
+	warlock = { light: 0, id: null };
+
+	CharactersExist() {
 		return this.titan.light > 0 || this.hunter.light > 0 || this.warlock.light > 0;
 	}
-	GetBestCharacterId(){
-		if (this.titan.light > this.hunter.light && this.titan.light > this.warlock.light){
+	GetBestCharacterId() {
+		if (this.titan.light > this.hunter.light && this.titan.light > this.warlock.light) {
 			return this.titan.id;
-		}else if (this.hunter.light > this.warlock.light){
+		} else if (this.hunter.light > this.warlock.light) {
 			return this.hunter.id;
-		}else{
+		} else {
 			return this.warlock.id;
 		}
 	}
@@ -53,7 +53,7 @@ export function get_character_details(response) {
 }
 
 export function get_node_data_with_extra_records(jsondata, recordHash, recordHashArray, textprefix) {
-	try {
+	return GetDataAndHandleErrors(textprefix, () => {
 		var progress = jsondata.profilePresentationNodes.data.nodes[recordHash].progressValue;
 		var completion = jsondata.profilePresentationNodes.data.nodes[recordHash].completionValue;
 		for (let recordHash of recordHashArray) {
@@ -64,65 +64,35 @@ export function get_node_data_with_extra_records(jsondata, recordHash, recordHas
 			state: progress == completion,
 			text: textprefix + ": " + progress + "/" + completion
 		};
-	} catch (e) {
-		CatchError(e);
-		return {
-			state: false,
-			text: textprefix + ": not defined"
-		};
-	}
+	});
 }
 
 export function get_node_data(jsondata, recordHash, textprefix) {
-	try {
-		return {
-			state: jsondata.profilePresentationNodes.data.nodes[recordHash].progressValue >=
-				jsondata.profilePresentationNodes.data.nodes[recordHash].completionValue,
-			text: textprefix + ": " +
-				jsondata.profilePresentationNodes.data.nodes[recordHash].progressValue + "/" +
-				jsondata.profilePresentationNodes.data.nodes[recordHash].completionValue
-		};
-	} catch (e) {
-		CatchError(e);
-		return {
-			state: false,
-			text: textprefix + ": not defined"
-		};
-	}
+	return GetDataAndHandleErrors(textprefix, () => ({
+		state: jsondata.profilePresentationNodes.data.nodes[recordHash].progressValue >=
+			jsondata.profilePresentationNodes.data.nodes[recordHash].completionValue,
+		text: textprefix + ": " +
+			jsondata.profilePresentationNodes.data.nodes[recordHash].progressValue + "/" +
+			jsondata.profilePresentationNodes.data.nodes[recordHash].completionValue
+	}));
 }
 
 export function get_character_node_data(characterPresentationNodes, recordHash, textprefix) {
-	try {
-		return {
-			state: characterPresentationNodes[0][1].nodes[recordHash].progressValue >=
-				characterPresentationNodes[0][1].nodes[recordHash].completionValue,
-			text: textprefix + ": " +
-				characterPresentationNodes[0][1].nodes[recordHash].progressValue + "/" +
-				characterPresentationNodes[0][1].nodes[recordHash].completionValue
-		};
-	} catch (e) {
-		CatchError(e);
-		return {
-			state: false,
-			text: textprefix + ": not defined"
-		};
-	}
+	return GetDataAndHandleErrors(textprefix, () => ({
+		state: characterPresentationNodes[0][1].nodes[recordHash].progressValue >=
+			characterPresentationNodes[0][1].nodes[recordHash].completionValue,
+		text: textprefix + ": " +
+			characterPresentationNodes[0][1].nodes[recordHash].progressValue + "/" +
+			characterPresentationNodes[0][1].nodes[recordHash].completionValue
+	}));
 }
 
 export function get_character_progression_data(characterProgressions, recordHash, neededValue, textprefix) {
-	try {
-		return {
-			state: characterProgressions[0][1].progressions[recordHash].currentProgress >= neededValue,
-			text: (textprefix == "" ? "" : textprefix + ": ") +
-				characterProgressions[0][1].progressions[recordHash].currentProgress + "/" + neededValue
-		};
-	} catch (e) {
-		CatchError(e);
-		return {
-			state: false,
-			text: textprefix + ": not defined"
-		};
-	}
+	return GetDataAndHandleErrors(textprefix, () => ({
+		state: characterProgressions[0][1].progressions[recordHash].currentProgress >= neededValue,
+		text: (textprefix == "" ? "" : textprefix + ": ") +
+			characterProgressions[0][1].progressions[recordHash].currentProgress + "/" + neededValue
+	}));
 }
 
 export function get_any_of_data(characterPresentationNodes, recordHashArray, textprefix) {
@@ -136,23 +106,15 @@ export function get_any_of_data(characterPresentationNodes, recordHashArray, tex
 }
 
 export function get_profile_records(jsondata, dataname, neededValue, textprefix) {
-	try {
-		return {
-			state: jsondata.profileRecords.data[dataname] >= neededValue,
-			text: (textprefix == "" ? "" : textprefix + ": ") +
-				jsondata.profileRecords.data[dataname] + "/" + (neededValue / 1000) + "k"
-		};
-	} catch (e) {
-		CatchError(e);
-		return {
-			state: false,
-			text: textprefix + ": not defined"
-		};
-	}
+	return GetDataAndHandleErrors(textprefix, () => ({
+		state: jsondata.profileRecords.data[dataname] >= neededValue,
+		text: (textprefix == "" ? "" : textprefix + ": ") +
+			jsondata.profileRecords.data[dataname] + "/" + (neededValue / 1000) + "k"
+	}));
 }
 
 export function get_season_triumphs(jsondata, characterPresentationNodes, nodeHash, ignoredRecordHashArray, textprefix) {
-	try {
+	return GetDataAndHandleErrors(textprefix, () => {
 		var ignored = 0;
 		for (let ignoredRecordHash of ignoredRecordHashArray) {
 			ignored = ignored + ((jsondata.profileRecords.data.records[ignoredRecordHash].state == 67) ? 0 : 1);
@@ -165,58 +127,41 @@ export function get_season_triumphs(jsondata, characterPresentationNodes, nodeHa
 				characterPresentationNodes[0][1].nodes[nodeHash].progressValue + "/" +
 				(characterPresentationNodes[0][1].nodes[nodeHash].completionValue - ignored)
 		};
-	} catch (e) {
-		CatchError(e);
-		return {
-			state: false,
-			text: textprefix + ": not defined"
-		};
-	}
+	});
 }
 
 export function get_day_one(jsondata, characterCollectibles) {
-	try {
-		return {
-			state: jsondata.profileCollectibles.data.collectibles[2273453972].state % 2 != 1 ||
-				characterCollectibles[0][1].collectibles[3938759711].state % 2 != 1 ||
-				jsondata.profileCollectibles.data.collectibles[3171386140].state % 2 != 1 ||
-				jsondata.profileCollectibles.data.collectibles[1171206947].state % 2 != 1,
-			text: "Day1: " +
-				(jsondata.profileCollectibles.data.collectibles[2273453972].state % 2 != 1 ? "СГК " : "") +
-				(characterCollectibles[0][1].collectibles[3938759711].state % 2 != 1 ? "СС " : "") +
-				(jsondata.profileCollectibles.data.collectibles[3171386140].state % 2 != 1 ? "КС " : "") +
-				(jsondata.profileCollectibles.data.collectibles[1171206947].state % 2 != 1 ? "ПЖ " : "")
-		};
-	} catch (e) {
-		CatchError(e);
-		return {
-			state: false,
-			text: "Day1: not defined"
-		};
-	}
+	return GetDataAndHandleErrors("Day 1: ", () => ({
+		state: jsondata.profileCollectibles.data.collectibles[2273453972].state % 2 != 1 ||
+			characterCollectibles[0][1].collectibles[3938759711].state % 2 != 1 ||
+			jsondata.profileCollectibles.data.collectibles[3171386140].state % 2 != 1 ||
+			jsondata.profileCollectibles.data.collectibles[1171206947].state % 2 != 1,
+		text: "Day 1: " +
+			(jsondata.profileCollectibles.data.collectibles[2273453972].state % 2 != 1 ? "СГК " : "") +
+			(characterCollectibles[0][1].collectibles[3938759711].state % 2 != 1 ? "СС " : "") +
+			(jsondata.profileCollectibles.data.collectibles[3171386140].state % 2 != 1 ? "КС " : "") +
+			(jsondata.profileCollectibles.data.collectibles[1171206947].state % 2 != 1 ? "ПЖ " : "")
+	}));
 }
 
 export function get_all_nodes(jsondata, recordHashArray, textprefix) {
-	var counter = 0;
-	for (let recordHash of recordHashArray) {
-		counter = counter + (jsondata.profileRecords.data.records[recordHash].state == 67 ? 1 : 0);
-	}
-	return {
-		state: counter == recordHashArray.length,
-		text: textprefix + ": " + counter + "/" + recordHashArray.length
-	};
+	return GetDataAndHandleErrors(textprefix, () => {
+		var counter = 0;
+		for (let recordHash of recordHashArray) {
+			counter = counter + (jsondata.profileRecords.data.records[recordHash].state == 67 ? 1 : 0);
+		}
+		return {
+			state: counter == recordHashArray.length,
+			text: textprefix + ": " + counter + "/" + recordHashArray.length
+		};
+	});
 }
 
 export function get_poi(jsondata) {
-	try {
-		return {
-			state: ((jsondata.profileRecords.data.records[3448775736].state == 67 ? 1 : 0) +
-				(jsondata.profileRecords.data.records[3804486505].state == 67 ? 1 : 0) +
-				(jsondata.profileRecords.data.records[3185876102].state == 67 ? 1 : 0)) < 3,
-			text: ""
-		};
-	} catch (e) {
-		CatchError(e);
-		return { state: false, text: "" };
-	}
+	return GetDataAndHandleErrors("", () => ({
+		state: ((jsondata.profileRecords.data.records[3448775736].state == 67 ? 1 : 0) +
+			(jsondata.profileRecords.data.records[3804486505].state == 67 ? 1 : 0) +
+			(jsondata.profileRecords.data.records[3185876102].state == 67 ? 1 : 0)) < 3,
+		text: ""
+	}));
 }
