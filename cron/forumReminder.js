@@ -12,5 +12,5 @@ client.on("ready", () => {
     setTimeout(function(){
         client.destroy();
         process.exit();
-    }, 150);
+    }, 1500);
 });
