@@ -51,10 +51,10 @@ export async function ExecuteForEveryMember(timeout, callback) {
 	iteration();
 }
 
-export function SetRoles(channel) {
+export function SetRoles(guild) {
 	ExecuteForEveryMember(5000, (member) => {
 		var clanMember = new ClanMember(member);
-		clanMember.FetchDiscordMember(channel.guild);
+		clanMember.FetchDiscordMember(guild);
 		GetShowAndSetRoles(clanMember, null);
 	});
 }
