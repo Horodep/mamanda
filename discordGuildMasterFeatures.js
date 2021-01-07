@@ -53,7 +53,7 @@ export function SaveForumLinkAndPublish(link, client) {
 }
 
 export function PublishDailyMessage(client) {
-	var channel = client.channels.cache.get(config.channels.clannews);
+	var channel = client.channels.cache.get(config.channels.flood);
 	var directory = config.credentials.directory ?? ".";
 	fs.readFile(directory + "/.data/forumlink.txt", 'utf8', function (err, data) {
 		if (err) CatchError(err);
