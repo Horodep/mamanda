@@ -67,6 +67,22 @@ export function PublishDailyMessage(client) {
 	})
 }
 
+export function SetMaximumTriumphsScore(message, args) {
+	if (args.length < 2) {
+		message.channel.send("Укажите значение.");
+		return;
+	}
+	var score = Number(args[1]);
+	if (Number.isNaN(score)) {
+		message.channel.send("Введенное значение не является числом.");
+		return;
+	}
+	var directory = config.credentials.directory ?? "./";
+	fs.writeFile(directory + ".data/maxtriumphs.json", args[1], function (err) {
+		if (err) CatchError(err);
+	});
+}
+
 export function ShowNewbieList(message) {
 	var newbieList = [];
 	message.guild.roles.cache.find(role => role.id == config.roles.newbie).members.forEach(function (member) {

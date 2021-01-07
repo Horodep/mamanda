@@ -1,5 +1,5 @@
 import { MessageEmbed } from "discord.js";
-import { DropPvpRole, GiveForumRole, SaveForumLinkAndPublish, ShowNewbieList, ShowQueueList, ShowQueueReqestsList } from "./discordGuildMasterFeatures.js"
+import { DropPvpRole, GiveForumRole, SaveForumLinkAndPublish, SetMaximumTriumphsScore, ShowNewbieList, ShowQueueList, ShowQueueReqestsList } from "./discordGuildMasterFeatures.js"
 import { ClanSize, ClanTime, Nicknames, SetRoles, ShowRecordStat, ShowTopTriumphScore } from "./clan.js"
 import { Roles } from "./roles.js"
 import { newAuthToken } from "./httpCore.js"
@@ -236,7 +236,9 @@ export class CommandManager {
             ForcedRemoveRaidMember(message, args);
         });
         this.AddCommand("guildmaster", 2, "reset", "!reset", "генерация текстового еженедельного ресета в текущий канал;", function (args, message) { });
-        this.AddCommand("guildmaster", 2, "setmaxtriumphs", "!setmaxtriumphs NUMBER", "обновить значение максимального количества триумфов;", function (args, message) { });
+        this.AddCommand("guildmaster", 0, "setmaxtriumphs", "!setmaxtriumphs NUMBER", "обновить значение максимального количества триумфов;", function (args, message) { 
+            SetMaximumTriumphsScore(message, args);
+        });
         this.AddCommand("guildmaster", 0, "size", "!size", "количество стражей в составах;", function (args, message) {
             ClanSize().then(value => message.channel.send(value));
         });
