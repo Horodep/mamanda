@@ -58,7 +58,7 @@ export class RaidData {
     AddRaidMember(userId) {
         if (this.members.includes(userId))
             return;
-        if (this.members.length < 6)
+        if (this.members.length < this.numberOfPlaces)
             this.members.push(userId);
     }
 
