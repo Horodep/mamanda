@@ -143,6 +143,16 @@ export function ClearRaidList(client) {
 	})
 }
 
+export async function GetPlannedRaids(message, discordMention){
+	var discordId = discordMention.replace(/\D/g, '');
+
+	var raid_channel = message.client.channels.cache.get(config.channels.raids);
+    var messages = (await raid_channel.messages.fetch({ limit: 50 })).filter(m => m.embeds.length > 0);
+    var raids = messages.map(m => GetDataFromEmbed(m.embeds[0]));
+    var myraids = raids.filter(r => r?.members?.includes(discordId));
+    message.channel.send(myraids.length == 0 ? 'Вы никуда не записались.' : myraids.map(r => r.header).join('\n'));
+}
+
 function ParseCommandAndGetData(args, member) {
     //0    1     2     3   4 
     //сбор 22.09 18:00 [3] кс, рандомный комент

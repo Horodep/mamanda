@@ -7,7 +7,7 @@ import { GetClanMemberOnlineTime } from "./clanMember.js";
 import { CatchError } from "./catcherror.js";
 import { InviteFriend, ChangeChannelCap, ChangeRegion, ClanMedalsSummary } from "./discordCommunityFeatures.js";
 import { SendCustomMessage, SendPrivateMessageByRole } from "./sendMessage.js";
-import { ClearRaidList, CreateRaid, ForcedAddRaidMember, ForcedRemoveRaidMember } from "./raid.js"
+import { ClearRaidList, CreateRaid, ForcedAddRaidMember, ForcedRemoveRaidMember, GetPlannedRaids } from "./raid.js"
 
 export class CommandManager {
     static commandList = [];
@@ -150,6 +150,9 @@ export class CommandManager {
         });
         this.AddCommand("restricted", 0, "mymt", "!mymt", "проверка активности стража в голосовом чате (только своей);", function (args, message) {
             GetClanMemberOnlineTime(message, (args.length > 1 ? args[1] : 7));
+        });
+        this.AddCommand("restricted", 0, "myraids", "!myraids", "список рейдов, в которые записался страж;", function (args, message) {
+            GetPlannedRaids(message, args.length > 1 ? args[1] : message.author.id)
         });
         this.AddCommand("restricted", 0, "region", "!region", "смена региона сервера;", function (args, message) {
             ChangeRegion(message);
