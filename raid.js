@@ -150,7 +150,9 @@ export async function GetPlannedRaids(message, discordMention){
     var messages = (await raid_channel.messages.fetch({ limit: 50 })).filter(m => m.embeds.length > 0);
     var raids = messages.map(m => GetDataFromEmbed(m.embeds[0]));
     var myraids = raids.filter(r => r?.members?.includes(discordId));
-    message.channel.send(myraids.length == 0 ? 'Вы никуда не записались.' : myraids.map(r => r.header).join('\n'));
+    message.channel.send(myraids.length == 0 
+        ? 'Вы никуда не записаны.' 
+        : myraids.map(r => "`" + r.dateString + "` Активность: **" + r.raidName + "**").join('\n'));
 }
 
 function ParseCommandAndGetData(args, member) {
