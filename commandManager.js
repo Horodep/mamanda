@@ -15,7 +15,7 @@ export class CommandManager {
     static Run(args, message) {
         try {
             var command = this.FindCommand(args[0]);
-            if (command.status > 1) message.channel.send("Команда отключена");
+            if (command?.status > 1) message.channel.send("Команда отключена");
             else command?.callback(args, message);
         } catch (e) {
             CatchError(e, message.channel);

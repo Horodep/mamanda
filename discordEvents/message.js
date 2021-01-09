@@ -4,9 +4,8 @@ import { CommandManager } from "../commandManager.js";
 
 export function Message(message){
 	try {
-		if (message.author.bot) return;
-		if (!message.content.startsWith("!")) return;
-
+		if (message.author.bot || !message.content.startsWith("!")) return;
+		
 		if (message.channel.type != "text") {
 			channel_sandbox = client.channels.cashe.get(config.channels.sandbox);
 			channel_sandbox.send("**" + message.author.username + "** написал в ЛС:\n" + message.content);
