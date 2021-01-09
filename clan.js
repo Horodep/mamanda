@@ -80,7 +80,6 @@ export async function ShowRecordStat(channel, triumphId) {
 		channel.send("Вы не обозначили искомый триумф.");
 		return;
 	}
-	ManifestManager.LoadData();
 	var recordData = ManifestManager.GetRecordData(triumphId);
 	if (recordData == null) {
 		channel.send("Триумф не найден.");
