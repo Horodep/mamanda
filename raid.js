@@ -148,7 +148,7 @@ export async function GetPlannedRaids(message, discordMention){
 
 	var raid_channel = message.client.channels.cache.get(config.channels.raids);
     var messages = (await raid_channel.messages.fetch({ limit: 50 })).filter(m => m.embeds.length > 0);
-    var raids = messages.map(m => GetDataFromEmbed(m.embeds[0]));
+    var raids = messages.map(m => GetDataFromEmbed(m.embeds[0])).sort((a, b) => a.date - b.date);
     var myraids = raids.filter(r => r?.members?.includes(discordId));
     message.channel.send(myraids.length == 0 
         ? 'Вы никуда не записаны.' 
