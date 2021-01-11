@@ -27,16 +27,13 @@ export async function ClanSize() {
 
 export async function GetMemberByDiscordName(discordName) {
 	var members = await GetFullGameClanMemberList();
-	try {
-		members.forEach(function (member) {
-			if (discordName.startsWith(member.destinyUserInfo.LastSeenDisplayName + " ") ||
-				discordName == member.destinyUserInfo.LastSeenDisplayName) {
-				throw member;
-			}
-		});
-	} catch (member) {
-		return member;
-	}
+	for(var i = 0; i < members.length; i++) {
+		if (discordName.startsWith(members[i].destinyUserInfo.LastSeenDisplayName + " ") ||
+			discordName == members[i].destinyUserInfo.LastSeenDisplayName) {
+				return members[i];
+		}
+	};
+	throw ({ message: 'Игровой профиль не найден.' });
 }
 
 export async function ExecuteForEveryMember(timeout, callback) {

@@ -211,39 +211,41 @@ export class ClanMember {
     }
 }
 
+export function GetDiscordMemberByMention(guild, discordMention) {
+    var discordId = discordMention.replace(/\D/g, '');
+    var discordMember = guild.members.cache.find(member => member.user.id == discordId);
+    if (discordMember == null) throw { message: 'Дискорд профиль не найден.' };
+    console.log(discordMember.displayName);
+    return discordMember;
+}
+
 export async function GetClanMemberOnlineTime(message, days, discordMention, isDetailed) {
-    var discordName = message.member.displayName;
-    if (discordMention != null) {
-        var discordId = discordMention.replace(/\D/g, '');
-        var discordMember = message.guild.members.cache.find(member => member.user.id == discordId);
-        if (discordMember == null) {
-            channel.send('Дискорд профиль не найден.');
-            return;
+    try{
+        var discordName = discordMention == null 
+            ? message.member.displayName 
+            : GetDiscordMemberByMention(message.guild, discordMention).displayName;
+
+        var apiMember = await GetMemberByDiscordName(discordName);
+        var clanMember = new ClanMember(apiMember);
+        await clanMember.FetchCharacterIds();
+        clanMember.FetchDiscordMember(message.guild);
+
+        var clanVoiceSummary = await GetClanVoiceSummary(days);
+        clanMember.AddToVoiceOnline(clanVoiceSummary[clanMember.discordMemberId]);
+
+        var activities = await GetAllActivities(clanMember, days);
+        activities.forEach(a => clanMember.AddToGameOnline(a.values.timePlayedSeconds.basic.value))
+
+        if (isDetailed) {
+            var detailedVoiceResults = await GetMemberDetailedVoice(days, clanMember.discordMemberId);
+            var lines = clanMember.FormLinesForDetailedVoice(detailedVoiceResults)
+            message.channel.send(clanMember.GetMemberTimeEmbed(lines));
         }
-        discordName = discordMember.displayName;
+        else message.channel.send(clanMember.GetMemberTimeString());
+    } catch (e){
+        if (e.stack != null) CatchError(e, message.channel);
+        else message.channel.send(e.message);
     }
-
-    var apiMember = await GetMemberByDiscordName(discordName);
-	if (apiMember == null) {
-		message.channel.send('Игровой профиль не найден.');
-		return;
-    }
-    var clanMember = new ClanMember(apiMember);
-    await clanMember.FetchCharacterIds();
-    clanMember.FetchDiscordMember(message.guild);
-
-    var clanVoiceSummary = await GetClanVoiceSummary(days);
-    clanMember.AddToVoiceOnline(clanVoiceSummary[clanMember.discordMemberId]);
-
-    var activities = await GetAllActivities(clanMember, days);
-    activities.forEach(a => clanMember.AddToGameOnline(a.values.timePlayedSeconds.basic.value))
-
-    if (isDetailed) {
-        var detailedVoiceResults = await GetMemberDetailedVoice(days, clanMember.discordMemberId);
-        var lines = clanMember.FormLinesForDetailedVoice(detailedVoiceResults)
-        message.channel.send(clanMember.GetMemberTimeEmbed(lines));
-    }
-    else message.channel.send(clanMember.GetMemberTimeString());
 }
 
 export async function GetAllActivities(clanMember, days) {

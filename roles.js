@@ -4,7 +4,7 @@ import { GetFullMemberData, GetProfileData } from "./bungieApi.js";
 import { GetMemberByDiscordName } from "./clan.js";
 import * as BungieApiLogic from "./coreLogic/bungieApiData.js";
 import { LogRolesGranting, CheckAndProcessRole, CheckAndProcessRoleBlock, SumMedals } from "./coreLogic/rolesLogic.js";
-import { ClanMember } from "./clanMember.js";
+import { ClanMember, GetDiscordMemberByMention } from "./clanMember.js";
 import { FormRolesEmbed } from "./embeds/rolesEmbed.js";
 
 export function Roles(message, args) {
@@ -18,24 +18,16 @@ export function Roles(message, args) {
 }
 
 export async function RolesByDiscordMention(channel, discordMention) {
-	var discordId = discordMention.replace(/\D/g, '');
-	var discordMember = channel.guild.members.cache.find(member => member.user.id == discordId);
-	if (discordMember == null) {
-		channel.send('Дискорд профиль не найден.');
-		return;
+	try{
+		var discordMember = GetDiscordMemberByMention(channel.guild, discordMention);
+		var member = await GetMemberByDiscordName(discordMember.displayName);
+		var clanMember = new ClanMember(member);
+		clanMember.SetDiscordMember(discordMember);
+		await GetShowAndSetRoles(clanMember, channel);
+	} catch (e){
+		if (e.stack != null) CatchError(e, channel);
+		else channel.send(e.message);
 	}
-	console.log(discordMember.displayName);
-
-	var member = await GetMemberByDiscordName(discordMember.displayName);
-	if (member == null) {
-		channel.send('Игровой профиль не найден.');
-		return;
-	}
-
-	var clanMember = new ClanMember(member);
-	clanMember.SetDiscordMember(discordMember);
-
-	await GetShowAndSetRoles(clanMember, channel);
 }
 
 export async function RolesByMembershipId(channel, membership) {
