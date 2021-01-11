@@ -1,4 +1,6 @@
 import { MessageEmbed } from "discord.js";
+import nodePackage from "./package.json";
+import { execSync } from "child_process";
 import { DropPvpRole, GiveForumRole, SaveForumLinkAndPublish, SetMaximumTriumphsScore, ShowNewbieList, ShowQueueList, ShowQueueReqestsList } from "./discordGuildMasterFeatures.js"
 import { ClanSize, ClanTime, Nicknames, SetRoles, ShowRecordStat, ShowTopTriumphScore } from "./clan.js"
 import { Roles } from "./roles.js"
@@ -35,9 +37,9 @@ export class CommandManager {
         var foundCommands = this.commandList.filter(c => c.name === commandName);
         return foundCommands.length > 0 ? foundCommands[0] : null;
     }
-    static GetStatus() {
+    static async GetStatus() {
         var embed = new MessageEmbed()
-            .setAuthor("Статус")
+            .setAuthor(nodePackage.name + " " + nodePackage.version)
             .setColor(0x11de1b)//0x00AE86
             .setDescription("[Issues tracker](https://github.com/Horodep/mamanda-issues-tracker/issues)")
         var restricted = [];
@@ -56,6 +58,7 @@ export class CommandManager {
                     break;
             }
             if (command.name != "") {
+                //var commandName = command.name.length > 2 ? command.name.slice(0, 2) + "▓".repeat(command.name.length-2) : command.name;
                 line += command.name;
                 switch (command.rights) {
                     case "restricted":
@@ -67,6 +70,11 @@ export class CommandManager {
                 }
             }
         });
+        const gitLogRequest = "git log $(git describe --abbrev=0 --tags $(git describe --abbrev=0)^)..HEAD --oneline --format='%s'";
+        const gitSaveLogRequest = process.platform == "win32" ? "git log -n5 --oneline --format='%s'" : gitLogRequest;
+        var gitLog = execSync(gitSaveLogRequest).toString();
+        embed.addField("Git log", gitLog.replace(/'/g, '`'))
+        embed.addField("Destiny API Status", "WIP")
         embed.addField("Restricted", restricted.join("\n"), true)
         embed.addField("Guildmaster", guildmaster.filter((_, i) => i < guildmaster.length / 2).join("\n"), true)
         embed.addField("Guildmaster", guildmaster.filter((_, i) => i >= guildmaster.length / 2).join("\n"), true)
@@ -115,8 +123,8 @@ export class CommandManager {
         return this.CheckRights(commandName, 'developer');
     }
     static Init() {
-        this.AddCommand("developer", 0, "status", "!status", "статус команд;", function (args, message) {
-            message.channel.send(CommandManager.GetStatus());
+        this.AddCommand("developer", 0, "status", "!status", "статус команд;", async function (args, message) {
+            message.channel.send(await CommandManager.GetStatus());
         });
         this.AddCommand("developer", 0, "oauth2", "!oauth2", "выслать команду авторизации;", function (args, message) {
             message.channel.send(`https://www.bungie.net/ru/OAuth/Authorize?response_type=code&client_id=${config.d2clientId}&state=12345`);
