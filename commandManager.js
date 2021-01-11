@@ -174,7 +174,7 @@ export class CommandManager {
         this.AddCommand("restricted", 0, "toptriumphs", "!triumphs", "топ 15 стражей клана по очкам триумфов текстом;", function (args, message) { 
             ShowTopTriumphScore(message.channel, args.length > 1 ? true : false);
         });
-        this.AddCommand("restricted", 0, "toptriumphs 1", "!triumphs gimmeimageplz", "топ 15 стражей клана по очкам триумфов графиком;", function (args, message) { });
+        this.AddCommand("restricted", 0, "toptriumphs img", "!triumphs gimmeimageplz", "топ 15 стражей клана по очкам триумфов графиком;", function (args, message) { });
         this.AddCommand("restricted", 0, "сбор", "!сбор ДД.ММ ЧЧ:ММ название активности, комментарии", "создание сбора на активность на 6 человек;", function (args, message) {
             CreateRaid(message, args);
         });
