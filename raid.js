@@ -115,28 +115,29 @@ export function ClearRaidList(client) {
     var history_channel = client.channels.cache.get(config.channels.raid_history);
     
 	raid_channel.messages.fetch({ limit: 50 }).then(messages => {
-		var today = new Date();
-		var lastMessage;
-		messages.sort(function(a, b) {
-			return a.id > b.id ? 1 : -1
-		}).forEach(message => {
-			if(message.pinned) return;
+        var today = new Date();
+        console.log("now:", today);
+		var tagMessage;
+		messages.sort((a, b) => a.id > b.id ? 1 : -1).forEach(message => {
+            if(message.pinned) return;
+            console.log(message.content, message.author.bot);
             if(!message.author.bot) {
+                console.log("message deleted");
                 message.delete();
                 return;
             }
             if(message.content != ""){
-                lastMessage = message;
+                tagMessage = message;
             }else{
                 var data = GetDataFromEmbed(message.embeds[0]);
                 
-                console.log(data.date, today, data.header);
+                console.log(data.date, data.header);
                 if(data.date < today){
                     console.log("have to be moved");
                     
                     history_channel.send(CreateRaidEmbed(data, message.createdAt));
                     message.delete();
-                    lastMessage.delete();
+                    tagMessage.delete();
                 }
             }
 		});
