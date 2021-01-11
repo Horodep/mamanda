@@ -1,5 +1,6 @@
 import { MessageEmbed } from "discord.js";
 import nodePackage from "./package.json";
+import { GetGlobalAlerts } from "./bungieApi.js";
 import { execSync } from "child_process";
 import { DropPvpRole, GiveForumRole, SaveForumLinkAndPublish, SetMaximumTriumphsScore, ShowNewbieList, ShowQueueList, ShowQueueReqestsList } from "./discordGuildMasterFeatures.js"
 import { ClanSize, ClanTime, Nicknames, SetRoles, ShowRecordStat, ShowTopTriumphScore } from "./clan.js"
@@ -38,6 +39,11 @@ export class CommandManager {
         return foundCommands.length > 0 ? foundCommands[0] : null;
     }
     static async GetStatus() {
+        var apiAlerts = await GetGlobalAlerts();
+        const gitLogRequest = "git log $(git describe --abbrev=0 --tags $(git describe --abbrev=0)^)..HEAD --oneline --format='%s'";
+        const gitSaveLogRequest = process.platform == "win32" ? "git log -n5 --oneline --format='%s'" : gitLogRequest;
+        var gitLog = execSync(gitSaveLogRequest).toString();
+
         var embed = new MessageEmbed()
             .setAuthor(nodePackage.name + " " + nodePackage.version)
             .setColor(0x11de1b)//0x00AE86
@@ -70,11 +76,8 @@ export class CommandManager {
                 }
             }
         });
-        const gitLogRequest = "git log $(git describe --abbrev=0 --tags $(git describe --abbrev=0)^)..HEAD --oneline --format='%s'";
-        const gitSaveLogRequest = process.platform == "win32" ? "git log -n5 --oneline --format='%s'" : gitLogRequest;
-        var gitLog = execSync(gitSaveLogRequest).toString();
         embed.addField("Git log", gitLog.replace(/'/g, '`'))
-        embed.addField("Destiny API Status", "WIP")
+        embed.addField("Destiny API Status", apiAlerts.ErrorStatus)
         embed.addField("Restricted", restricted.join("\n"), true)
         embed.addField("Guildmaster", guildmaster.filter((_, i) => i < guildmaster.length / 2).join("\n"), true)
         embed.addField("Guildmaster", guildmaster.filter((_, i) => i >= guildmaster.length / 2).join("\n"), true)

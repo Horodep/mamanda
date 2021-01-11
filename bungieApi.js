@@ -1,5 +1,14 @@
 import { makeRequestWithPromise } from "./httpCore.js";
 
+export async function GetGlobalAlerts() {
+	try {
+		var result = await makeRequestWithPromise('GET', `https://www.bungie.net/Platform/GlobalAlerts/`);
+		return result;
+	} catch {
+		console.error("Rejected: " + result);
+	}
+}
+
 export async function GetClanMembers(clanId) {
 	try {
 		var result = await makeRequestWithPromise('GET', `https://www.bungie.net/Platform/GroupV2/${clanId}/Members/`);
