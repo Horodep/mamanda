@@ -55,7 +55,7 @@ export class CommandManager {
         var gitLog = execSync(gitSaveLogRequest).toString();
 
         var embed = new MessageEmbed()
-            .setAuthor(nodePackage.name + " " + nodePackage.version)
+            .setAuthor(nodePackage.name + " v" + nodePackage.version)
             .setColor(0x11de1b)//0x00AE86
             .setDescription("[Issues tracker](https://github.com/Horodep/mamanda-issues-tracker/issues)")
             .addField("Git log", "```" + gitLog.replace(/'/g, '') + "```")
