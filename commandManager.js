@@ -55,13 +55,15 @@ export class CommandManager {
         const gitLogRequest = "git log $(git describe --abbrev=0 --tags $(git describe --abbrev=0)^)..HEAD --oneline --format='%s'";
         const gitSaveLogRequest = process.platform == "win32" ? "git log -n5 --oneline --format='%s'" : gitLogRequest;
         var gitLog = execSync(gitSaveLogRequest).toString();
+        var uptime = process.uptime()
 
         var embed = new MessageEmbed()
             .setAuthor(nodePackage.name + " v" + nodePackage.version)
             .setColor(0x11de1b)//0x00AE86
             .setDescription("[баг-трекер](https://github.com/Horodep/mamanda-issues-tracker/issues)")
+            .addField("Destiny API Status", apiAlerts.ErrorStatus, true)
+            .addField("Uptime", Math.round(uptime/3600)+' hours', true)
             .addField("Git log", "```" + gitLog.replace(/'/g, '') + "```")
-            .addField("Destiny API Status", apiAlerts.ErrorStatus)
 
         var restricted = this.commandList.filter(c => c.rights == "restricted" && c.name != "").map(c => this.GetEmojiStatus(c, apiAlerts) + " " + c.name);
         embed.addField("Command list", restricted.filter((_, i) => i < restricted.length / 3).join("\n"), true)
