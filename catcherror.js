@@ -7,9 +7,12 @@ export function FetchDefaultCatchErrorChannel(client){
 }
 
 export function CatchError(e, channel) {
-	console.error(e);
-	(typeof(channel) == 'undefined' ? sandbox : channel).send(`<@${config.users.developer}>`);
-	(typeof(channel) == 'undefined' ? sandbox : channel).send(`Ошибка ${e.name}: ${e.message}\n\n${e.stack}`, { code: 'js' });
+	if (e.stack == null) (typeof(channel) == 'undefined' ? sandbox : channel).send(e.message);
+	else {
+		console.error(e);
+		(typeof(channel) == 'undefined' ? sandbox : channel).send(`<@${config.users.developer}>`);
+		(typeof(channel) == 'undefined' ? sandbox : channel).send(`Ошибка ${e.name}: ${e.message}\n\n${e.stack}`, { code: 'js' });
+	}
 }
 
 export function CatchErrorWithTimeout(e, channel, timeout){

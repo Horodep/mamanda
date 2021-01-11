@@ -1,4 +1,5 @@
 import { MessageEmbed } from "discord.js";
+import { CatchError } from "./catcherror.js";
 import { GetActivitiesFromApi, GetCoreMemberData, GetProfileData } from "./bungieApi.js";
 import { GetMemberByDiscordName } from "./clan.js";
 import { GetClanVoiceSummary, GetMemberDetailedVoice } from "./sql.js"
@@ -19,7 +20,7 @@ export class ClanMember {
     #voiceOnline = 0;
     #gameOnline = 0;
     access = true;
-    
+
     #activeScore = 0;
 
     constructor(member) {
@@ -56,7 +57,7 @@ export class ClanMember {
     get discordTag() {
         return "<@" + this.discordMember?.id + ">";
     }
-    get joined(){
+    get joined() {
         return this.discordMember == null ? 0 :
             Math.round((Date.now() - this.discordMember.joinedTimestamp) / (1000 * 60 * 60 * 24))
     }
@@ -65,17 +66,17 @@ export class ClanMember {
         return this.discordMember.roles.cache.find(role => role.id == roleId) != null;
     }
 
-    get voiceOnline(){
+    get voiceOnline() {
         return this.#voiceOnline;
     }
-    get gameOnline(){
+    get gameOnline() {
         return this.#gameOnline;
     }
     get percentage() {
         return (this.#gameOnline == 0) ? 0 : Math.floor(100 * this.#voiceOnline / this.#gameOnline);
     }
     get isLowGame() {
-        return this.#gameOnline < 5*60*60;
+        return this.#gameOnline < 5 * 60 * 60;
     }
     get isZeroGame() {
         return this.#gameOnline == 0;
@@ -87,10 +88,10 @@ export class ClanMember {
         return this.#activeScore;
     }
 
-    async GetRecordDataState(triumphId){
+    async GetRecordDataState(triumphId) {
         var coreData = await GetCoreMemberData(this.#destinyUserInfo.membershipType, this.#destinyUserInfo.membershipId);
-        
-        return coreData?.profileRecords?.data?.records[triumphId]?.state%2 == 1;
+
+        return coreData?.profileRecords?.data?.records[triumphId]?.state % 2 == 1;
     }
 
     async FetchCharacterIds() {
@@ -112,7 +113,7 @@ export class ClanMember {
     }
 
     AddToVoiceOnline(deltaTime) {
-        if(typeof(deltaTime) == 'undefined') return;
+        if (typeof (deltaTime) == 'undefined') return;
         var deltaSeconds = (((deltaTime.hours ?? 0) * 60) + (deltaTime.minutes ?? 0)) * 60 + (deltaTime.seconds ?? 0);
         this.#voiceOnline += deltaSeconds;
     }
@@ -159,8 +160,8 @@ export class ClanMember {
                 new Date(row.next_datetime_fixed.getTime() + 3 * 60 * 60 * 1000).toISOString().replace(/T/, ' ').replace(/\..+/, '').substring(5, 16) + "   " +
                 PeriodValueToLine(row.period.hours) + ":" + PeriodValueToLine(row.period.minutes));
         });
-        function PeriodValueToLine(value){
-            return value ? (value < 10 ? "0"+value : value) : "00";
+        function PeriodValueToLine(value) {
+            return value ? (value < 10 ? "0" + value : value) : "00";
         }
         return lines;
     }
@@ -220,9 +221,9 @@ export function GetDiscordMemberByMention(guild, discordMention) {
 }
 
 export async function GetClanMemberOnlineTime(message, days, discordMention, isDetailed) {
-    try{
-        var discordName = discordMention == null 
-            ? message.member.displayName 
+    try {
+        var discordName = discordMention == null
+            ? message.member.displayName
             : GetDiscordMemberByMention(message.guild, discordMention).displayName;
 
         var apiMember = await GetMemberByDiscordName(discordName);
@@ -242,9 +243,8 @@ export async function GetClanMemberOnlineTime(message, days, discordMention, isD
             message.channel.send(clanMember.GetMemberTimeEmbed(lines));
         }
         else message.channel.send(clanMember.GetMemberTimeString());
-    } catch (e){
-        if (e.stack != null) CatchError(e, message.channel);
-        else message.channel.send(e.message);
+    } catch (e) {
+        CatchError(e, message.channel);
     }
 }
 

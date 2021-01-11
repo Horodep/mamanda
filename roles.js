@@ -18,15 +18,14 @@ export function Roles(message, args) {
 }
 
 export async function RolesByDiscordMention(channel, discordMention) {
-	try{
+	try {
 		var discordMember = GetDiscordMemberByMention(channel.guild, discordMention);
 		var member = await GetMemberByDiscordName(discordMember.displayName);
 		var clanMember = new ClanMember(member);
 		clanMember.SetDiscordMember(discordMember);
 		await GetShowAndSetRoles(clanMember, channel);
-	} catch (e){
-		if (e.stack != null) CatchError(e, channel);
-		else channel.send(e.message);
+	} catch (e) {
+		CatchError(e, channel);
 	}
 }
 
@@ -45,7 +44,7 @@ export async function RolesByMembershipId(channel, membership) {
 		clanMember.FetchDiscordMember(channel.guild);
 
 		await GetShowAndSetRoles(clanMember, channel);
-	} catch (e){
+	} catch (e) {
 		CatchError(e, channel);
 	}
 }
@@ -76,7 +75,7 @@ async function GetRolesData(membershipType, membershipId) {
 		legacy_triumphs: {},
 		season: {},
 		extra: {
-			legacy:{}
+			legacy: {}
 		}
 	};
 	var characterDetails = BungieApiLogic.get_character_details(response);
