@@ -72,24 +72,6 @@ export class CommandManager {
             embed.addField("Guildmaster", guildmaster.filter((_, i) => i < 2*guildmaster.length / 3 && i >= guildmaster.length / 3).join("\n"), true)
             embed.addField("Guildmaster", guildmaster.filter((_, i) => i >= 2*guildmaster.length / 3).join("\n"), true)
         }
-            if (command.name != "") {
-                //var commandName = command.name.length > 2 ? command.name.slice(0, 2) + "▓".repeat(command.name.length-2) : command.name;
-                line += command.name;
-                switch (command.rights) {
-                    case "restricted":
-                        restricted.push(line);
-                        break;
-                    case "guildmaster":
-                        guildmaster.push(line);
-                        break;
-                }
-            }
-        });
-        embed.addField("Git log", gitLog.replace(/'/g, '`'))
-        embed.addField("Destiny API Status", apiAlerts.ErrorStatus)
-        embed.addField("Restricted", restricted.join("\n"), true)
-        embed.addField("Guildmaster", guildmaster.filter((_, i) => i < guildmaster.length / 2).join("\n"), true)
-        embed.addField("Guildmaster", guildmaster.filter((_, i) => i >= guildmaster.length / 2).join("\n"), true)
         return embed;
     }
     static GetRestrictedHelp() {
@@ -135,9 +117,6 @@ export class CommandManager {
         return this.CheckRights(commandName, 'developer');
     }
     static Init() {
-        this.AddCommand("developer", 0, "status", "!status", "статус команд;", async function (args, message) {
-            message.channel.send(await CommandManager.GetStatus());
-        });
         this.AddCommand("developer", 0, "oauth2", "!oauth2", "выслать команду авторизации;", function (args, message) {
             message.channel.send(`https://www.bungie.net/ru/OAuth/Authorize?response_type=code&client_id=${config.d2clientId}&state=12345`);
         });
@@ -189,6 +168,9 @@ export class CommandManager {
         this.AddCommand("restricted", 0, "record", "!record TRIUMPH_HASH", "отобразить стражей клана, получивших конкретный триумф или предмет;", function (args, message) { 
             ShowRecordStat(message.channel, args.length > 1 ? args[1] : null)
         });
+        this.AddCommand("restricted", 0, "status", "!status", "статус бота;", async function (args, message) {
+            message.channel.send(await CommandManager.GetStatus());
+        });
         this.AddCommand("restricted", 0, "toptriumphs", "!triumphs", "топ 15 стражей клана по очкам триумфов текстом;", function (args, message) { 
             ShowTopTriumphScore(message.channel, args.length > 1 ? true : false);
         });
@@ -227,6 +209,9 @@ export class CommandManager {
         });
         this.AddCommand("guildmaster", 0, "gmhelp", "!gmhelp", "список доступных ГМ-ских команд;", function (args, message) {
             message.channel.send(CommandManager.GetRestrictedHelp());
+        });
+        this.AddCommand("guildmaster", 0, "gmstatus", "!gmstatus", "статус с учетом гм-ских команд;", async function (args, message) {
+            message.channel.send(await CommandManager.GetStatus(true));
         });
         this.AddCommand("guildmaster", 0, "membertime", "!membertime @DiscrordTag %days%", "выборка активности стража;\n_по умолчанию — 7 дней_;", function (args, message) {
             GetClanMemberOnlineTime(message, (args.length > 2 ? args[2] : 7), (args.length > 1 ? args[1] : message.member.id), true)
