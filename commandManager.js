@@ -62,7 +62,7 @@ export class CommandManager {
             .addField("Git log", "```" + gitLog.replace(/'/g, '') + "```")
             .addField("Destiny API Status", apiAlerts.ErrorStatus)
 
-        var restricted = this.commandList.filter(c => c.rights == "restricted" && c.name != "").map(c => this.GetEmojiStatus(c.status) + " " + c.name);
+        var restricted = this.commandList.filter(c => c.rights == "restricted" && c.name != "").map(c => this.GetEmojiStatus(c) + " " + c.name);
         embed.addField("Command list", restricted.filter((_, i) => i < restricted.length / 3).join("\n"), true)
         embed.addField('\u200B', restricted.filter((_, i) => i < 2*restricted.length / 3 && i >= restricted.length / 3).join("\n"), true)
         embed.addField('\u200B', restricted.filter((_, i) => i >= 2*restricted.length / 3).join("\n"), true)
