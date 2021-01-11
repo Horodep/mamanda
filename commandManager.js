@@ -58,7 +58,7 @@ export class CommandManager {
             .setAuthor(nodePackage.name + " " + nodePackage.version)
             .setColor(0x11de1b)//0x00AE86
             .setDescription("[Issues tracker](https://github.com/Horodep/mamanda-issues-tracker/issues)")
-            .addField("Git log", gitLog.replace(/'/g, '`'))
+            .addField("Git log", "```" + gitLog.replace(/'/g, '') + "```")
             .addField("Destiny API Status", apiAlerts.ErrorStatus)
 
         var restricted = this.commandList.filter(c => c.rights == "restricted" && c.name != "").map(c => this.GetEmojiStatus(c.status) + " " + c.name);
