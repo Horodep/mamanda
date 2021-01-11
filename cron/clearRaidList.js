@@ -7,14 +7,14 @@ const client = new Discord.Client({ partials: ['MESSAGE', 'CHANNEL', 'REACTION']
 client.login(config.credentials.discordApiKey);
 
 client.on("ready", () => {
-    try{
+    try {
         FetchDefaultCatchErrorChannel(client);
         ClearRaidList(client);
-        setTimeout(function(){
+        setTimeout(() => {
             client.destroy();
             process.exit();
         }, 5000);
-    }catch(e){
+    } catch (e) {
         CatchError(e);
     }
 });

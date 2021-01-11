@@ -9,7 +9,7 @@ client.login(config.credentials.discordApiKey);
 client.on("ready", () => {
 	FetchDefaultCatchErrorChannel(client);
     PublishDailyMessage(client);
-    setTimeout(function(){
+    setTimeout(() => {
         client.destroy();
         process.exit();
     }, 1500);
