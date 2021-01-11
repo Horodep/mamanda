@@ -24,11 +24,12 @@ export class CommandManager {
             CatchError(e, message.channel);
         }
     }
-    static AddCommand(rights, status, name, title, description, callback) {
+    static AddCommand(rights, status, apiDependency, name, title, description, callback) {
         this.commandList.push({
             name: name,
             rights: rights,
             status: status,
+            apiDependency: apiDependency,
             title: title,
             description: description,
             callback: callback
@@ -38,8 +39,8 @@ export class CommandManager {
         var foundCommands = this.commandList.filter(c => c.name === commandName);
         return foundCommands.length > 0 ? foundCommands[0] : null;
     }
-    static GetEmojiStatus(status) {
-        switch (status) {
+    static GetEmojiStatus(command, apiAlerts) {
+        switch (command.status) {
             case 0:
                 return "<:yes:769922757592612874>";
             case 1:
@@ -117,142 +118,142 @@ export class CommandManager {
         return this.CheckRights(commandName, 'developer');
     }
     static Init() {
-        this.AddCommand("developer", 0, "oauth2", "!oauth2", "выслать команду авторизации;", function (args, message) {
+        this.AddCommand("developer", 0, false, "oauth2", "!oauth2", "выслать команду авторизации;", function (args, message) {
             message.channel.send(`https://www.bungie.net/ru/OAuth/Authorize?response_type=code&client_id=${config.d2clientId}&state=12345`);
         });
-        this.AddCommand("developer", 0, "code", "!code", "сохранить код авторизации;", function (args, message) {
+        this.AddCommand("developer", 0, false, "code", "!code", "сохранить код авторизации;", function (args, message) {
             newAuthToken(args[1]);
         });
 
 
-        this.AddCommand("common", 0, "ping", "!ping", "testing functionality", function (args, message) {
+        this.AddCommand("common", 0, false, "ping", "!ping", "testing functionality", function (args, message) {
             message.channel.send('pong ' + args[0]);
         });
-        this.AddCommand("common", 0, "rand", "!rand", "отправить рандомный эмоджик", function (args, message) {
+        this.AddCommand("common", 0, false, "rand", "!rand", "отправить рандомный эмоджик", function (args, message) {
             message.channel.send(emoji.random().emoji);
         });
-        this.AddCommand("common", 0, "clown", "!clown", "отправить клоуна", function (args, message) {
+        this.AddCommand("common", 0, false, "clown", "!clown", "отправить клоуна", function (args, message) {
             message.channel.send('🤡');
         });
 
-        this.AddCommand("restricted", 0, "cap", "!cap NUMBER", "ограничение комнаты до NUMBER мест;", function (args, message) {
+        this.AddCommand("restricted", 0, false, "cap", "!cap NUMBER", "ограничение комнаты до NUMBER мест;", function (args, message) {
             ChangeChannelCap(message, (args.length > 1 ? args[1] : 0));
         });
-        this.AddCommand("restricted", 0, "help", "!help", "список доступных команд;", function (args, message) {
+        this.AddCommand("restricted", 0, false, "help", "!help", "список доступных команд;", function (args, message) {
             if (args.length == 1) message.channel.send(CommandManager.GetRestrictedHelp());
         });
-        this.AddCommand("restricted", 0, "invitefriend", "!invitefriend @DiscordTag", "выдача роли 'Странник' вместо роли 'Очередь';\n_доступна опытным стражам_;", function (args, message) {
+        this.AddCommand("restricted", 0, false, "invitefriend", "!invitefriend @DiscordTag", "выдача роли 'Странник' вместо роли 'Очередь';\n_доступна опытным стражам_;", function (args, message) {
             InviteFriend(message, (args.length > 1 ? args[1] : ""));
         });
-        this.AddCommand("restricted", 0, "medals", "!medals", "стражи с большим количеством медалей;", function (args, message) {
+        this.AddCommand("restricted", 0, false, "medals", "!medals", "стражи с большим количеством медалей;", function (args, message) {
             ClanMedalsSummary(message.channel);
         });
-        this.AddCommand("restricted", 0, "mymt", "!mymt", "проверка активности стража в голосовом чате (только своей);", function (args, message) {
+        this.AddCommand("restricted", 0, true, "mymt", "!mymt", "проверка активности стража в голосовом чате (только своей);", function (args, message) {
             GetClanMemberOnlineTime(message, (args.length > 1 ? args[1] : 7));
         });
-        this.AddCommand("restricted", 0, "myraids", "!myraids", "список рейдов, в которые записался страж;", function (args, message) {
+        this.AddCommand("restricted", 0, false, "myraids", "!myraids", "список рейдов, в которые записался страж;", function (args, message) {
             GetPlannedRaids(message, args.length > 1 ? args[1] : message.author.id)
         });
-        this.AddCommand("restricted", 0, "region", "!region", "смена региона сервера;", function (args, message) {
+        this.AddCommand("restricted", 0, false, "region", "!region", "смена региона сервера;", function (args, message) {
             ChangeRegion(message);
         });
-        this.AddCommand("restricted", 2, "rl", "!rl / !rl @DiscordTag", "отчет по стражу на пригодность в качестве наставника;", function (args, message) { 
+        this.AddCommand("restricted", 2, true, "rl", "!rl / !rl @DiscordTag", "отчет по стражу на пригодность в качестве наставника;", function (args, message) { 
             //raidleader.rl(message.channel, (args.length > 1 ? args[1] : message.member.user.id), (args.length > 2 ? args[2] : 7));	break;
         });
-        this.AddCommand("restricted", 0, "roles", "!roles / !roles @DiscordTag", "отображение и выдача стражу заслуженных медалей;", function (args, message) {
+        this.AddCommand("restricted", 0, true, "roles", "!roles / !roles @DiscordTag", "отображение и выдача стражу заслуженных медалей;", function (args, message) {
             Roles(message, args);
         });
-        this.AddCommand("restricted", 0, "roles id:", "!roles id:type/id", "отображение и выдача заслуженных медалей по bungie id;", function (args, message) {
+        this.AddCommand("restricted", 0, true, "roles id:", "!roles id:type/id", "отображение и выдача заслуженных медалей по bungie id;", function (args, message) {
             Roles(message, args);
         });
-        this.AddCommand("restricted", 0, "record", "!record TRIUMPH_HASH", "отобразить стражей клана, получивших конкретный триумф или предмет;", function (args, message) { 
+        this.AddCommand("restricted", 0, true, "record", "!record TRIUMPH_HASH", "отобразить стражей клана, получивших конкретный триумф или предмет;", function (args, message) { 
             ShowRecordStat(message.channel, args.length > 1 ? args[1] : null)
         });
-        this.AddCommand("restricted", 0, "status", "!status", "статус бота;", async function (args, message) {
+        this.AddCommand("restricted", 0, false, "status", "!status", "статус бота;", async function (args, message) {
             message.channel.send(await CommandManager.GetStatus());
         });
-        this.AddCommand("restricted", 0, "toptriumphs", "!triumphs", "топ 15 стражей клана по очкам триумфов текстом;", function (args, message) { 
+        this.AddCommand("restricted", 0, true, "toptriumphs", "!triumphs", "топ 15 стражей клана по очкам триумфов текстом;", function (args, message) { 
             ShowTopTriumphScore(message.channel, args.length > 1 ? true : false);
         });
-        this.AddCommand("restricted", 0, "toptriumphs img", "!triumphs gimmeimageplz", "топ 15 стражей клана по очкам триумфов графиком;", function (args, message) { });
-        this.AddCommand("restricted", 0, "сбор", "!сбор ДД.ММ ЧЧ:ММ название активности, комментарии", "создание сбора на активность на 6 человек;", function (args, message) {
+        this.AddCommand("restricted", 0, true, "toptriumphs img", "!triumphs gimmeimageplz", "топ 15 стражей клана по очкам триумфов графиком;", function (args, message) { });
+        this.AddCommand("restricted", 0, false, "сбор", "!сбор ДД.ММ ЧЧ:ММ название активности, комментарии", "создание сбора на активность на 6 человек;", function (args, message) {
             CreateRaid(message, args);
         });
-        this.AddCommand("restricted", 0, "", "!сбор ДД.ММ ЧЧ:ММ [N] название активности, комментарии", "создание сбора на активность на N человек;", function (args, message) { });
+        this.AddCommand("restricted", 0, false, "", "!сбор ДД.ММ ЧЧ:ММ [N] название активности, комментарии", "создание сбора на активность на N человек;", function (args, message) { });
 
 
-        this.AddCommand("guildmaster", 2, "checksync", "!______________", "_______________;", function (args, message) { });
-        this.AddCommand("guildmaster", 0, "ck", "", "", function (args, message) {
+        this.AddCommand("guildmaster", 2, false, "checksync", "!______________", "_______________;", function (args, message) { });
+        this.AddCommand("guildmaster", 0, true, "ck", "", "", function (args, message) {
             ClanTime(message.channel, (args.length > 1 ? args[1] : 7), 'full');
         });
-        this.AddCommand("guildmaster", 0, "clankick", "!clankick %days%", "выборка активности малоактивных стражей;\n_по умолчанию — 7 дней_;", function (args, message) {
+        this.AddCommand("guildmaster", 0, true, "clankick", "!clankick %days%", "выборка активности малоактивных стражей;\n_по умолчанию — 7 дней_;", function (args, message) {
             ClanTime(message.channel, (args.length > 1 ? args[1] : 7), 'full');
         });
-        this.AddCommand("guildmaster", 0, "ckp", "", "", function (args, message) {
+        this.AddCommand("guildmaster", 0, true, "ckp", "", "", function (args, message) {
             ClanTime(message.channel, (args.length > 1 ? args[1] : 7));
         });
-        this.AddCommand("guildmaster", 0, "clankickpub", "!clankickpub %days%", "выборка активности **самых** малоактивных стражей;\n_по умолчанию — 7 дней_;", function (args, message) {
+        this.AddCommand("guildmaster", 0, true, "clankickpub", "!clankickpub %days%", "выборка активности **самых** малоактивных стражей;\n_по умолчанию — 7 дней_;", function (args, message) {
             ClanTime(message.channel, (args.length > 1 ? args[1] : 7));
         });
-        this.AddCommand("guildmaster", 0, "copy", "!copy", "ручной запуск переноса в архив старых сборов рейдов;", function (args, message) { 
+        this.AddCommand("guildmaster", 0, false, "copy", "!copy", "ручной запуск переноса в архив старых сборов рейдов;", function (args, message) { 
             ClearRaidList(message.client);
          });
-        this.AddCommand("guildmaster", 0, "csr", "!csr", "ручной запуск выдачи ролей всему клану;", function (args, message) {
+        this.AddCommand("guildmaster", 0, true, "csr", "!csr", "ручной запуск выдачи ролей всему клану;", function (args, message) {
             SetRoles(message.guild);
         });
-        this.AddCommand("guildmaster", 2, "engreset", "!engreset", "генерация ссылок на англоязычные изображения еженедельного ресета в текущий канал;", function (args, message) { });
-        this.AddCommand("guildmaster", 0, "forum", "!forum LINKTEXT", "опубликовать объявление о наборе в канал новостей;", function (args, message) { 
+        this.AddCommand("guildmaster", 2, false, "engreset", "!engreset", "генерация ссылок на англоязычные изображения еженедельного ресета в текущий канал;", function (args, message) { });
+        this.AddCommand("guildmaster", 0, false, "forum", "!forum LINKTEXT", "опубликовать объявление о наборе в канал новостей;", function (args, message) { 
             SaveForumLinkAndPublish(message.content.slice(7), message.client);
         });
-        this.AddCommand("guildmaster", 0, "forumtime", "!forumtime", "выдать всем стражам роли перед объявлением о наборе;", function (args, message) { 
+        this.AddCommand("guildmaster", 0, false, "forumtime", "!forumtime", "выдать всем стражам роли перед объявлением о наборе;", function (args, message) { 
             GiveForumRole(message);
         });
-        this.AddCommand("guildmaster", 0, "gmhelp", "!gmhelp", "список доступных ГМ-ских команд;", function (args, message) {
+        this.AddCommand("guildmaster", 0, false, "gmhelp", "!gmhelp", "список доступных ГМ-ских команд;", function (args, message) {
             message.channel.send(CommandManager.GetRestrictedHelp());
         });
-        this.AddCommand("guildmaster", 0, "gmstatus", "!gmstatus", "статус с учетом гм-ских команд;", async function (args, message) {
+        this.AddCommand("guildmaster", 0, false, "gmstatus", "!gmstatus", "статус с учетом гм-ских команд;", async function (args, message) {
             message.channel.send(await CommandManager.GetStatus(true));
         });
-        this.AddCommand("guildmaster", 0, "membertime", "!membertime @DiscrordTag %days%", "выборка активности стража;\n_по умолчанию — 7 дней_;", function (args, message) {
+        this.AddCommand("guildmaster", 0, true, "membertime", "!membertime @DiscrordTag %days%", "выборка активности стража;\n_по умолчанию — 7 дней_;", function (args, message) {
             GetClanMemberOnlineTime(message, (args.length > 2 ? args[2] : 7), (args.length > 1 ? args[1] : message.member.id), true)
         });
-        this.AddCommand("guildmaster", 0, "message", "!message channel_id текст", "отправить сообщение в канал;", function (args, message) {
+        this.AddCommand("guildmaster", 0, false, "message", "!message channel_id текст", "отправить сообщение в канал;", function (args, message) {
             SendCustomMessage(message.client, args);
         });
-        this.AddCommand("guildmaster", 0, "n", "!n", "список новичков в клане;", function (args, message) {
+        this.AddCommand("guildmaster", 0, false, "n", "!n", "список новичков в клане;", function (args, message) {
             ShowNewbieList(message);
         });
-        this.AddCommand("guildmaster", 0, "nicknames", "!nicknames", "проверка никнеймов стражей;", function (args, message) {
+        this.AddCommand("guildmaster", 0, true, "nicknames", "!nicknames", "проверка никнеймов стражей;", function (args, message) {
             Nicknames(message.channel);
         });
-        this.AddCommand("guildmaster", 0, "pmspam", "!pmspam", "спам говном в личку по роли;", function (args, message) {
+        this.AddCommand("guildmaster", 0, false, "pmspam", "!pmspam", "спам говном в личку по роли;", function (args, message) {
             SendPrivateMessageByRole(message.guild, args);
         });
-        this.AddCommand("guildmaster", 0, "pvpdrop", "!pvpdrop", "снять все пвп роли;", function (args, message) { 
+        this.AddCommand("guildmaster", 0, false, "pvpdrop", "!pvpdrop", "снять все пвп роли;", function (args, message) { 
             DropPvpRole(message.guild);
         });
-        this.AddCommand("guildmaster", 0, "q", "!q", "список стражей в очереди;", function (args, message) {
+        this.AddCommand("guildmaster", 0, false, "q", "!q", "список стражей в очереди;", function (args, message) {
             ShowQueueList(message);
         });
-        this.AddCommand("guildmaster", 0, "qq", "!qq", "список анкет стражей в очереди;", function (args, message) {
+        this.AddCommand("guildmaster", 0, false, "qq", "!qq", "список анкет стражей в очереди;", function (args, message) {
             ShowQueueReqestsList(message);
         });
-        this.AddCommand("guildmaster", 0, "raidadd", "!raidadd message_id member_id", "добавление в рейд стража;", function (args, message) { 
+        this.AddCommand("guildmaster", 0, false, "raidadd", "!raidadd message_id member_id", "добавление в рейд стража;", function (args, message) { 
             ForcedAddRaidMember(message, args);
         });
-        this.AddCommand("guildmaster", 0, "raidkick", "!raidkick message_id member_id", "исключение из рейда стража, пример: https://media.discordapp.net/attachments/515244455033438209/626795525710020638/unknown.png;", function (args, message) { 
+        this.AddCommand("guildmaster", 0, false, "raidkick", "!raidkick message_id member_id", "исключение из рейда стража, пример: https://media.discordapp.net/attachments/515244455033438209/626795525710020638/unknown.png;", function (args, message) { 
             ForcedRemoveRaidMember(message, args);
         });
-        this.AddCommand("guildmaster", 2, "reset", "!reset", "генерация текстового еженедельного ресета в текущий канал;", function (args, message) { });
-        this.AddCommand("guildmaster", 0, "setmaxtriumphs", "!setmaxtriumphs NUMBER", "обновить значение максимального количества триумфов;", function (args, message) { 
+        this.AddCommand("guildmaster", 2, true, "reset", "!reset", "генерация текстового еженедельного ресета в текущий канал;", function (args, message) { });
+        this.AddCommand("guildmaster", 0, false, "setmaxtriumphs", "!setmaxtriumphs NUMBER", "обновить значение максимального количества триумфов;", function (args, message) { 
             SetMaximumTriumphsScore(message, args);
         });
-        this.AddCommand("guildmaster", 0, "size", "!size", "количество стражей в составах;", function (args, message) {
+        this.AddCommand("guildmaster", 0, true, "size", "!size", "количество стражей в составах;", function (args, message) {
             ClanSize().then(value => message.channel.send(value));
         });
-        this.AddCommand("guildmaster", 2, "sync", "!______________", "_______________;", function (args, message) { });
-        this.AddCommand("guildmaster", 2, "watermelon", "!watermelon @DiscrordTag", "проверка стража на абуз;", function (args, message) { });
-        this.AddCommand("guildmaster", 2, "xur", "!xur", "геренация изображения товаров Зура в текущий канал;", function (args, message) { });
+        this.AddCommand("guildmaster", 2, false, "sync", "!______________", "_______________;", function (args, message) { });
+        this.AddCommand("guildmaster", 2, true, "watermelon", "!watermelon @DiscrordTag", "проверка стража на абуз;", function (args, message) { });
+        this.AddCommand("guildmaster", 2, true, "xur", "!xur", "геренация изображения товаров Зура в текущий канал;", function (args, message) { });
     }
 }
 
