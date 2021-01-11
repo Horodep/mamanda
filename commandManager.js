@@ -38,7 +38,17 @@ export class CommandManager {
         var foundCommands = this.commandList.filter(c => c.name === commandName);
         return foundCommands.length > 0 ? foundCommands[0] : null;
     }
-    static async GetStatus() {
+    static GetEmojiStatus(status) {
+        switch (status) {
+            case 0:
+                return "<:yes:769922757592612874>";
+            case 1:
+                return "<:reload:781107772224962561>";
+            default:
+                return "<:no:769922772549632031>";
+        }
+    }
+    static async GetStatus(isGuildmaster) {
         var apiAlerts = await GetGlobalAlerts();
         const gitLogRequest = "git log $(git describe --abbrev=0 --tags $(git describe --abbrev=0)^)..HEAD --oneline --format='%s'";
         const gitSaveLogRequest = process.platform == "win32" ? "git log -n5 --oneline --format='%s'" : gitLogRequest;
@@ -48,21 +58,20 @@ export class CommandManager {
             .setAuthor(nodePackage.name + " " + nodePackage.version)
             .setColor(0x11de1b)//0x00AE86
             .setDescription("[Issues tracker](https://github.com/Horodep/mamanda-issues-tracker/issues)")
-        var restricted = [];
-        var guildmaster = [];
-        this.commandList.forEach(command => {
-            var line = "";
-            switch (command.status) {
-                case 0:
-                    line += "<:yes:769922757592612874> ";
-                    break;
-                case 1:
-                    line += "<:reload:781107772224962561> ";
-                    break;
-                default:
-                    line += "<:no:769922772549632031> ";
-                    break;
-            }
+            .addField("Git log", gitLog.replace(/'/g, '`'))
+            .addField("Destiny API Status", apiAlerts.ErrorStatus)
+
+        var restricted = this.commandList.filter(c => c.rights == "restricted" && c.name != "").map(c => this.GetEmojiStatus(c.status) + " " + c.name);
+        embed.addField("Restricted", restricted.filter((_, i) => i < restricted.length / 3).join("\n"), true)
+        embed.addField("Restricted", restricted.filter((_, i) => i < 2*restricted.length / 3 && i >= restricted.length / 3).join("\n"), true)
+        embed.addField("Restricted", restricted.filter((_, i) => i >= 2*restricted.length / 3).join("\n"), true)
+
+        if(isGuildmaster){
+            var guildmaster = this.commandList.filter(c => c.rights == "guildmaster" && c.name != "").map(c => this.GetEmojiStatus(c.status) + " " + c.name);
+            embed.addField("Guildmaster", guildmaster.filter((_, i) => i < guildmaster.length / 3).join("\n"), true)
+            embed.addField("Guildmaster", guildmaster.filter((_, i) => i < 2*guildmaster.length / 3 && i >= guildmaster.length / 3).join("\n"), true)
+            embed.addField("Guildmaster", guildmaster.filter((_, i) => i >= 2*guildmaster.length / 3).join("\n"), true)
+        }
             if (command.name != "") {
                 //var commandName = command.name.length > 2 ? command.name.slice(0, 2) + "▓".repeat(command.name.length-2) : command.name;
                 line += command.name;
