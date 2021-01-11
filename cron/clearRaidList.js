@@ -13,7 +13,7 @@ client.on("ready", () => {
         setTimeout(() => {
             client.destroy();
             process.exit();
-        }, 5000);
+        }, 18000);
     } catch (e) {
         CatchError(e);
     }
