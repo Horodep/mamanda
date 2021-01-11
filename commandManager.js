@@ -57,20 +57,20 @@ export class CommandManager {
         var embed = new MessageEmbed()
             .setAuthor(nodePackage.name + " v" + nodePackage.version)
             .setColor(0x11de1b)//0x00AE86
-            .setDescription("[Issues tracker](https://github.com/Horodep/mamanda-issues-tracker/issues)")
+            .setDescription("[баг-трекер](https://github.com/Horodep/mamanda-issues-tracker/issues)")
             .addField("Git log", "```" + gitLog.replace(/'/g, '') + "```")
             .addField("Destiny API Status", apiAlerts.ErrorStatus)
 
         var restricted = this.commandList.filter(c => c.rights == "restricted" && c.name != "").map(c => this.GetEmojiStatus(c.status) + " " + c.name);
-        embed.addField("Restricted", restricted.filter((_, i) => i < restricted.length / 3).join("\n"), true)
-        embed.addField("Restricted", restricted.filter((_, i) => i < 2*restricted.length / 3 && i >= restricted.length / 3).join("\n"), true)
-        embed.addField("Restricted", restricted.filter((_, i) => i >= 2*restricted.length / 3).join("\n"), true)
+        embed.addField("Command list", restricted.filter((_, i) => i < restricted.length / 3).join("\n"), true)
+        embed.addField('\u200B', restricted.filter((_, i) => i < 2*restricted.length / 3 && i >= restricted.length / 3).join("\n"), true)
+        embed.addField('\u200B', restricted.filter((_, i) => i >= 2*restricted.length / 3).join("\n"), true)
 
         if(isGuildmaster){
             var guildmaster = this.commandList.filter(c => c.rights == "guildmaster" && c.name != "").map(c => this.GetEmojiStatus(c.status) + " " + c.name);
             embed.addField("Guildmaster", guildmaster.filter((_, i) => i < guildmaster.length / 3).join("\n"), true)
-            embed.addField("Guildmaster", guildmaster.filter((_, i) => i < 2*guildmaster.length / 3 && i >= guildmaster.length / 3).join("\n"), true)
-            embed.addField("Guildmaster", guildmaster.filter((_, i) => i >= 2*guildmaster.length / 3).join("\n"), true)
+            embed.addField('\u200B', guildmaster.filter((_, i) => i < 2*guildmaster.length / 3 && i >= guildmaster.length / 3).join("\n"), true)
+            embed.addField('\u200B', guildmaster.filter((_, i) => i >= 2*guildmaster.length / 3).join("\n"), true)
         }
         return embed;
     }
