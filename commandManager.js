@@ -40,6 +40,7 @@ export class CommandManager {
         return foundCommands.length > 0 ? foundCommands[0] : null;
     }
     static GetEmojiStatus(command, apiAlerts) {
+        if (command.apiDependency == true && apiAlerts.ErrorCode != 1) return "<:reload:781107772224962561>";
         switch (command.status) {
             case 0:
                 return "<:yes:769922757592612874>";
@@ -62,13 +63,13 @@ export class CommandManager {
             .addField("Git log", "```" + gitLog.replace(/'/g, '') + "```")
             .addField("Destiny API Status", apiAlerts.ErrorStatus)
 
-        var restricted = this.commandList.filter(c => c.rights == "restricted" && c.name != "").map(c => this.GetEmojiStatus(c) + " " + c.name);
+        var restricted = this.commandList.filter(c => c.rights == "restricted" && c.name != "").map(c => this.GetEmojiStatus(c, apiAlerts) + " " + c.name);
         embed.addField("Command list", restricted.filter((_, i) => i < restricted.length / 3).join("\n"), true)
         embed.addField('\u200B', restricted.filter((_, i) => i < 2*restricted.length / 3 && i >= restricted.length / 3).join("\n"), true)
         embed.addField('\u200B', restricted.filter((_, i) => i >= 2*restricted.length / 3).join("\n"), true)
 
         if(isGuildmaster){
-            var guildmaster = this.commandList.filter(c => c.rights == "guildmaster" && c.name != "").map(c => this.GetEmojiStatus(c.status) + " " + c.name);
+            var guildmaster = this.commandList.filter(c => c.rights == "guildmaster" && c.name != "").map(c => this.GetEmojiStatus(c, apiAlerts) + " " + c.name);
             embed.addField("Guildmaster", guildmaster.filter((_, i) => i < guildmaster.length / 3).join("\n"), true)
             embed.addField('\u200B', guildmaster.filter((_, i) => i < 2*guildmaster.length / 3 && i >= guildmaster.length / 3).join("\n"), true)
             embed.addField('\u200B', guildmaster.filter((_, i) => i >= 2*guildmaster.length / 3).join("\n"), true)
