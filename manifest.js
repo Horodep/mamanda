@@ -19,11 +19,13 @@ export class ManifestManager {
     }
 
     static GetRecordData(triumphHash) {
-        var manifest = JSON.parse(fs.readFileSync('./.data/destiny2.json'));
+        var directory = config.credentials.directory ?? "./";
+        var manifest = JSON.parse(fs.readFileSync(directory + '.data/destiny2.json'));
         return manifest?.Record[triumphHash]?.displayProperties; // name, icon, description
     }
     static GetItemData(itemHash) {
-        var manifest = JSON.parse(fs.readFileSync('./.data/destiny2.json'));
+        var directory = config.credentials.directory ?? "./";
+        var manifest = JSON.parse(fs.readFileSync(directory + '.data/destiny2.json'));
         return manifest?.InventoryItem[itemHash]?.displayProperties; // name, icon, description
     }
 }
