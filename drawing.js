@@ -1,74 +1,134 @@
-import maxtriumphs from "./.data/maxtriumphs.json";
+import maxtriumphs from "./.data/maxtriumphs.json"; //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+import config from "./config.json";
 import jimp from "jimp";
 import fs from "fs";
+import fetch from "node-fetch";
 import { CatchError } from "./catcherror.js";
+import { GetXur } from "./bungieApi.js";
+import { ManifestManager } from "./manifest.js";
+import { RefreshAuthToken } from "./httpCore.js";
 
-export async function DrawTriumphs(members, channel){
-    try{
+export async function DrawTriumphs(members, channel) {
+    try {
         var directory = config.credentials.directory ?? "./";
         var top = members
             .sort((a, b) => (a.activeScore > b.activeScore ? -1 : 1))
             .filter((_, i) => i < 15);
         var min = top[top.length - 1].activeScore - 100;
-        var delta = maxtriumphs-min;
+        var delta = maxtriumphs - min;
 
-        var image = await jimp.read(directory+'.data/templates/bg.png');
+        var image = await jimp.read(directory + '.data/templates/bg.png');
         for (var i = 0; i < top.length; i++) {
-            image = await DrawText(image, 10, 20 + 17*i-5, directory+'.data/fonts/calibri_light_22.fnt', top[i].displayName);
-            image = await DrawText(image, 130, 20 + 17*i-5, directory+'.data/fonts/calibri_light_22.fnt', top[i].activeScore);
-            image = await DrawWhiteRectangle(image, 185, 20 + (12+5)*i, ((top[i].activeScore-min)*170)/delta, 12);
+            await DrawText(image, 10, 20 + 17 * i - 5, directory + '.data/fonts/calibri_light_22.fnt', top[i].displayName);
+            await DrawText(image, 130, 20 + 17 * i - 5, directory + '.data/fonts/calibri_light_22.fnt', top[i].activeScore);
+            await DrawWhiteRectangle(image, 185, 20 + (12 + 5) * i, ((top[i].activeScore - min) * 170) / delta, 12);
         }
 
-        image.write(directory+'.data/images/toptriumphs.png');
-        channel.send("", {files: [directory+'.data/images/toptriumphs.png']});
-    }catch(e){
+        image.write(directory + '.data/images/toptriumphs.png');
+        channel.send("", { files: [directory + '.data/images/toptriumphs.png'] });
+    } catch (e) {
         CatchError(e);
     }
 }
 
-function WIP_CacheImageToDisk(mainImage, x, y, resize, url, hash) {
-    var fullUrl = 'https://www.bungie.net' + url;
-    var filename = '/.data/images/' + hash + '.png';
-    var images = {};
+export async function Xur(channel) {
+    try {
+        await RefreshAuthToken();
+        var directory = config.credentials.directory ?? "./";
+        // 1. refresh manifest
+        var data = await GetXur();
+        var sales = data.Response.sales.data;
+        var allStats = data.Response.itemComponents.stats.data;
+        var vendorItemIndexes = Object.keys(allStats);
 
-    toload++;
-    request.head(fullUrl, function (err, res, body) {
-        request(fullUrl).pipe(fs.createWriteStream(filename))
-            .on('close', function () {
-                jimp.read(filename)
-                    .then(function (image) {
-                        images[hash] = image;
-                        if (resize != 0) images[hash].resize(resize, jimp.AUTO);
-                    })
-                    .then(function (image) {
-                        mainImage.composite(images[hash], x, y)
-                    })
-                    .then(() => mainImage)
-            });
-    });
+        const box_coords = [
+            { x: 280, y: 126 },
+            { x: 10, y: 10 },
+            { x: 10, y: 126 },
+            { x: 280, y: 10 }
+        ];
+
+        const statHashes = [
+            2996146975,
+            392767087,
+            1943323491,
+            1735777505,
+            144602215,
+            4244567218
+        ];
+
+        const left_margin = 130;
+        const line_height = 12;
+        const line_spacing = 5;
+
+        var image = await jimp.read(directory + '.data/templates/xur.png');
+        for (var i = 0; i < vendorItemIndexes.length; i++) {
+            var vendorItemIndex = vendorItemIndexes[i];
+            var stats = allStats[vendorItemIndex].stats;
+            var item = sales[vendorItemIndex];
+            var itemImageUrl = ManifestManager.GetItemData(item.itemHash)?.icon;
+            var itemImage = await CacheOrGetImage(item.itemHash, itemImageUrl);
+
+            await DrawImage(image, box_coords[i].x, box_coords[i].y, 0, itemImage);
+
+            if (!stats[statHashes[0]]) continue;
+            for (var k = 0; k < 6; k++) {
+                var stat = stats[statHashes[k]].value;
+
+                var left = box_coords[i].x + left_margin;
+                var top = box_coords[i].y + (line_height + line_spacing) * k;
+                var space = stat < 10 ? 9 : 0;
+
+                await DrawText(image, left - 24 + space, top - 5,
+                    directory + '.data/fonts/calibri_light_22.fnt', stat);
+                await DrawWhiteRectangle(image,
+                    left, top, 4 * stat, line_height);
+            }
+            await DrawText(image,
+                box_coords[i].x + 235,
+                box_coords[i].y + (line_height + line_spacing) * 5 - 5,
+                directory + '.data/fonts/calibri_light_22.fnt',
+                statHashes.map(s => stats[s].value).reduce((a, b) => a + b, 0));
+
+        }
+        image.write(directory + '.data/images/xur_filled.png');
+        channel.send("Зур приехал", { files: [directory + '.data/images/xur_filled.png'] });
+    } catch (e) {
+        CatchError(e);
+    }
+}
+
+async function CacheOrGetImage(hash, img_url) {
+    var directory = config.credentials.directory ?? "./";
+    var filename = '.data/images/' + hash + '.png';
+
+    if (fs.existsSync(directory + filename)){
+        return (await jimp.read(directory + filename));
+    }else{
+        var url = 'https://www.bungie.net' + img_url;
+        var response = await fetch(url);
+        var buffer = await response.buffer();
+        fs.writeFile(directory + filename, buffer, () => {});
+        return jimp.read(buffer);
+    }
+}
+
+async function DrawImage(mainImage, x, y, resize, image) {
+    if (resize != 0) await image.resize(resize, jimp.AUTO)
+    await mainImage.composite(image, x, y);
 }
 
 async function DrawText(mainImage, x, y, font_url, text) {
-    return jimp
-        .loadFont(font_url)
-        .then((font) => { mainImage.print(font, x, y, text); })
-        .then(() => mainImage)
+    var font = await jimp.loadFont(font_url)
+    await mainImage.print(font, x, y, text);
 }
 
 async function DrawWhiteRectangle(mainImage, x, y, width, height) {
     var directory = config.credentials.directory ?? "./";
-    var filename = directory+'.data/templates/white.png';
-    var whiteImage;
-    return jimp
-        .read(filename)
-        .then(function (image) {
-            whiteImage = image;
-            whiteImage.resize(width, height);
-        })
-        .then(function (image) {
-            mainImage.composite(whiteImage, x, y)
-        })
-        .then(() => mainImage)
+    var filename = directory + '.data/templates/white.png';
+    var whiteImage = await jimp.read(filename);
+    await whiteImage.resize(width, height);
+    mainImage.composite(whiteImage, x, y);
 }
 
 

@@ -23,6 +23,7 @@
     "discord.js": "^12.5.1",
     "ffmpeg-static": "^3.0.0",
     "jimp": "^0.16.1",
+    "node-fetch": "^2.6.1",
     "opusscript": "0.0.6",
     "pg": "^8.5.1",
     "utf-8-validate": "^5.0.2",

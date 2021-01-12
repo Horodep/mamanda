@@ -1,8 +1,8 @@
 import { makeRequestWithPromise } from "./httpCore.js";
+import config from "./config.json";
 
 export async function GetGlobalAlerts() {
-	var result = await makeRequestWithPromise('GET', `https://www.bungie.net/Platform/GlobalAlerts/`);
-	return result;
+	return (await makeRequestWithPromise('GET', `https://www.bungie.net/Platform/GlobalAlerts/`));
 }
 
 export async function GetClanMembers(clanId) {
@@ -39,4 +39,16 @@ export async function GetActivitiesFromApi(membershipType, membershipId, charact
 		console.error("Rejected: " + responce.ErrorStatus + " id: " + membershipId);
 		return responce;
 	}
+}
+
+export async function GetVendor(vendorId, componentsArray){
+	var cred = config.credentials.game_defaults;
+	var components = componentsArray.join(",");
+	return (await makeRequestWithPromise('GET', 
+		`https://www.bungie.net/Platform/Destiny2/${cred.membershipType}/Profile/${cred.membershipId}/Character/${cred.characterId}/Vendors/${vendorId}/?components=${components}`,
+		true /*auth*/));
+}
+
+export async function GetXur(){
+	return await GetVendor(2190858386, [402,304]);
 }

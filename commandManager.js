@@ -1,16 +1,18 @@
 import { MessageEmbed } from "discord.js";
+import config from "./config.json";
 import nodePackage from "./package.json";
 import { GetGlobalAlerts } from "./bungieApi.js";
 import { execSync } from "child_process";
 import { DropPvpRole, GiveForumRole, SaveForumLinkAndPublish, SetMaximumTriumphsScore, ShowNewbieList, ShowQueueList, ShowQueueReqestsList } from "./discordGuildMasterFeatures.js"
 import { ClanSize, ClanTime, Nicknames, SetRoles, ShowRecordStat, ShowTopTriumphScore } from "./clan.js"
 import { Roles } from "./roles.js"
-import { newAuthToken } from "./httpCore.js"
+import { NewAuthToken } from "./httpCore.js"
 import { GetClanMemberOnlineTime } from "./clanMember.js";
 import { CatchError } from "./catcherror.js";
 import { InviteFriend, ChangeChannelCap, ChangeRegion, ClanMedalsSummary } from "./discordCommunityFeatures.js";
 import { SendCustomMessage, SendPrivateMessageByRole } from "./sendMessage.js";
 import { ClearRaidList, CreateRaid, ForcedAddRaidMember, ForcedRemoveRaidMember, GetPlannedRaids } from "./raid.js"
+import { Xur } from "./drawing.js";
 
 export class CommandManager {
     static commandList = [];
@@ -122,10 +124,10 @@ export class CommandManager {
     }
     static Init() {
         this.AddCommand("developer", 0, false, "oauth2", "!oauth2", "выслать команду авторизации;", function (args, message) {
-            message.channel.send(`https://www.bungie.net/ru/OAuth/Authorize?response_type=code&client_id=${config.d2clientId}&state=12345`);
+            message.channel.send(`https://www.bungie.net/ru/OAuth/Authorize?response_type=code&client_id=${config.credentials.client_id}&state=12345`);
         });
         this.AddCommand("developer", 0, false, "code", "!code", "сохранить код авторизации;", function (args, message) {
-            newAuthToken(args[1]);
+            NewAuthToken(args[1]);
         });
 
 
@@ -256,7 +258,9 @@ export class CommandManager {
         });
         this.AddCommand("guildmaster", 2, false, "sync", "!______________", "_______________;", function (args, message) { });
         this.AddCommand("guildmaster", 2, true, "watermelon", "!watermelon @DiscrordTag", "проверка стража на абуз;", function (args, message) { });
-        this.AddCommand("guildmaster", 2, true, "xur", "!xur", "геренация изображения товаров Зура в текущий канал;", function (args, message) { });
+        this.AddCommand("guildmaster", 0, true, "xur", "!xur", "геренация изображения товаров Зура в текущий канал;", function (args, message) {
+            Xur(message.channel);
+        });
     }
 }
 
