@@ -1,32 +1,20 @@
 import { makeRequestWithPromise } from "./httpCore.js";
 
 export async function GetGlobalAlerts() {
-	try {
-		var result = await makeRequestWithPromise('GET', `https://www.bungie.net/Platform/GlobalAlerts/`);
-		return result;
-	} catch {
-		console.error("Rejected: " + result);
-	}
+	var result = await makeRequestWithPromise('GET', `https://www.bungie.net/Platform/GlobalAlerts/`);
+	return result;
 }
 
 export async function GetClanMembers(clanId) {
-	try {
-		var result = await makeRequestWithPromise('GET', `https://www.bungie.net/Platform/GroupV2/${clanId}/Members/`);
-		return result.Response.results;
-	} catch {
-		console.error("Rejected: " + result);
-	}
+	var result = await makeRequestWithPromise('GET', `https://www.bungie.net/Platform/GroupV2/${clanId}/Members/`);
+	return result?.Response?.results;
 }
 
 async function GetMemberData(membershipType, membershipId, componentsArray) {
-	try {
-		var components = componentsArray.join(",");
-		var result = await makeRequestWithPromise('GET',
-			`https://www.bungie.net/Platform/Destiny2/${membershipType}/Profile/${membershipId}/?components=${components}`);
-		return result.Response;
-	} catch {
-		console.error("Rejected: " + result);
-	}
+	var components = componentsArray.join(",");
+	var result = await makeRequestWithPromise('GET',
+		`https://www.bungie.net/Platform/Destiny2/${membershipType}/Profile/${membershipId}/?components=${components}`);
+	return result?.Response;
 }
 
 export async function GetCoreMemberData(membershipType, membershipId) {
@@ -46,9 +34,9 @@ export async function GetActivitiesFromApi(membershipType, membershipId, charact
 		mode = mode ? mode : "None";
 		var result = await makeRequestWithPromise('GET',
 			`https://www.bungie.net/Platform/Destiny2/${membershipType}/Account/${membershipId}/Character/${characterId}/Stats/Activities/?mode=${mode}&count=250&page=${page}`);
-		return result.Response;
-	} catch {
-		console.error("Rejected: " + result + " id: " + membershipId);
 		return result;
+	} catch (responce) {
+		console.error("Rejected: " + responce.ErrorStatus + " id: " + membershipId);
+		return responce;
 	}
 }

@@ -1,6 +1,7 @@
 import pkg from 'pg';
 const { Pool } = pkg;
 import config from "./config.json";
+import { CatchError } from "./catcherror.js";
 
 const pool = new Pool({
     host: config.sql.host,

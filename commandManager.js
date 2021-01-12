@@ -40,9 +40,9 @@ export class CommandManager {
         return foundCommands.length > 0 ? foundCommands[0] : null;
     }
     static GetEmojiStatus(command, apiAlerts) {
-        if (command.apiDependency == true && apiAlerts.ErrorCode != 1) return "<:reload:781107772224962561>";
         switch (command.status) {
             case 0:
+                if (command.apiDependency == true && apiAlerts.ErrorCode != 0) return ":warning:";
                 return "<:yes:769922757592612874>";
             case 1:
                 return "<:reload:781107772224962561>";

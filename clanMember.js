@@ -113,7 +113,7 @@ export class ClanMember {
     }
 
     AddToVoiceOnline(deltaTime) {
-        if (typeof (deltaTime) == 'undefined') return;
+        if (!deltaTime) return;
         var deltaSeconds = (((deltaTime.hours ?? 0) * 60) + (deltaTime.minutes ?? 0)) * 60 + (deltaTime.seconds ?? 0);
         this.#voiceOnline += deltaSeconds;
     }
@@ -155,7 +155,7 @@ export class ClanMember {
 
     FormLinesForDetailedVoice(results) {
         var lines = []
-        results.rows.forEach((row) => {
+        results?.rows?.forEach((row) => {
             lines.push(new Date(row.datetime.getTime() + 3 * 60 * 60 * 1000).toISOString().replace(/T/, ' ').replace(/\..+/, '').substring(5, 16) + "   " +
                 new Date(row.next_datetime_fixed.getTime() + 3 * 60 * 60 * 1000).toISOString().replace(/T/, ' ').replace(/\..+/, '').substring(5, 16) + "   " +
                 PeriodValueToLine(row.period.hours) + ":" + PeriodValueToLine(row.period.minutes));
@@ -200,14 +200,14 @@ export class ClanMember {
         var body = this.GetTimeLine(this.#voiceOnline) + "```";
         detailedLines.forEach(line => {
             if ((body + line).length > 1010) {
-                embed.addField("Voice online", body + "```");
+                embed.addField("Voice online", body + "\u200B```");
                 body = "```" + line;
             } else {
                 body += "\n" + line;
             }
 
         });
-        embed.addField("Voice online", body + "```");
+        embed.addField("Voice online", body + "\u200B```");
         return embed;
     }
 }
@@ -263,15 +263,17 @@ export async function GetAllActivities(clanMember, days) {
 async function GetCharacterActivities(clanMember, characterId, page, mode, deltaDate) {
     var filteredActivities = [];
     var responceActivities = await GetActivitiesFromApi(clanMember.membershipType, clanMember.membershipId, characterId, page, mode);
-    if (typeof (responceActivities) == 'undefined') {
+
+    if (responceActivities.ErrorCode == 1665) {
         clanMember.access = false;
         return [];
     }
-    var isLastPage = false;
-    if (typeof (responceActivities.activities) == 'undefined') {
+    if (!responceActivities.Response?.activities) {
         return [];
     }
-    responceActivities.activities.forEach(function (activity) {
+
+    var isLastPage = false;
+    responceActivities.Response.activities.forEach(function (activity) {
         if (deltaDate < new Date(activity.period)) {
             filteredActivities.push(activity);
         } else {

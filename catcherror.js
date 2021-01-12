@@ -7,12 +7,23 @@ export function FetchDefaultCatchErrorChannel(client){
 }
 
 export function CatchError(e, channel) {
-	if (e.stack == null) (typeof(channel) == 'undefined' ? sandbox : channel).send(e.message);
-	else {
-		console.error(e);
-		(typeof(channel) == 'undefined' ? sandbox : channel).send(`<@${config.users.developer}>`);
-		(typeof(channel) == 'undefined' ? sandbox : channel).send(`Ошибка ${e.name}: ${e.message}\n\n${e.stack}`, { code: 'js' });
+	var validChannel = channel ?? sandbox;
+
+	console.error(e);
+	if (e.stack == null) {
+		validChannel.send(e.message);
+		return;
 	}
+	validChannel.send(`<@${config.users.developer}>`);
+	validChannel.send(`Ошибка ${e.name}: ${e.message}\n\n${e.stack}`, { code: 'js' });
+}
+
+export function CatchBadResponce(responce, channel) {
+	if (responce.ErrorCode == 1665) return; //DestinyPrivacyRestriction
+
+	console.error(responce);
+	var validChannel = channel ?? sandbox;
+	validChannel.send(`Ошибка взаимодействия с API Bungie:\n> Error ${responce.ErrorCode}: ${responce.ErrorStatus}\n> ${responce.Message}`);
 }
 
 export function CatchErrorWithTimeout(e, channel, timeout){

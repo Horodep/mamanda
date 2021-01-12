@@ -1,7 +1,7 @@
 import fs from "fs";
 import { XMLHttpRequest } from "xmlhttprequest";
 import config from "./config.json";
-import { CatchError } from "./catcherror.js";
+import { CatchError, CatchBadResponce } from "./catcherror.js";
 
 class AccessToken{
     static #tokenObject = null;
@@ -20,7 +20,7 @@ class AccessToken{
     }
     WriteFile(fileName){
         fs.writeFile(fileName, JSON.stringify(tokenObject), (err) => {
-            if (err)  CatchError(err);
+            if (err)  CatchBadResponce(err);
         });
     }
 }
@@ -34,10 +34,14 @@ export async function makeRequestWithPromise(method, url, setAuth) {
 		xhr.onreadystatechange = function() {
 			if (xhr.readyState == 4) {
 			    if (xhr.status >= 300) {
-				    reject("Error, status code = " + xhr.status)
+                    var responce = JSON.parse(xhr.responseText)
+                    CatchBadResponce(responce);
+				    reject(responce)
 			    } else {
                     try{
-                        resolve(JSON.parse(xhr.responseText));
+                        var responce = JSON.parse(xhr.responseText)
+                        if (responce.ErrorCode != 1) CatchBadResponce(responce);
+                        resolve(responce);
                     }catch(e){
                         CatchError(e);
                         reject("Error name = " + e.name)
@@ -60,7 +64,7 @@ export async function refreshAuthToken(){
     authpost.onreadystatechange = function(){
         if(this.readyState === 4 && this.status === 200){
             AccessToken.SetTokenJson(this.responseText);
-            if(typeof(AccessToken.access_token) != 'undefined'){
+            if(AccessToken.access_token){
                 AccessToken.WriteFile('access_token.json');
             }
             console.log("TOKEN REFRESHED!");
@@ -80,7 +84,7 @@ export function newAuthToken(code){
     authpost.onreadystatechange = function(){
         if(this.readyState === 4 && this.status === 200){
             AccessToken.SetTokenJson(this.responseText);
-            if(typeof(AccessToken.access_token) != 'undefined'){
+            if(AccessToken.access_token){
                 AccessToken.WriteFile('access_token.json');
             }
             console.log("NEW TOKEN!");
