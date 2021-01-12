@@ -1,6 +1,7 @@
 import AdmZip from "adm-zip";
 import fs from "fs";
 import https from "https";
+import config from "./config.json";
 
 export class ManifestManager {
     static Refresh() {
