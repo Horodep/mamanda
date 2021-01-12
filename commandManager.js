@@ -3,7 +3,7 @@ import config from "./config.json";
 import nodePackage from "./package.json";
 import { GetGlobalAlerts } from "./bungieApi.js";
 import { execSync } from "child_process";
-import { DropPvpRole, GiveForumRole, SaveForumLinkAndPublish, SetMaximumTriumphsScore, ShowNewbieList, ShowQueueList, ShowQueueReqestsList } from "./discordGuildMasterFeatures.js"
+import { DropPvpRole, GiveForumRole, SaveForumLinkAndPublish, SetMaximumTriumphsScore, ShowNewbieList, ShowQueueList, ShowQueueReqestsList, ResetEnglish } from "./discordGuildMasterFeatures.js"
 import { ClanSize, ClanTime, Nicknames, SetRoles, ShowRecordStat, ShowTopTriumphScore } from "./clan.js"
 import { Roles } from "./roles.js"
 import { NewAuthToken } from "./httpCore.js"
@@ -206,7 +206,9 @@ export class CommandManager {
         this.AddCommand("guildmaster", 0, true, "csr", "!csr", "ручной запуск выдачи ролей всему клану;", function (args, message) {
             SetRoles(message.guild);
         });
-        this.AddCommand("guildmaster", 2, false, "engreset", "!engreset", "генерация ссылок на англоязычные изображения еженедельного ресета в текущий канал;", function (args, message) { });
+        this.AddCommand("guildmaster", 0, false, "engreset", "!engreset", "генерация ссылок на англоязычные изображения еженедельного ресета в текущий канал;", function (args, message) {
+            ResetEnglish(message.channel);
+        });
         this.AddCommand("guildmaster", 0, false, "forum", "!forum LINKTEXT", "опубликовать объявление о наборе в канал новостей;", function (args, message) { 
             SaveForumLinkAndPublish(message.content.slice(7), message.client);
         });
@@ -263,44 +265,3 @@ export class CommandManager {
         });
     }
 }
-
-/*
-GM
-    case 'checksync':	checksync.checksync(message.channel);					break;
-    case 'sync':		roles.roles_bytag(message.channel, args.length > 1 ? args[1] : message.member.id, true);					break;
-    case 'watermelon':		watermelon.watermelon(message.channel, args.length > 1 ? args[1] : message.member.id);
-        break;
-    case 'setmaxtriumphs':
-        if(args.length > 1){
-            fs.writeFile('maxtriumphs.txt', args[1], function(error){
-                if(error) throw error; // если возникла ошибкаS
-            });
-        }else{
-            message.channel.send("нет данных!");
-        }
-        break;
-    case 'testreset':
-        var yyyy = date.getFullYear();
-        var dd = date.getDate();
-        if(dd<10) { dd='0'+dd; }
-        var mm = date.getMonth()+1;
-        if(mm<10) { mm='0'+mm; }
-
-        message.channel.send(
-            "Reset by Kyber3000\n"+
-            "https://kyberscorner.files.wordpress.com/"+yyyy+"/"+mm+"/destiny-2-weekly-reset-summary-"+mm+"-"+dd+"-"+yyyy+".png\n"+
-            "https://kyberscorner.files.wordpress.com/"+yyyy+"/"+mm+"/destiny-2-weekly-raid-challenges-by-kyber3000-"+mm+"-"+dd+"-"+yyyy+".png");
-        break;
-    case 'xur':
-        reset.auth(boss);
-        setTimeout(function (){
-            reset.xur(message.channel);
-        }, 2000);
-        break;
-    case 'reset':
-        reset.auth(boss);
-        setTimeout(function (){
-            reset.weeklyreset(message.channel);
-        }, 2000);
-        break;
-}*/

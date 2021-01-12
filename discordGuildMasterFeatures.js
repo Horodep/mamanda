@@ -1,7 +1,17 @@
-import { MessageEmbed } from "discord.js";
 import fs from "fs";
 import config from "./config.json";
+import fetch from "node-fetch";
 import { CatchError } from "./catcherror.js";
+
+export async function ResetEnglish(channel) {
+	try{
+		var response = await fetch("http://kyber3000.com/Reset");
+		channel.send("Reset by Kyber3000");
+		channel.send(response.url);
+	}catch(e){
+		CatchError(e);
+	}
+}
 
 export function DropPvpRole(guild) {
 	var topPvpRole = guild.roles.find(role => role.id == config.roles.medals.category_first_role.crucible);
