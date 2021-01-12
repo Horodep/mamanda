@@ -12,6 +12,7 @@ class AccessToken{
         this.#tokenObject = JSON.parse(string);
     }
     static get access_token() {
+        AccessToken.ReadFile();
         return this.#tokenObject.access_token;
     }
     static get refresh_token() {
