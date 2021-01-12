@@ -8,11 +8,13 @@ const accessTokenFileName = '.data/access_token.json';
 class AccessToken{
     static #tokenObject = null;
 
+    static get token_exists() {
+        return this.#tokenObject != null;
+    }
     static SetTokenJson(string) {
         this.#tokenObject = JSON.parse(string);
     }
     static get access_token() {
-        AccessToken.ReadFile();
         return this.#tokenObject.access_token;
     }
     static get refresh_token() {
@@ -66,7 +68,7 @@ async function authRequestWithPromise(body) {
         authpost.onreadystatechange = function(){
             if(this.readyState === 4 && this.status === 200){
                 AccessToken.SetTokenJson(this.responseText);
-                if(AccessToken.access_token){
+                if(AccessToken.token_exists){
                     AccessToken.WriteFile();
                 }
                 console.log("TOKEN!");
