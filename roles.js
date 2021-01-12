@@ -63,7 +63,7 @@ export async function GetShowAndSetRoles(clanMember, channel) {
 
 async function GetRolesData(membershipType, membershipId) {
 	var response = await GetFullMemberData(membershipType, membershipId);
-	if (response.profileRecords.privacy == 2) return null;
+	if (!response.profileRecords.data) return null;
 
 	var data = {
 		raids: {},
