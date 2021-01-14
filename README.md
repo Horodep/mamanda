@@ -1,7 +1,7 @@
 # mamanda
 clan discord bot for two clans
 
-## example config.json
+## example config.json // redundant
 ```json
 {
      "_comment": "This is an example file. Here should be your data.",
