@@ -1,7 +1,7 @@
 import fs from "fs";
 import { XMLHttpRequest } from "xmlhttprequest";
 import config from "./config.json";
-import { CatchError, CatchBadResponce } from "./catcherror.js";
+import { CatchError, CatchBadResponce, CatchHttpResponce } from "./catcherror.js";
 
 const accessTokenFileName = '.data/access_token.json';
 
@@ -40,20 +40,21 @@ export async function makeRequestWithPromise(method, url, setAuth) {
         if (setAuth == true) xhr.setRequestHeader("Authorization", "Bearer "+AccessToken.access_token);
 		xhr.onreadystatechange = function() {
 			if (xhr.readyState == 4) {
-			    if (xhr.status >= 300) {
-                    var responce = JSON.parse(xhr.responseText)
-                    CatchBadResponce(responce);
-				    reject(responce)
-			    } else {
-                    try{
-                        var responce = JSON.parse(xhr.responseText)
-                        if (responce.ErrorCode != 1) CatchBadResponce(responce);
-                        resolve(responce);
-                    }catch(e){
-                        CatchError(e);
-                        reject("Error name = " + e.name)
+                try{
+                    var responce = JSON.parse(xhr.responseText);
+
+                    if (xhr.status >= 300) {
+                        CatchBadResponce(responce);
+                        reject(responce)
+                    } else {
+                            if (responce.ErrorCode != 1) CatchBadResponce(responce);
+                            resolve(responce);
                     }
-			    }
+                }catch(e){
+                    if (e.stack.startsWith("SyntaxError")) CatchHttpResponce(e, xhr.responseText);
+                    else CatchError(e);
+                    reject("Error name = " + e.name)
+                }
 			}
 		  }
         xhr.send();
