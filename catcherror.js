@@ -26,11 +26,11 @@ export function CatchBadResponce(responce, channel) {
 	validChannel.send(`Ошибка взаимодействия с API Bungie:\n> Error ${responce.ErrorCode}: ${responce.ErrorStatus}\n> ${responce.Message}`);
 }
 
-export function CatchHttpResponce(e, responce, channel){
+export function CatchHttpResponce(e, url, responce, channel){
 	var validChannel = channel ?? sandbox;
 
 	console.error(e);
-	validChannel.send(`<@${config.users.developer}>, API вернуло не JSON:`);
+	validChannel.send(`<@${config.users.developer}>, API вернуло не JSON:\n\`endpoint: ${url}\``);
 	validChannel.send(`${responce}`, { code: 'xml' });
 	validChannel.send(`${e.stack}`, { code: 'elixir' });
 }

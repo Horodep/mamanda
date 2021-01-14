@@ -51,7 +51,7 @@ export async function makeRequestWithPromise(method, url, setAuth) {
                             resolve(responce);
                     }
                 }catch(e){
-                    if (e.stack.startsWith("SyntaxError")) CatchHttpResponce(e, xhr.responseText);
+                    if (e.stack.startsWith("SyntaxError")) CatchHttpResponce(e, url, xhr.responseText);
                     else CatchError(e);
                     reject("Error name = " + e.name)
                 }
