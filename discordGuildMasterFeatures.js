@@ -56,7 +56,8 @@ export function SaveForumLinkAndPublish(link, client) {
 		if (err) CatchError(err); // если возникла ошибка
 	});
 	var channel_news = client.channels.cache.get(config.channels.clannews);
-	channel_news.send(link + "\n" +
+	channel_news.send("Не важно, <@&"+config.roles.guardians[0]+"> ты, <@&"+config.roles.guest+"> или @everyone другой, мы верим, что ты хочешь помочь клану! <@&"+config.separators.footer+">\n" +
+		"Проще всего это сделать подняв тему о наборе на форуме, нажав на стрелочку вверх.\n" +	link + "\n" + 
 		"p.s. Для того, чтобы снять роль прожмите эмоцию `🆗` под данным сообщением.").then((msg) => {
 			msg.react("🆗");
 		});
