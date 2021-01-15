@@ -4,6 +4,8 @@ import https from "https";
 import config from "./config.json";
 
 export class ManifestManager {
+    static manifest = null;
+
     static Refresh() {
         var uri = "https://www.d2checklist.com/assets/destiny2.zip";
         var filename = 'manifest.zip';
@@ -19,15 +21,44 @@ export class ManifestManager {
         });
     }
 
-    static GetRecordData(triumphHash) {
+    static Cache() {
         var directory = config.credentials.directory ?? "./";
-        var manifest = JSON.parse(fs.readFileSync(directory + '.data/destiny2.json'));
-        return manifest?.Record[triumphHash]?.displayProperties; // name, icon, description
+        this.manifest = JSON.parse(fs.readFileSync(directory + '.data/destiny2.json'));
     }
-    static GetItemData(itemHash) {
-        var directory = config.credentials.directory ?? "./";
-        var manifest = JSON.parse(fs.readFileSync(directory + '.data/destiny2.json'));
-        return manifest?.InventoryItem[itemHash]?.displayProperties; // name, icon, description
+
+    static CleanCache() {
+        this.manifest = null;
+    }
+
+    static GetData(doNotClean, callback) {
+        if (!ManifestManager.manifest) ManifestManager.Cache();
+        var data = callback();
+        if (!doNotClean) ManifestManager.CleanCache();
+        return data;
+    }
+
+    static GetRecordData(hash, doNotClean) {
+        return this.GetData(doNotClean, function(){
+            return ManifestManager.manifest?.Record[hash]?.displayProperties; // name, icon, description
+        });
+    }
+
+    static GetItemData(hash, doNotClean) {
+        return this.GetData(doNotClean, function(){
+            return ManifestManager.manifest?.InventoryItem[hash]?.displayProperties; // name, icon, description
+        });
+    }
+
+    static GetActivityData(hash, doNotClean) {
+        return this.GetData(doNotClean, function(){
+            return ManifestManager.manifest?.Activity[hash];
+        });
+    }
+
+    static GetActivityModifierData(hash, doNotClean) {
+        return this.GetData(doNotClean, function(){
+            return ManifestManager.manifest?.ActivityModifier[hash];
+        });
     }
 }
 
