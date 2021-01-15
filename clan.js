@@ -113,6 +113,7 @@ export async function ShowTopTriumphScore(channel, showImage) {
 
 export async function ClanTime(channel, days, modificators) {
 	var clanVoiceSummary = await GetClanVoiceSummary(days);
+	await channel.guild.members.fetch();
 	SendAndUpdateEmbed(channel, 500, 20,
 		async (member) => {
 			var clanMember = new ClanMember(member);
