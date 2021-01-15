@@ -9,7 +9,7 @@ client.login(config.credentials.discordApiKey);
 client.on("ready", () => {
     try {
         FetchDefaultCatchErrorChannel(client);
-        var guild = client.guilds.cache.get(config.guild);
+        var guild = client.guilds.cache.get(config.guilds.main);
         SetRoles(guild);
         setTimeout(() => {
             client.destroy();
