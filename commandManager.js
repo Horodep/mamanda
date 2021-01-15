@@ -9,7 +9,7 @@ import { Roles } from "./roles.js"
 import { NewAuthToken } from "./httpCore.js"
 import { GetClanMemberOnlineTime } from "./clanMember.js";
 import { CatchError } from "./catcherror.js";
-import { InviteFriend, ChangeChannelCap, ChangeRegion, ClanMedalsSummary } from "./discordCommunityFeatures.js";
+import { InviteFriend, ChangeChannelCap, ChangeRegion, ClanMedalsSummary, ShowLegendarySectors } from "./discordCommunityFeatures.js";
 import { SendCustomMessage, SendPrivateMessageByRole } from "./sendMessage.js";
 import { ClearRaidList, CreateRaid, ForcedAddRaidMember, ForcedRemoveRaidMember, GetPlannedRaids } from "./raid.js"
 import { Xur } from "./drawing.js";
@@ -173,6 +173,9 @@ export class CommandManager {
         });
         this.AddCommand("restricted", 0, true, "record", "!record TRIUMPH_HASH", "отобразить стражей клана, получивших конкретный триумф или предмет;", function (args, message) { 
             ShowRecordStat(message.channel, args.length > 1 ? args[1] : null)
+        });
+        this.AddCommand("restricted", 0, false, "sectors", "!sectors", "легендарные сектора;", async function (args, message) {
+            ShowLegendarySectors(message.channel);
         });
         this.AddCommand("restricted", 0, false, "status", "!status", "статус бота;", async function (args, message) {
             message.channel.send(await CommandManager.GetStatus());

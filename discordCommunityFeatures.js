@@ -1,5 +1,33 @@
 import { MessageEmbed } from "discord.js";
 import config from "./config.json";
+import { ManifestManager } from "./manifest.js";
+
+export function ShowLegendarySectors(channel) {
+	var today = new Date();
+	today.setHours(today.getHours() + 7);
+	var counter = Math.floor((today) / (24 * 3600 * 1000));
+
+	var emojiServer = channel.client.guilds.cache.get(config.guilds.emojis);
+    var emojiCache = emojiServer.emojis.cache;
+
+	var legend = ManifestManager.GetActivityData(SECTOR_ROTATION_MAP[counter % 5][0], true);
+	var master = ManifestManager.GetActivityData(SECTOR_ROTATION_MAP[counter % 5][1], true);
+	var legendReward = ManifestManager.GetItemData(SECTOR_REWARD_ROTATION_MAP[counter % 4][0], true);
+	var masterReward = ManifestManager.GetItemData(SECTOR_REWARD_ROTATION_MAP[counter % 4][1], true);
+	var legendModifiers = legend.modifiers.map(m => m.activityModifierHash)
+		.map(hash => `${emojiCache.find(e => e.name == hash)} ` + ManifestManager.GetActivityModifierData(hash, true)?.displayProperties?.name);
+	var masterModifiers = master.modifiers.map(m => m.activityModifierHash)
+		.map(hash => `${emojiCache.find(e => e.name == hash)} ` + ManifestManager.GetActivityModifierData(hash, true)?.displayProperties?.name);
+	ManifestManager.CleanCache();
+
+	var embed = new MessageEmbed()
+		.setAuthor("Legendary sectors")
+		.setColor(0x00AE86)
+		.setTimestamp()
+		.addField(legend.displayProperties.name, legendReward.name + '\n\n' + legendModifiers.join('\n'), true)
+		.addField(master.displayProperties.name, masterReward.name + '\n\n' + masterModifiers.join('\n'), true)
+	channel.send(embed)
+}
 
 export function InviteFriend(message, discordMention) {
 	var topRole = message.member.roles.highest.position;
@@ -98,3 +126,19 @@ export function GetFullDiscordClanMemberList(guild) {
 	guild.roles.cache.find(r => r.id == config.roles.afk).members.forEach(m => members.push(m));
 	return members;
 }
+
+// ordered legend, master
+const SECTOR_ROTATION_MAP = {
+	0: [912873277, 3094493727],
+	1: [1648125541, 912873274],
+	2: [1070981430, 1648125538],
+	3: [2936791996, 1070981425],
+	4: [3094493720, 2936791995]
+};
+
+const SECTOR_REWARD_ROTATION_MAP = {
+	0: [1572351682, 247000308],
+	1: [176055472, 256080248],
+	2: [1387420892, 2686128774],
+	3: [2850782006, 2679019194]
+};
