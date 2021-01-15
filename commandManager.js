@@ -195,10 +195,10 @@ export class CommandManager {
             ClanTime(message.channel, (args.length > 1 ? args[1] : 7), 'full');
         });
         this.AddCommand("guildmaster", 0, true, "ckp", "", "", function (args, message) {
-            ClanTime(message.channel, (args.length > 1 ? args[1] : 7));
+            ClanTime(message.channel, (args.length > 1 ? args[1] : 7), '');
         });
         this.AddCommand("guildmaster", 0, true, "clankickpub", "!clankickpub %days%", "выборка активности **самых** малоактивных стражей;\n_по умолчанию — 7 дней_;", function (args, message) {
-            ClanTime(message.channel, (args.length > 1 ? args[1] : 7));
+            ClanTime(message.channel, (args.length > 1 ? args[1] : 7), '');
         });
         this.AddCommand("guildmaster", 0, false, "copy", "!copy", "ручной запуск переноса в архив старых сборов рейдов;", function (args, message) { 
             ClearRaidList(message.client);
