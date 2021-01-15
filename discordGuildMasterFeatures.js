@@ -98,7 +98,7 @@ export function ShowNewbieList(message) {
 	var newbieList = [];
 	message.guild.roles.cache.find(role => role.id == config.roles.newbie).members.forEach(function (member) {
 		var secondsOnServer = Date.now() - member.joinedTimestamp;
-		var daysOnServer = Math.round(secondsOnServer / (1000 * 60 * 60 * 24));
+		var daysOnServer = Math.floor(secondsOnServer / (1000 * 60 * 60 * 24));
 		newbieList.push(`\`${daysOnServer}d\` <@${member.user.id}>`);
 	});
 	newbieList.sort();
@@ -109,7 +109,7 @@ export async function ShowQueueList(message) {
 	await message.guild.members.fetch();
 	message.guild.members.cache.filter(m => m.roles.cache.size == 1).forEach(function (member) {
 		var secondsOnServer = Date.now() - member.joinedTimestamp;
-		var daysOnServer = Math.round(secondsOnServer / (1000 * 60 * 60 * 24));
+		var daysOnServer = Math.floor(secondsOnServer / (1000 * 60 * 60 * 24));
 		queueList.push("`" + daysOnServer + "d` <@" + member.user.id + ">");
 	});
 	queueList.sort();
@@ -123,7 +123,7 @@ export async function ShowQueueReqestsList(message) {
 		.sort(function (a, b) { return a.joinedTimestamp > b.joinedTimestamp ? 1 : -1 })
 		.forEach(function (member) {
 			var secondsOnServer = Date.now() - member.joinedTimestamp;
-			var daysOnServer = Math.round(secondsOnServer / (1000 * 60 * 60 * 24));
+			var daysOnServer = Math.floor(secondsOnServer / (1000 * 60 * 60 * 24));
 			var headerText = `Заявка от <@${member.user.id}> (дней на сервере: ${daysOnServer}) `;
 			var emojis = "";
 			var requestBody = "";

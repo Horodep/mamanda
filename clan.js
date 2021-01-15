@@ -101,7 +101,7 @@ export async function ShowTopTriumphScore(channel, showImage) {
 			return clanMember;
 		},
 		(array, i, size) => {
-			return showImage ? Math.round(100*i/size)+"%" : FormTopTriumphScoreEmbed(array, i, size);
+			return showImage ? Math.floor(100*i/size)+"%" : FormTopTriumphScoreEmbed(array, i, size);
 		},
 		(array, message) => {
 			if (showImage) {

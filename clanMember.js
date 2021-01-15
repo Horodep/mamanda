@@ -59,7 +59,7 @@ export class ClanMember {
     }
     get joined() {
         return this.discordMember == null ? 0 :
-            Math.round((Date.now() - this.discordMember.joinedTimestamp) / (1000 * 60 * 60 * 24))
+            Math.floor((Date.now() - this.discordMember.joinedTimestamp) / (1000 * 60 * 60 * 24))
     }
     HasDiscordRole(roleId) {
         if (!this.discordMemberExists) return false;
