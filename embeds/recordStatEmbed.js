@@ -9,7 +9,7 @@ export function FromRecordStatEmbed(membersSucceeded, i, size, recordData) {
 
 	if (membersSucceeded.length > 0)
 		embed.addField(
-			"1 - " + Math.floor(membersSucceeded.length / 2),
+			"1 - " + Math.round(membersSucceeded.length / 2),
 			membersSucceeded
 				.sort()
 				.filter((_, i) => i < membersSucceeded.length / 2)
@@ -18,7 +18,7 @@ export function FromRecordStatEmbed(membersSucceeded, i, size, recordData) {
 			, true);
 	if (membersSucceeded.length > 1)
 		embed.addField(
-			(Math.floor(membersSucceeded.length / 2) + 1) + " - " + membersSucceeded.length,
+			(Math.round(membersSucceeded.length / 2) + 1) + " - " + membersSucceeded.length,
 			membersSucceeded
 				.sort()
 				.filter((_, i) => i >= membersSucceeded.length / 2)
