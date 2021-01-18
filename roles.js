@@ -98,7 +98,7 @@ async function GetRolesData(membershipType, membershipId) {
 	data.raids.day1 = BungieApiLogic.get_day_one(response, characterCollectibles);
 	data.locations.dc = BungieApiLogic.get_node_data(response, 3483405511, "Город Грез");
 	data.locations.moon = BungieApiLogic.get_node_data(response, 1473265108, "Луна");
-	data.locations.euro = BungieApiLogic.get_node_data(response, 2647590440, "Европа");
+	data.locations.euro = BungieApiLogic.get_node_data_with_extra_records(response, 2647590440, [3560923614], "Европа");
 	data.triumphs.tier1 = BungieApiLogic.get_profile_records(response, "activeScore", 12000, "");
 	data.triumphs.tier2 = BungieApiLogic.get_profile_records(response, "activeScore", 14000, "");
 	data.triumphs.tier3 = BungieApiLogic.get_profile_records(response, "activeScore", 16000, "");
