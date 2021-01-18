@@ -1,3 +1,5 @@
+import { CatchError } from "../catcherror.js";
+
 class CharacterDetails {
 	titan = { light: 0, id: null };
 	hunter = { light: 0, id: null };
@@ -21,9 +23,10 @@ function GetDataAndHandleErrors(textprefix, callback) {
 	try {
 		return callback();
 	} catch (e) {
-		CatchError(e);
+		//CatchError(e);
 		return {
 			state: false,
+			error: true,
 			text: textprefix + ": not defined"
 		};
 	}
@@ -95,10 +98,13 @@ export function get_character_progression_data(characterProgressions, recordHash
 	}));
 }
 
-export function get_any_of_data(characterPresentationNodes, recordHashArray, textprefix) {
+export function get_any_of_data(jsondata, characterPresentationNodes, recordHashArray, textprefix) {
 	var data;
 	for (let recordHash of recordHashArray) {
-		data = get_character_node_data(characterPresentationNodes, recordHash, textprefix);
+		var characterData = get_character_node_data(characterPresentationNodes, recordHash, textprefix);
+		var profileData = get_node_data(jsondata, recordHash, textprefix);
+		data = characterData.error ? profileData : characterData;
+		
 		if (data.state)
 			return data;
 	}
