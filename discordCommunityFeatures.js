@@ -69,18 +69,14 @@ export function ChangeRegion(message) {
 }
 
 export function ChangeChannelCap(message, limit) {
-	if (message.member.voice.channel == null) {
-		message.channel.send('Вы не в голосовом канале.');
-		return;
-	}
-	if (message.member.voice.channel.parent.id == config.categories.limited) {
-		message.channel.send('Вы не можете изменить размер данной комнаты.');
-		return;
-	}
-	try {
+	if (message.member.voice.channel == null)
+		throw 'Вы не в голосовом канале.';
+	if (message.member.voice.channel.parent.id == config.categories.limited)
+		throw 'Вы не можете изменить размер данной комнаты.';
+	if (limit > -1 && limit < 100) {
 		message.member.voice.channel.setUserLimit(limit);
-	} catch {
-		message.channel.send('Введено некорректное значение.');
+	} else {
+		throw 'Введено некорректное значение.';
 	}
 }
 
