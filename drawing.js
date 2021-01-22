@@ -6,7 +6,7 @@ import fetch from "node-fetch";
 import { CatchError } from "./catcherror.js";
 import { GetXur } from "./bungieApi.js";
 import { ManifestManager } from "./manifest.js";
-import { RefreshAuthToken } from "./httpCore.js";
+import { AsyncRefreshAuthToken } from "./httpCore.js";
 
 export async function DrawTriumphs(members, channel) {
     try {
@@ -19,9 +19,9 @@ export async function DrawTriumphs(members, channel) {
 
         var image = await jimp.read(directory + '.data/templates/bg.png');
         for (var i = 0; i < top.length; i++) {
-            await DrawText(image, 10, 20 + 17 * i - 5, directory + '.data/fonts/calibri_light_22.fnt', top[i].displayName);
-            await DrawText(image, 130, 20 + 17 * i - 5, directory + '.data/fonts/calibri_light_22.fnt', top[i].activeScore);
-            await DrawWhiteRectangle(image, 185, 20 + (12 + 5) * i, ((top[i].activeScore - min) * 170) / delta, 12);
+            await AsyncDrawText(image, 10, 20 + 17 * i - 5, directory + '.data/fonts/calibri_light_22.fnt', top[i].displayName);
+            await AsyncDrawText(image, 130, 20 + 17 * i - 5, directory + '.data/fonts/calibri_light_22.fnt', top[i].activeScore);
+            await AsyncDrawWhiteRectangle(image, 185, 20 + (12 + 5) * i, ((top[i].activeScore - min) * 170) / delta, 12);
         }
 
         image.write(directory + '.data/images/toptriumphs.png');
@@ -33,7 +33,7 @@ export async function DrawTriumphs(members, channel) {
 
 export async function Xur(channel) {
     try {
-        await RefreshAuthToken();
+        await AsyncRefreshAuthToken();
         var directory = config.credentials.directory ?? "./";
         // 1. refresh manifest
         var data = await GetXur();
@@ -67,9 +67,9 @@ export async function Xur(channel) {
             var stats = allStats[vendorItemIndex].stats;
             var item = sales[vendorItemIndex];
             var itemImageUrl = ManifestManager.GetItemData(item.itemHash)?.icon;
-            var itemImage = await CacheOrGetImage(item.itemHash, itemImageUrl);
+            var itemImage = await AsyncCacheOrGetImage(item.itemHash, itemImageUrl);
 
-            await DrawImage(image, box_coords[i].x, box_coords[i].y, 0, itemImage);
+            await AsyncDrawImage(image, box_coords[i].x, box_coords[i].y, 0, itemImage);
 
             if (!stats[statHashes[0]]) continue;
             for (var k = 0; k < 6; k++) {
@@ -79,12 +79,12 @@ export async function Xur(channel) {
                 var top = box_coords[i].y + (line_height + line_spacing) * k;
                 var space = stat < 10 ? 9 : 0;
 
-                await DrawText(image, left - 24 + space, top - 5,
+                await AsyncDrawText(image, left - 24 + space, top - 5,
                     directory + '.data/fonts/calibri_light_22.fnt', stat);
-                await DrawWhiteRectangle(image,
+                await AsyncDrawWhiteRectangle(image,
                     left, top, 4 * stat, line_height);
             }
-            await DrawText(image,
+            await AsyncDrawText(image,
                 box_coords[i].x + 235,
                 box_coords[i].y + (line_height + line_spacing) * 5 - 5,
                 directory + '.data/fonts/calibri_light_22.fnt',
@@ -98,7 +98,7 @@ export async function Xur(channel) {
     }
 }
 
-async function CacheOrGetImage(hash, img_url) {
+async function AsyncCacheOrGetImage(hash, img_url) {
     var directory = config.credentials.directory ?? "./";
     var filename = '.data/images/' + hash + '.png';
 
@@ -113,17 +113,17 @@ async function CacheOrGetImage(hash, img_url) {
     }
 }
 
-async function DrawImage(mainImage, x, y, resize, image) {
+async function AsyncDrawImage(mainImage, x, y, resize, image) {
     if (resize != 0) await image.resize(resize, jimp.AUTO)
     await mainImage.composite(image, x, y);
 }
 
-async function DrawText(mainImage, x, y, font_url, text) {
+async function AsyncDrawText(mainImage, x, y, font_url, text) {
     var font = await jimp.loadFont(font_url)
     await mainImage.print(font, x, y, text);
 }
 
-async function DrawWhiteRectangle(mainImage, x, y, width, height) {
+async function AsyncDrawWhiteRectangle(mainImage, x, y, width, height) {
     var directory = config.credentials.directory ?? "./";
     var filename = directory + '.data/templates/white.png';
     var whiteImage = await jimp.read(filename);

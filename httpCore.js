@@ -32,7 +32,7 @@ class AccessToken{
     }
 }
 
-export async function makeRequestWithPromise(method, url, setAuth) {
+export async function AsyncRequestWithPromise(method, url, setAuth) {
     return new Promise(function (resolve, reject) {
 		let xhr = new XMLHttpRequest();
 		xhr.open(method, url, true);
@@ -61,7 +61,7 @@ export async function makeRequestWithPromise(method, url, setAuth) {
     });
 }
 
-async function authRequestWithPromise(body) {
+async function AsyncAuthRequestWithPromise(body) {
     return new Promise(function (resolve, reject) {
         var authpost = new XMLHttpRequest();
         authpost.open("POST", "https://www.bungie.net/Platform/App/OAuth/Token/", true);
@@ -82,13 +82,13 @@ async function authRequestWithPromise(body) {
     });
 }
 
-export async function RefreshAuthToken(){
+export async function AsyncRefreshAuthToken(){
     AccessToken.ReadFile();
     var body = `grant_type=refresh_token&refresh_token=${AccessToken.refresh_token}&client_id=${config.credentials.client_id}&client_secret=${config.credentials.client_secret}`;
-    await authRequestWithPromise(body);
+    await AsyncAuthRequestWithPromise(body);
 }
 
 export function NewAuthToken(code){
     var body = `grant_type=authorization_code&code=${code}&client_id=${config.credentials.client_id}&client_secret=${config.credentials.client_secret}`;
-    authRequestWithPromise(body);
+    AsyncAuthRequestWithPromise(body);
 }

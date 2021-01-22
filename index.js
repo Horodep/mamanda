@@ -8,13 +8,13 @@ import { MessageReactionRemove } from "./discordEvents/messageReactionRemove.js"
 import { CommandManager } from "./commandManager.js";
 import { ManifestManager } from "./manifest.js";
 import { FetchDefaultCatchErrorChannel } from "./catcherror.js";
-import { RefreshAuthToken } from "./httpCore.js";
+import { AsyncRefreshAuthToken } from "./httpCore.js";
 
 const client = new Discord.Client({ partials: ['MESSAGE', 'CHANNEL', 'REACTION'] });
 client.login(config.credentials.discordApiKey);
 CommandManager.Init();
 ManifestManager.Refresh();
-RefreshAuthToken();
+AsyncRefreshAuthToken();
 
 client.on("ready", () => {
 	client.user.setActivity("на Летописца 9 из 10", { type: 'WATCHING' });
