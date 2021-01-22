@@ -33,7 +33,7 @@ export async function GetMemberByDiscordName(discordName) {
 				return members[i];
 		}
 	};
-	throw ({ message: 'Игровой профиль не найден.' });
+	throw 'Игровой профиль не найден.';
 }
 
 export async function ExecuteForEveryMember(timeout, callback) {

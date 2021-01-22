@@ -19,9 +19,9 @@ export function CreateRaid(message, args) {
         });
         message.delete();
     } catch (e) {
-        if (e.stack != null) CatchError(e);
+        if (typeof(e) == 'object') CatchError(e);
         else message.channel.send(
-            "Неверный синтаксис: __" + e.message.toLowerCase() + "__\nДолжно быть:\n```!сбор ДД.ММ ЧЧ:ММ активность, комментарии```" +
+            "Неверный синтаксис: __" + e.toLowerCase() + "__\nДолжно быть:\n```!сбор ДД.ММ ЧЧ:ММ активность, комментарии```" +
             "Вы написали:\n```" + message.content + "```").then((msg) => {
                 message.delete();
                 setTimeout(function () {
@@ -161,11 +161,11 @@ function ParseCommandAndGetData(args, member) {
     var today = new Date();
     var date = new Date(today.getFullYear(), args[1].split('.')[1] - 1, args[1].split('.')[0], args[2].split(':')[0], args[2].split(':')[1]);
     if (date < today) date.setFullYear(today.getFullYear() + 1);
-    if (isNaN(date) || typeof (date) == 'underfined') throw ({ message: 'Не удалось обнаружить дату.' });
+    if (isNaN(date) || typeof (date) == 'underfined') throw 'Не удалось обнаружить дату.';
 
     var commandRaidInfo = args.filter((_, i) => i > 2).join(" ");
     var raidName = commandRaidInfo.indexOf(',') == -1 ? commandRaidInfo : commandRaidInfo.substr(0, commandRaidInfo.indexOf(','));
-    if (raidName == '') throw ({ message: 'Активность не определена.' });
+    if (raidName == '') throw 'Активность не определена.';
 
     var description = (commandRaidInfo.indexOf(',') == -1 ? null : commandRaidInfo.substr(commandRaidInfo.indexOf(',') + 1));
 
@@ -213,11 +213,11 @@ function GetDataFromEmbed(embed) {
 
 function CreateRaidEmbed(data, customTimestamp) {
     if (data.header.length > 256)
-        throw ({ message: 'Длина заголовка сбора не может быть больше 256 символов.' });
+        throw 'Длина заголовка сбора не может быть больше 256 символов.';
     else if (data.description != null && data.description.length > 2048)
-        throw ({ message: 'Длина комментария сбора не может быть больше 2048 символов.' });
+        throw 'Длина комментария сбора не может быть больше 2048 символов.';
     else if (data.numberOfPlaces == 1)
-        throw ({ message: 'Активность можно собрать не менее, чем на двоих участников.' });
+        throw 'Активность можно собрать не менее, чем на двоих участников.';
 
     var {field0, field1, left} = data.FormFields()
     var embed = new MessageEmbed()

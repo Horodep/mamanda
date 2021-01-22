@@ -9,7 +9,7 @@ export function FetchDefaultCatchErrorChannel(client){
 export function CatchError(e, channel) {
 	var validChannel = channel ?? sandbox;
 
-	if (e.stack == null) ShowInfoMessage(e, validChannel);
+	if (typeof(e) == 'string') ShowInfoMessage(e, validChannel);
 	else ShowCodeError(e, validChannel);
 }
 

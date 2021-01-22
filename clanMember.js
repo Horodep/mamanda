@@ -215,7 +215,7 @@ export class ClanMember {
 export function GetDiscordMemberByMention(guild, discordMention) {
     var discordId = discordMention.replace(/\D/g, '');
     var discordMember = guild.members.cache.find(member => member.user.id == discordId);
-    if (discordMember == null) throw { message: 'Дискорд профиль не найден.' };
+    if (discordMember == null) throw 'Дискорд профиль не найден.';
     console.log(discordMember.displayName);
     return discordMember;
 }
