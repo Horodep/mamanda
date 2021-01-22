@@ -158,6 +158,8 @@ export async function GetPlannedRaids(message, discordMention){
 function ParseCommandAndGetData(args, member) {
     //0    1     2     3   4 
     //сбор 22.09 18:00 [3] кс, рандомный комент
+    if (args.length < 3) throw 'Указано недостаточно данных.';
+
     var today = new Date();
     var date = new Date(today.getFullYear(), args[1].split('.')[1] - 1, args[1].split('.')[0], args[2].split(':')[0], args[2].split(':')[1]);
     if (date < today) date.setFullYear(today.getFullYear() + 1);
