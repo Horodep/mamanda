@@ -9,13 +9,19 @@ export function FetchDefaultCatchErrorChannel(client){
 export function CatchError(e, channel) {
 	var validChannel = channel ?? sandbox;
 
+	if (e.stack == null) ShowInfoMessage(e, validChannel);
+	else ShowCodeError(e, validChannel);
+}
+
+export function ShowCodeError(e, channel) {
 	console.error(e);
-	if (e.stack == null) {
-		validChannel.send(e.message);
-		return;
-	}
-	validChannel.send(`<@${config.users.developer}>`);
-	validChannel.send(`Ошибка ${e.name}: ${e.message}\n\n${e.stack}`, { code: 'elixir' });
+	channel.send(`<@${config.users.developer}>`);
+	channel.send(`Ошибка ${e.name}: ${e.message}\n\n${e.stack}`, { code: 'elixir' });
+}
+
+export function ShowInfoMessage(e, channel) {
+	console.log(e);
+	channel.send(e);
 }
 
 export function CatchBadResponce(responce, channel) {
