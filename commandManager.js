@@ -1,18 +1,18 @@
 import { MessageEmbed } from "discord.js";
 import config from "./config.json";
 import nodePackage from "./package.json";
-import { GetGlobalAlerts } from "./bungieApi.js";
+import { AsyncGetGlobalAlerts } from "./bungieApi.js";
 import { execSync } from "child_process";
-import { DropPvpRole, GiveForumRole, SaveForumLinkAndPublish, SetMaximumTriumphsScore, ShowNewbieList, ShowQueueList, ShowQueueReqestsList, ResetEnglish } from "./discordGuildMasterFeatures.js"
-import { ClanSize, ClanTime, Nicknames, SetRoles, ShowRecordStat, ShowTopTriumphScore } from "./clan.js"
-import { Roles } from "./roles.js"
+import { DropPvpRole, GiveForumRole, SaveForumLinkAndPublish, SetMaximumTriumphsScore, ShowNewbieList, AsyncShowQueueList, AsyncShowQueueReqestsList, AsyncShowResetEnglish } from "./discordGuildMasterFeatures.js"
+import { AsyncClanSize, AsyncShowClanTime, AsyncShowNicknames, AsyncSetRolesToEveryMember, ShowRecordStat, ShowTopTriumphScore } from "./clan.js"
+import { AsyncRoles } from "./roles.js"
 import { NewAuthToken } from "./httpCore.js"
-import { GetClanMemberOnlineTime } from "./clanMember.js";
+import { AsyncGetClanMemberOnlineTime } from "./clanMember.js";
 import { CatchError } from "./catcherror.js";
 import { InviteFriend, ChangeChannelCap, ChangeRegion, ClanMedalsSummary, ShowLegendarySectors } from "./discordCommunityFeatures.js";
 import { SendCustomMessage, SendPrivateMessageByRole } from "./sendMessage.js";
-import { ClearRaidList, CreateRaid, ForcedAddRaidMember, ForcedRemoveRaidMember, GetPlannedRaids } from "./raid.js"
-import { Xur } from "./drawing.js";
+import { ClearRaidList, CreateRaid, ForcedAddRaidMember, ForcedRemoveRaidMember, AsyncGetPlannedRaids } from "./raid.js"
+import { AsyncDrawXur } from "./drawing.js";
 
 export class CommandManager {
     static commandList = [];
@@ -53,7 +53,7 @@ export class CommandManager {
         }
     }
     static async GetStatus(isGuildmaster) {
-        var apiAlerts = await GetGlobalAlerts();
+        var apiAlerts = await AsyncGetGlobalAlerts();
         const gitLogRequest = "git log $(git describe --abbrev=0 --tags $(git describe --abbrev=0)^)..HEAD --oneline --format='%s'";
         const gitSaveLogRequest = process.platform == "win32" ? "git log -n5 --oneline --format='%s'" : gitLogRequest;
         var gitLog = execSync(gitSaveLogRequest).toString();
@@ -154,10 +154,10 @@ export class CommandManager {
             ClanMedalsSummary(message.channel);
         });
         this.AddCommand("restricted", 0, true, "mymt", "!mymt", "проверка активности стража в голосовом чате (только своей);", async function (args, message) {
-            GetClanMemberOnlineTime(message, (args.length > 1 ? args[1] : 7));
+            AsyncGetClanMemberOnlineTime(message, (args.length > 1 ? args[1] : 7));
         });
         this.AddCommand("restricted", 0, false, "myraids", "!myraids", "список рейдов, в которые записался страж;", async function (args, message) {
-            GetPlannedRaids(message, args.length > 1 ? args[1] : message.author.id)
+            AsyncGetPlannedRaids(message, args.length > 1 ? args[1] : message.author.id)
         });
         this.AddCommand("restricted", 0, false, "region", "!region", "смена региона сервера;", async function (args, message) {
             ChangeRegion(message);
@@ -166,10 +166,10 @@ export class CommandManager {
             //raidleader.rl(message.channel, (args.length > 1 ? args[1] : message.member.user.id), (args.length > 2 ? args[2] : 7));	break;
         });
         this.AddCommand("restricted", 0, true, "roles", "!roles / !roles @DiscordTag", "отображение и выдача стражу заслуженных медалей;", async function (args, message) {
-            Roles(message, args);
+            AsyncRoles(message, args);
         });
         this.AddCommand("restricted", 0, true, "roles id:", "!roles id:type/id", "отображение и выдача заслуженных медалей по bungie id;", async function (args, message) {
-            Roles(message, args);
+            AsyncRoles(message, args);
         });
         this.AddCommand("restricted", 0, true, "record", "!record TRIUMPH_HASH", "отобразить стражей клана, получивших конкретный триумф или предмет;", async function (args, message) { 
             ShowRecordStat(message.channel, args.length > 1 ? args[1] : null)
@@ -192,25 +192,25 @@ export class CommandManager {
 
         this.AddCommand("guildmaster", 2, false, "checksync", "!______________", "_______________;", async function (args, message) { });
         this.AddCommand("guildmaster", 0, true, "ck", "", "", async function (args, message) {
-            ClanTime(message.channel, (args.length > 1 ? args[1] : 7), 'full');
+            AsyncShowClanTime(message.channel, (args.length > 1 ? args[1] : 7), 'full');
         });
         this.AddCommand("guildmaster", 0, true, "clankick", "!clankick %days%", "выборка активности малоактивных стражей;\n_по умолчанию — 7 дней_;", async function (args, message) {
-            ClanTime(message.channel, (args.length > 1 ? args[1] : 7), 'full');
+            AsyncShowClanTime(message.channel, (args.length > 1 ? args[1] : 7), 'full');
         });
         this.AddCommand("guildmaster", 0, true, "ckp", "", "", async function (args, message) {
-            ClanTime(message.channel, (args.length > 1 ? args[1] : 7), '');
+            AsyncShowClanTime(message.channel, (args.length > 1 ? args[1] : 7), '');
         });
         this.AddCommand("guildmaster", 0, true, "clankickpub", "!clankickpub %days%", "выборка активности **самых** малоактивных стражей;\n_по умолчанию — 7 дней_;", async function (args, message) {
-            ClanTime(message.channel, (args.length > 1 ? args[1] : 7), '');
+            AsyncShowClanTime(message.channel, (args.length > 1 ? args[1] : 7), '');
         });
         this.AddCommand("guildmaster", 0, false, "copy", "!copy", "ручной запуск переноса в архив старых сборов рейдов;", async function (args, message) { 
             ClearRaidList(message.client);
          });
         this.AddCommand("guildmaster", 0, true, "csr", "!csr", "ручной запуск выдачи ролей всему клану;", async function (args, message) {
-            SetRoles(message.guild);
+            AsyncSetRolesToEveryMember(message.guild);
         });
         this.AddCommand("guildmaster", 0, false, "engreset", "!engreset", "генерация ссылок на англоязычные изображения еженедельного ресета в текущий канал;", async function (args, message) {
-            ResetEnglish(message.channel);
+            AsyncShowResetEnglish(message.channel);
         });
         this.AddCommand("guildmaster", 0, false, "forum", "!forum LINKTEXT", "опубликовать объявление о наборе в канал новостей;", async function (args, message) { 
             SaveForumLinkAndPublish(message.content.slice(7), message.client);
@@ -225,7 +225,7 @@ export class CommandManager {
             message.channel.send(await CommandManager.GetStatus(true));
         });
         this.AddCommand("guildmaster", 0, true, "membertime", "!membertime @DiscrordTag %days%", "выборка активности стража;\n_по умолчанию — 7 дней_;", async function (args, message) {
-            GetClanMemberOnlineTime(message, (args.length > 2 ? args[2] : 7), (args.length > 1 ? args[1] : message.member.id), true)
+            AsyncGetClanMemberOnlineTime(message, (args.length > 2 ? args[2] : 7), (args.length > 1 ? args[1] : message.member.id), true)
         });
         this.AddCommand("guildmaster", 0, false, "message", "!message channel_id текст", "отправить сообщение в канал;", async function (args, message) {
             SendCustomMessage(message.client, args);
@@ -234,7 +234,7 @@ export class CommandManager {
             ShowNewbieList(message);
         });
         this.AddCommand("guildmaster", 0, true, "nicknames", "!nicknames", "проверка никнеймов стражей;", async function (args, message) {
-            Nicknames(message.channel);
+            AsyncShowNicknames(message.channel);
         });
         this.AddCommand("guildmaster", 0, false, "pmspam", "!pmspam", "спам говном в личку по роли;", async function (args, message) {
             SendPrivateMessageByRole(message.guild, args);
@@ -243,10 +243,10 @@ export class CommandManager {
             DropPvpRole(message.guild);
         });
         this.AddCommand("guildmaster", 0, false, "q", "!q", "список стражей в очереди;", async function (args, message) {
-            ShowQueueList(message);
+            AsyncShowQueueList(message);
         });
         this.AddCommand("guildmaster", 0, false, "qq", "!qq", "список анкет стражей в очереди;", async function (args, message) {
-            ShowQueueReqestsList(message);
+            AsyncShowQueueReqestsList(message);
         });
         this.AddCommand("guildmaster", 0, false, "raidadd", "!raidadd message_id member_id", "добавление в рейд стража;", async function (args, message) { 
             ForcedAddRaidMember(message, args);
@@ -259,12 +259,12 @@ export class CommandManager {
             SetMaximumTriumphsScore(message, args);
         });
         this.AddCommand("guildmaster", 0, true, "size", "!size", "количество стражей в составах;", async function (args, message) {
-            ClanSize().then(value => message.channel.send(value));
+            AsyncClanSize().then(value => message.channel.send(value));
         });
         this.AddCommand("guildmaster", 2, false, "sync", "!______________", "_______________;", async function (args, message) { });
         this.AddCommand("guildmaster", 2, true, "watermelon", "!watermelon @DiscrordTag", "проверка стража на абуз;", async function (args, message) { });
         this.AddCommand("guildmaster", 0, true, "xur", "!xur", "геренация изображения товаров Зура в текущий канал;", async function (args, message) {
-            Xur(message.channel);
+            AsyncDrawXur(message.channel);
         });
     }
 }

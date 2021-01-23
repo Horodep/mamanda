@@ -1,9 +1,9 @@
 import { MessageEmbed } from "discord.js";
 import config from "./config.json";
-import { GetClanMembers } from "./bungieApi.js";
-import { GetShowAndSetRoles } from "./roles.js";
-import { ClanMember, GetAllActivities } from "./clanMember.js";
-import { GetClanVoiceSummary } from "./sql.js";
+import { AsyncGetClanMembers } from "./bungieApi.js";
+import { AsyncGetShowAndSetRoles } from "./roles.js";
+import { ClanMember, AsyncGetAllActivities } from "./clanMember.js";
+import { AsyncGetClanVoiceSummary } from "./sql.js";
 import { GetFullDiscordClanMemberList } from "./discordCommunityFeatures.js";
 import { SendPrivateMessagesToArray } from "./sendMessage.js";
 import { ManifestManager } from "./manifest.js";
@@ -11,33 +11,17 @@ import { FormClanTimeEmbed } from "./embeds/clanTimeEmbed.js";
 import { FromRecordStatEmbed } from "./embeds/recordStatEmbed.js";
 import { FormTopTriumphScoreEmbed } from "./embeds/topTriumphScoreEmbed.js";
 import { FormNicknamesEmbed } from "./embeds/nicknamesEmbed.js";
-import { DrawTriumphs } from "./drawing.js";
+import { AsyncDrawTriumphs } from "./drawing.js";
 
-async function GetFullGameClanMemberList() {
+async function AsyncGetFullApiClanMemberList() {
 	var members = [];
-	Array.prototype.push.apply(members, await GetClanMembers(config.clans[0].id));
-	Array.prototype.push.apply(members, await GetClanMembers(config.clans[1].id));
+	Array.prototype.push.apply(members, await AsyncGetClanMembers(config.clans[0].id));
+	Array.prototype.push.apply(members, await AsyncGetClanMembers(config.clans[1].id));
 	return members;
 }
 
-export async function ClanSize() {
-	return config.clans[0].name + ": " + (await GetClanMembers(config.clans[0].id)).length + "\n" +
-		config.clans[1].name + ": " + (await GetClanMembers(config.clans[1].id)).length;
-}
-
-export async function GetMemberByDiscordName(discordName) {
-	var members = await GetFullGameClanMemberList();
-	for(var i = 0; i < members.length; i++) {
-		if (discordName.startsWith(members[i].destinyUserInfo.LastSeenDisplayName + " ") ||
-			discordName == members[i].destinyUserInfo.LastSeenDisplayName) {
-				return members[i];
-		}
-	};
-	throw 'Игровой профиль не найден.';
-}
-
-export async function ExecuteForEveryMember(timeout, callback) {
-	var members = await GetFullGameClanMemberList();
+async function AsyncExecuteForEveryMember(timeout, callback) {
+	var members = await AsyncGetFullApiClanMemberList();
 	var i = 0;
 	var iteration = function () {
 		if (i < members.length) {
@@ -49,19 +33,12 @@ export async function ExecuteForEveryMember(timeout, callback) {
 	iteration();
 }
 
-export function SetRoles(guild) {
-	ExecuteForEveryMember(5000, (member) => {
-		var clanMember = new ClanMember(member);
-		clanMember.FetchDiscordMember(guild);
-		GetShowAndSetRoles(clanMember, null);
-	});
-}
-
-export async function SendAndUpdateEmbed(channel, requestTimeout, updateFrequency, formData, createEmbed, finalAction) {
+function SendAndUpdateEmbed(channel, requestTimeout, updateFrequency, formData, createEmbed, finalAction) {
 	var iterator = 0;
 	var arrayWithData = [];
 	channel.send(new MessageEmbed()).then((msg) => {
-		ExecuteForEveryMember(requestTimeout, async function (member, i, members) {
+		//TODO@Horodep #33 How to handle errors here?
+		AsyncExecuteForEveryMember(requestTimeout, async function (member, i, members) {
 			arrayWithData.push(await formData(member));
 			iterator++;
 			if (iterator % updateFrequency == 0 || iterator == members.length) {
@@ -72,7 +49,31 @@ export async function SendAndUpdateEmbed(channel, requestTimeout, updateFrequenc
 	});
 }
 
-export async function ShowRecordStat(channel, triumphId) {
+export async function AsyncClanSize() {
+	return config.clans[0].name + ": " + (await AsyncGetClanMembers(config.clans[0].id)).length + "\n" +
+		config.clans[1].name + ": " + (await AsyncGetClanMembers(config.clans[1].id)).length;
+}
+
+export async function AsyncGetMemberByDiscordName(discordName) {
+	var members = await AsyncGetFullApiClanMemberList();
+	for(var i = 0; i < members.length; i++) {
+		if (discordName.startsWith(members[i].destinyUserInfo.LastSeenDisplayName + " ") ||
+			discordName == members[i].destinyUserInfo.LastSeenDisplayName) {
+				return members[i];
+		}
+	};
+	throw 'Игровой профиль не найден.';
+}
+
+export function AsyncSetRolesToEveryMember(guild) {
+	AsyncExecuteForEveryMember(5000, (member) => {
+		var clanMember = new ClanMember(member);
+		clanMember.FetchDiscordMember(guild);
+		AsyncGetShowAndSetRoles(clanMember, null);
+	});
+}
+
+export function ShowRecordStat(channel, triumphId) {
 	if (triumphId == null) {
 		channel.send("Вы не обозначили искомый триумф.");
 		return;
@@ -93,7 +94,7 @@ export async function ShowRecordStat(channel, triumphId) {
 		})
 }
 
-export async function ShowTopTriumphScore(channel, showImage) {
+export function ShowTopTriumphScore(channel, showImage) {
 	SendAndUpdateEmbed(channel, 50, 15,
 		async (member) => {
 			var clanMember = new ClanMember(member);
@@ -106,13 +107,13 @@ export async function ShowTopTriumphScore(channel, showImage) {
 		(array, message) => {
 			if (showImage) {
 				message.delete();
-				DrawTriumphs(array, channel);
+				AsyncDrawTriumphs(array, channel);
 			}
 		})
 }
 
-export async function ClanTime(channel, days, modificators) {
-	var clanVoiceSummary = await GetClanVoiceSummary(days);
+export async function AsyncShowClanTime(channel, days, modificators) {
+	var clanVoiceSummary = await AsyncGetClanVoiceSummary(days);
 	await channel.guild.members.fetch();
 	SendAndUpdateEmbed(channel, 500, 20,
 		async (member) => {
@@ -120,7 +121,7 @@ export async function ClanTime(channel, days, modificators) {
 			await clanMember.FetchCharacterIds();
 			clanMember.FetchDiscordMember(channel.guild);
 			clanMember.AddToVoiceOnline(clanVoiceSummary[clanMember.discordMemberId]);
-			var activities = await GetAllActivities(clanMember, days);
+			var activities = await AsyncGetAllActivities(clanMember, days);
 			activities.forEach(a => clanMember.AddToGameOnline(a.values.timePlayedSeconds.basic.value))
 			return clanMember;
 		},
@@ -193,8 +194,8 @@ export function filterClanMembersData(clanMembers) {
 	return { lowGame, lowVoice, zeroGame, zeroVoice, goodNewbie, isAway, noData, weForgotToKik, discordNotFound };
 }
 
-export async function Nicknames(channel, isReminder) {
-	var gameMembers = await GetFullGameClanMemberList();
+export async function AsyncShowNicknames(channel, isReminder) {
+	var gameMembers = await AsyncGetFullApiClanMemberList();
 	var discordMembers = GetFullDiscordClanMemberList(channel.guild);
 
 	var discordList = [];

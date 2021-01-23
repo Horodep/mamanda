@@ -4,11 +4,11 @@ import jimp from "jimp";
 import fs from "fs";
 import fetch from "node-fetch";
 import { CatchError } from "./catcherror.js";
-import { GetXur } from "./bungieApi.js";
+import { AsyncGetXurData } from "./bungieApi.js";
 import { ManifestManager } from "./manifest.js";
 import { AsyncRefreshAuthToken } from "./httpCore.js";
 
-export async function DrawTriumphs(members, channel) {
+export async function AsyncDrawTriumphs(members, channel) {
     try {
         var directory = config.credentials.directory ?? "./";
         var top = members
@@ -31,12 +31,11 @@ export async function DrawTriumphs(members, channel) {
     }
 }
 
-export async function Xur(channel) {
+export async function AsyncDrawXur(channel) {
     try {
         await AsyncRefreshAuthToken();
         var directory = config.credentials.directory ?? "./";
-        // 1. refresh manifest
-        var data = await GetXur();
+        var data = await AsyncGetXurData();
         var sales = data.Response.sales.data;
         var allStats = data.Response.itemComponents.stats.data;
         var vendorItemIndexes = Object.keys(allStats);
@@ -127,6 +126,6 @@ async function AsyncDrawWhiteRectangle(mainImage, x, y, width, height) {
     var directory = config.credentials.directory ?? "./";
     var filename = directory + '.data/templates/white.png';
     var whiteImage = await jimp.read(filename);
-    await whiteImage.resize(width, height);
+    whiteImage.resize(width, height);
     mainImage.composite(whiteImage, x, y);
 }

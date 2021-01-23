@@ -1,7 +1,7 @@
 import config from "../config.json";
 import { CatchError } from "../catcherror.js";
 
-export async function MessageReactionRemove(reaction, user) {
+export async function AsyncMessageReactionRemove(reaction, user) {
 	if(user.bot) return;
 	if (reaction.partial) {
 		try {

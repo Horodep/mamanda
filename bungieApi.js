@@ -1,35 +1,35 @@
 import { AsyncRequestWithPromise } from "./httpCore.js";
 import config from "./config.json";
 
-export async function GetGlobalAlerts() {
+export async function AsyncGetGlobalAlerts() {
 	return (await AsyncRequestWithPromise('GET', `https://www.bungie.net/Platform/GlobalAlerts/`));
 }
 
-export async function GetClanMembers(clanId) {
+export async function AsyncGetClanMembers(clanId) {
 	var result = await AsyncRequestWithPromise('GET', `https://www.bungie.net/Platform/GroupV2/${clanId}/Members/`);
 	return result?.Response?.results;
 }
 
-async function GetMemberData(membershipType, membershipId, componentsArray) {
+async function AsyncGetMemberData(membershipType, membershipId, componentsArray) {
 	var components = componentsArray.join(",");
 	var result = await AsyncRequestWithPromise('GET',
 		`https://www.bungie.net/Platform/Destiny2/${membershipType}/Profile/${membershipId}/?components=${components}`);
 	return result?.Response;
 }
 
-export async function GetCoreMemberData(membershipType, membershipId) {
-	return (await GetMemberData(membershipType, membershipId, ['Records', 'Collectibles']));
+export async function AsyncGetCoreMemberData(membershipType, membershipId) {
+	return (await AsyncGetMemberData(membershipType, membershipId, ['Records', 'Collectibles']));
 }
 
-export async function GetFullMemberData(membershipType, membershipId) {
-	return (await GetMemberData(membershipType, membershipId, ['Profiles', 'Characters', 'CharacterProgressions', 'PresentationNodes', 'Records', 'Collectibles']));
+export async function AsyncGetFullMemberData(membershipType, membershipId) {
+	return (await AsyncGetMemberData(membershipType, membershipId, ['Profiles', 'Characters', 'CharacterProgressions', 'PresentationNodes', 'Records', 'Collectibles']));
 }
 
-export async function GetProfileData(membershipType, membershipId) {
-	return (await GetMemberData(membershipType, membershipId, ['Profiles']))?.profile;
+export async function AsyncGetProfileData(membershipType, membershipId) {
+	return (await AsyncGetMemberData(membershipType, membershipId, ['Profiles']))?.profile;
 }
 
-export async function GetActivitiesFromApi(membershipType, membershipId, characterId, page, mode) {
+export async function AsyncGetActivitiesFromApi(membershipType, membershipId, characterId, page, mode) {
 	try {
 		mode = mode ? mode : "None";
 		var result = await AsyncRequestWithPromise('GET',
@@ -41,7 +41,7 @@ export async function GetActivitiesFromApi(membershipType, membershipId, charact
 	}
 }
 
-export async function GetVendor(vendorId, componentsArray){
+export async function AsyncGetVendor(vendorId, componentsArray){
 	var cred = config.credentials.game_defaults;
 	var components = componentsArray.join(",");
 	return (await AsyncRequestWithPromise('GET', 
@@ -49,6 +49,6 @@ export async function GetVendor(vendorId, componentsArray){
 		true /*auth*/));
 }
 
-export async function GetXur(){
-	return await GetVendor(2190858386, [402,304]);
+export async function AsyncGetXurData(){
+	return await AsyncGetVendor(2190858386, [402,304]);
 }

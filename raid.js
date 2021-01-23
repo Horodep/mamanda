@@ -143,7 +143,7 @@ export function ClearRaidList(client) {
 	})
 }
 
-export async function GetPlannedRaids(message, discordMention){
+export async function AsyncGetPlannedRaids(message, discordMention){
 	var discordId = discordMention.replace(/\D/g, '');
 
 	var raid_channel = message.client.channels.cache.get(config.channels.raids);

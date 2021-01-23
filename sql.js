@@ -12,7 +12,7 @@ const pool = new Pool({
     max: 10
 });
 
-export async function GetMemberDetailedVoice(days, discordMemberId) {
+export async function AsyncGetMemberDetailedVoice(days, discordMemberId) {
     try {
         var results = await pool.query(memberVoiceDetailsQuery.replace('$2', days), [discordMemberId]);
         console.log("member voice online - ok");
@@ -22,7 +22,7 @@ export async function GetMemberDetailedVoice(days, discordMemberId) {
     return results;
 }
 
-export async function GetClanVoiceSummary(days) {
+export async function AsyncGetClanVoiceSummary(days) {
     try {
         var clanVoiceSummary = [];
         var results = await pool.query(guildVoiceSummaryQuery.replace('$2', days), []);

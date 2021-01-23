@@ -32,7 +32,7 @@ function GetDataAndHandleErrors(textprefix, callback) {
 	}
 }
 
-export function get_character_details(response) {
+export function FetchCharacterDetails(response) {
 	var charactersDetails = new CharacterDetails();
 	var characterIds = response.profile.data.characterIds;
 	var characters = response.characters.data;

@@ -2,7 +2,7 @@ import config from "../config.json";
 import { AddRaidMember, RemoveRaidMember, KickRaidMember, CancelRaid } from "../raid.js";
 import { CatchError } from "../catcherror.js";
 
-export async function MessageReactionAdd(reaction, user) {
+export async function AsyncMessageReactionAdd(reaction, user) {
 	if(user.bot) return;
 	if (reaction.partial) {
 		try {

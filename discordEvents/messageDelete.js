@@ -1,7 +1,7 @@
 import config from "../config.json";
 import { CatchError } from "../catcherror.js";
 
-export async function MessageDelete(message) {
+export function MessageDelete(message) {
 	console.log("messageDeleted");
 	try {
 		if (message.author?.bot ?? true) return;

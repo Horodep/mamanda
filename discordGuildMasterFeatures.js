@@ -3,7 +3,7 @@ import config from "./config.json";
 import fetch from "node-fetch";
 import { CatchError } from "./catcherror.js";
 
-export async function ResetEnglish(channel) {
+export async function AsyncShowResetEnglish(channel) {
 	try{
 		var response = await fetch("http://kyber3000.com/Reset");
 		channel.send("Reset by Kyber3000");
@@ -104,7 +104,7 @@ export function ShowNewbieList(message) {
 	newbieList.sort();
 	message.channel.send(newbieList.join('\n'));
 }
-export async function ShowQueueList(message) {
+export async function AsyncShowQueueList(message) {
 	var queueList = [];
 	await message.guild.members.fetch();
 	message.guild.members.cache.filter(m => m.roles.cache.size == 1).forEach(function (member) {
@@ -115,7 +115,7 @@ export async function ShowQueueList(message) {
 	queueList.sort();
 	message.channel.send(queueList.join('\n'));
 }
-export async function ShowQueueReqestsList(message) {
+export async function AsyncShowQueueReqestsList(message) {
 	var counterOfMessagesByUser = [];
 	var counterOfReactsOnMessage = [];
 	await message.guild.members.fetch();
