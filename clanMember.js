@@ -221,7 +221,7 @@ export function GetDiscordMemberByMention(guild, discordMention) {
 }
 
 export async function AsyncGetClanMemberOnlineTime(message, days, discordMention, isDetailed) {
-    try {
+    try /*need to check if needed*/{
         var discordName = discordMention == null
             ? message.member.displayName
             : GetDiscordMemberByMention(message.guild, discordMention).displayName;

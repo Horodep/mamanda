@@ -30,7 +30,7 @@ export async function AsyncGetProfileData(membershipType, membershipId) {
 }
 
 export async function AsyncGetActivitiesFromApi(membershipType, membershipId, characterId, page, mode) {
-	try {
+	try /*need to check if needed*/{
 		mode = mode ? mode : "None";
 		var result = await AsyncRequestWithPromise('GET',
 			`https://www.bungie.net/Platform/Destiny2/${membershipType}/Account/${membershipId}/Character/${characterId}/Stats/Activities/?mode=${mode}&count=250&page=${page}`);

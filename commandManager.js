@@ -18,7 +18,7 @@ export class CommandManager {
     static commandList = [];
 
     static async Run(args, message) {
-        try {
+        try /*need to check if needed*/{
             var command = this.FindCommand(args[0]);
             if (command?.status > 1) message.channel.send("Команда отключена");
             else await command?.callback(args, message);

@@ -135,7 +135,7 @@ export async function AsyncShowQueueReqestsList(message) {
 					.sort((a, b) => a.id > b.id ? 1 : -1)
 					.filter(m => m.author.id == member.user.id)
 					.forEach(async function (requestMessage) {
-						try {
+						try /*need to check if needed*/{
 							counterOfMessagesByUser[member.id]++;
 							counterOfReactsOnMessage[requestMessage.id] = 0;
 							requestBody += requestMessage.content;

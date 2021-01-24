@@ -9,7 +9,7 @@ import { ManifestManager } from "./manifest.js";
 import { AsyncRefreshAuthToken } from "./httpCore.js";
 
 export async function AsyncDrawTriumphs(members, channel) {
-    try {
+    try /*need to check if needed*/{
         var directory = config.credentials.directory ?? "./";
         var top = members
             .sort((a, b) => (a.activeScore > b.activeScore ? -1 : 1))
@@ -32,7 +32,7 @@ export async function AsyncDrawTriumphs(members, channel) {
 }
 
 export async function AsyncDrawXur(channel) {
-    try {
+    try /*need to check if needed*/{
         await AsyncRefreshAuthToken();
         var directory = config.credentials.directory ?? "./";
         var data = await AsyncGetXurData();

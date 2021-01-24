@@ -20,7 +20,7 @@ class CharacterDetails {
 }
 
 function GetDataAndHandleErrors(textprefix, callback) {
-	try {
+	try /*need to check if needed*/{
 		return callback();
 	} catch (e) {
 		//CatchError(e);

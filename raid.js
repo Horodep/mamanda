@@ -5,7 +5,7 @@ import { SendPrivateMessage } from "./sendMessage.js";
 import { RaidData } from "./raidData.js";
 
 export function CreateRaid(message, args) {
-    try {
+    try /*need to check if needed*/{
         var data = ParseCommandAndGetData(args, message.member);
         data.AddRaidMember(message.member.id);
         var embed = CreateRaidEmbed(data);
@@ -32,7 +32,7 @@ export function CreateRaid(message, args) {
 }
 
 export function AddRaidMember(message, user) {
-    try {
+    try /*need to check if needed*/{
         var data = GetDataFromEmbed(message.embeds[0]);
         if (data.members.length == data.numberOfPlaces) return;
         data.AddRaidMember(user.id);
@@ -44,7 +44,7 @@ export function AddRaidMember(message, user) {
 }
 
 export function RemoveRaidMember(message, user, showAsLeaver) {
-    try {
+    try /*need to check if needed*/{
         var data = GetDataFromEmbed(message.embeds[0]);
         if (!data.members.includes(user.id)) return;
         data.RemoveRaidMember(user.id);

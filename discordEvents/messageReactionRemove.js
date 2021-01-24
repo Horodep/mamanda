@@ -4,7 +4,7 @@ import { CatchError } from "../catcherror.js";
 export async function AsyncMessageReactionRemove(reaction, user) {
 	if(user.bot) return;
 	if (reaction.partial) {
-		try {
+		try /*need to check if needed*/{
 			await reaction.fetch();
 		} catch (error) {
 			error.name = 'Something went wrong when fetching the reaction: ' + error.name;

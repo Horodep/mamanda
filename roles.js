@@ -20,7 +20,7 @@ export async function AsyncRoles(message, args) {
 
 // TODO@Horodep #32 Make it return clanMember
 async function AsyncRolesByDiscordMention(channel, discordMention) {
-	try {
+	try /*need to check if needed*/{
 		var discordMember = GetDiscordMemberByMention(channel.guild, discordMention);
 		var member = await AsyncGetMemberByDiscordName(discordMember.displayName);
 		var clanMember = new ClanMember(member);
@@ -32,7 +32,7 @@ async function AsyncRolesByDiscordMention(channel, discordMention) {
 }
 
 async function AsyncRolesByMembershipId(channel, membership) {
-	try {
+	try /*need to check if needed*/{
 		var membershipType = membership.replace('id:', '').split('/')[0];
 		var membershipId = membership.replace('id:', '').split('/')[1];
 
@@ -52,7 +52,7 @@ async function AsyncRolesByMembershipId(channel, membership) {
 }
 
 export async function AsyncGetShowAndSetRoles(clanMember, channel) {
-	try {
+	try /*need to check if needed*/{
 		var rolesData = await AsyncGetRolesData(clanMember.membershipType, clanMember.membershipId);
 
 		console.log(rolesData);
