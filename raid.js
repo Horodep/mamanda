@@ -1,11 +1,11 @@
-import { CatchError, CatchErrorAndDeleteByTimeout } from "./catcherror.js";
+import { CatchError, CatchErrorAndDeleteByTimeout, CatchRaidError } from "./catcherror.js";
 import config from "./config.json";
 import { MessageEmbed } from "discord.js";
 import { SendPrivateMessage } from "./sendMessage.js";
 import { RaidData } from "./raidData.js";
 
 export function CreateRaid(message, args) {
-    try /*need to check if needed*/{
+    try {
         var data = ParseCommandAndGetData(args, message.member);
         data.AddRaidMember(message.member.id);
         var embed = CreateRaidEmbed(data);
@@ -19,40 +19,26 @@ export function CreateRaid(message, args) {
         });
         message.delete();
     } catch (e) {
-        if (typeof(e) == 'object') CatchError(e);
-        else message.channel.send(
-            "Неверный синтаксис: __" + e.toLowerCase() + "__\nДолжно быть:\n```!сбор ДД.ММ ЧЧ:ММ активность, комментарии```" +
-            "Вы написали:\n```" + message.content + "```").then((msg) => {
-                message.delete();
-                setTimeout(function () {
-                    msg.delete();
-                }, 30000);
-            });
+        if (typeof(e) == 'object') CatchError(e, message.channel);
+        else CatchRaidError(e, message.content, message.channel);
+        message.delete();
     }
 }
 
 export function AddRaidMember(message, user) {
-    try /*need to check if needed*/{
-        var data = GetDataFromEmbed(message.embeds[0]);
-        if (data.members.length == data.numberOfPlaces) return;
-        data.AddRaidMember(user.id);
-        data.RemoveFromLeftField(user.id);
-        message.edit(CreateRaidEmbed(data));
-    } catch (e) {
-        CatchErrorAndDeleteByTimeout(e, message.channel, 15000);
-    }
+    var data = GetDataFromEmbed(message.embeds[0]);
+    if (data.members.length == data.numberOfPlaces) return;
+    data.AddRaidMember(user.id);
+    data.RemoveFromLeftField(user.id);
+    message.edit(CreateRaidEmbed(data));
 }
 
 export function RemoveRaidMember(message, user, showAsLeaver) {
-    try /*need to check if needed*/{
-        var data = GetDataFromEmbed(message.embeds[0]);
-        if (!data.members.includes(user.id)) return;
-        data.RemoveRaidMember(user.id);
-        if (showAsLeaver) data.AddToLeftField(user.id);
-        message.edit(CreateRaidEmbed(data));
-    } catch (e) {
-        CatchErrorAndDeleteByTimeout(e, message.channel, 15000);
-    }
+    var data = GetDataFromEmbed(message.embeds[0]);
+    if (!data.members.includes(user.id)) return;
+    data.RemoveRaidMember(user.id);
+    if (showAsLeaver) data.AddToLeftField(user.id);
+    message.edit(CreateRaidEmbed(data));
 }
 
 export function KickRaidMember(message, user, reaction) {

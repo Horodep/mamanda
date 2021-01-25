@@ -18,7 +18,7 @@ export class CommandManager {
     static commandList = [];
 
     static async Run(args, message) {
-        try /*need to check if needed*/{
+        try {
             var command = this.FindCommand(args[0]);
             if (command?.status > 1) message.channel.send("Команда отключена");
             else await command?.callback(args, message);
@@ -154,7 +154,7 @@ export class CommandManager {
             ClanMedalsSummary(message.channel);
         });
         this.AddCommand("restricted", 0, true, "mymt", "!mymt", "проверка активности стража в голосовом чате (только своей);", async function (args, message) {
-            AsyncGetClanMemberOnlineTime(message, (args.length > 1 ? args[1] : 7));
+            await AsyncGetClanMemberOnlineTime(message, (args.length > 1 ? args[1] : 7));
         });
         this.AddCommand("restricted", 0, false, "myraids", "!myraids", "список рейдов, в которые записался страж;", async function (args, message) {
             AsyncGetPlannedRaids(message, args.length > 1 ? args[1] : message.author.id)
@@ -223,7 +223,7 @@ export class CommandManager {
             message.channel.send(await CommandManager.GetStatus(true));
         });
         this.AddCommand("guildmaster", 0, true, "membertime", "!membertime @DiscrordTag %days%", "выборка активности стража;\n_по умолчанию — 7 дней_;", async function (args, message) {
-            AsyncGetClanMemberOnlineTime(message, (args.length > 2 ? args[2] : 7), (args.length > 1 ? args[1] : message.member.id), true)
+            await AsyncGetClanMemberOnlineTime(message, (args.length > 2 ? args[2] : 7), (args.length > 1 ? args[1] : message.member.id), true)
         });
         this.AddCommand("guildmaster", 0, false, "message", "!message channel_id текст", "отправить сообщение в канал;", async function (args, message) {
             SendCustomMessage(message.client, args);

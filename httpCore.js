@@ -39,7 +39,7 @@ export async function AsyncRequestWithPromise(method, url, setAuth) {
         if (setAuth == true) xhr.setRequestHeader("Authorization", "Bearer "+AccessToken.access_token);
 		xhr.onreadystatechange = function() {
 			if (xhr.readyState == 4) {
-                try{
+                try /*need to check if needed*/{
                     var responce = JSON.parse(xhr.responseText);
 
                     if (xhr.status >= 300) {

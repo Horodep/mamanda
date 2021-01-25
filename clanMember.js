@@ -221,31 +221,27 @@ export function GetDiscordMemberByMention(guild, discordMention) {
 }
 
 export async function AsyncGetClanMemberOnlineTime(message, days, discordMention, isDetailed) {
-    try /*need to check if needed*/{
-        var discordName = discordMention == null
-            ? message.member.displayName
-            : GetDiscordMemberByMention(message.guild, discordMention).displayName;
+    var discordName = discordMention == null
+        ? message.member.displayName
+        : GetDiscordMemberByMention(message.guild, discordMention).displayName;
 
-        var apiMember = await AsyncGetMemberByDiscordName(discordName);
-        var clanMember = new ClanMember(apiMember);
-        await clanMember.FetchCharacterIds();
-        clanMember.FetchDiscordMember(message.guild);
+    var apiMember = await AsyncGetMemberByDiscordName(discordName);
+    var clanMember = new ClanMember(apiMember);
+    await clanMember.FetchCharacterIds();
+    clanMember.FetchDiscordMember(message.guild);
 
-        var clanVoiceSummary = await AsyncGetClanVoiceSummary(days);
-        clanMember.AddToVoiceOnline(clanVoiceSummary[clanMember.discordMemberId]);
+    var clanVoiceSummary = await AsyncGetClanVoiceSummary(days);
+    clanMember.AddToVoiceOnline(clanVoiceSummary[clanMember.discordMemberId]);
 
-        var activities = await AsyncGetAllActivities(clanMember, days);
-        activities.forEach(a => clanMember.AddToGameOnline(a.values.timePlayedSeconds.basic.value))
+    var activities = await AsyncGetAllActivities(clanMember, days);
+    activities.forEach(a => clanMember.AddToGameOnline(a.values.timePlayedSeconds.basic.value))
 
-        if (isDetailed) {
-            var detailedVoiceResults = await AsyncGetMemberDetailedVoice(days, clanMember.discordMemberId);
-            var lines = clanMember.FormLinesForDetailedVoice(detailedVoiceResults)
-            message.channel.send(clanMember.GetMemberTimeEmbed(lines));
-        }
-        else message.channel.send(clanMember.GetMemberTimeString());
-    } catch (e) {
-        CatchError(e, message.channel);
+    if (isDetailed) {
+        var detailedVoiceResults = await AsyncGetMemberDetailedVoice(days, clanMember.discordMemberId);
+        var lines = clanMember.FormLinesForDetailedVoice(detailedVoiceResults)
+        message.channel.send(clanMember.GetMemberTimeEmbed(lines));
     }
+    else message.channel.send(clanMember.GetMemberTimeString());
 }
 
 export async function AsyncGetAllActivities(clanMember, days) {
