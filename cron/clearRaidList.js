@@ -7,7 +7,7 @@ const client = new Discord.Client({ partials: ['MESSAGE', 'CHANNEL', 'REACTION']
 client.login(config.credentials.discordApiKey);
 
 client.on("ready", () => {
-    try /*need to check if needed*/{
+    try {
         FetchDefaultCatchErrorChannel(client);
         ClearRaidList(client);
         setTimeout(() => {
@@ -15,6 +15,6 @@ client.on("ready", () => {
             process.exit();
         }, 18000);
     } catch (e) {
-        CatchError(e);
+        CatchCronError(e);
     }
 });

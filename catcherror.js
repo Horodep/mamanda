@@ -10,10 +10,15 @@ export function CatchError(e, channel) {
 	var validChannel = channel ?? sandbox;
 
 	if (typeof(e) == 'string') ShowInfoMessage(e, validChannel);
-	else ShowCodeError(e, validChannel);
+	else ShowErrorWithStack(e, validChannel);
 }
 
-export function ShowCodeError(e, channel) {
+export function CatchCronError(e) {
+	sandbox.send(`This is a cron code error.`);
+	ShowErrorWithStack(e, sandbox);
+}
+
+export function ShowErrorWithStack(e, channel) {
 	console.error(e);
 	channel.send(`<@${config.users.developer}>`);
 	channel.send(`Ошибка ${e.name}: ${e.message}\n\n${e.stack}`, { code: 'elixir' });

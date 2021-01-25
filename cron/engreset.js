@@ -7,7 +7,7 @@ const client = new Discord.Client({ partials: ['MESSAGE', 'CHANNEL', 'REACTION']
 client.login(config.credentials.discordApiKey);
 
 client.on("ready", () => {
-    try /*need to check if needed*/{
+    try {
         FetchDefaultCatchErrorChannel(client);
         const channel = client.channels.cache.get(config.channels.gamenews);
         AsyncShowResetEnglish(channel);
@@ -16,6 +16,6 @@ client.on("ready", () => {
             process.exit();
         }, 8000);
     } catch (e) {
-        CatchError(e);
+        CatchCronError(e);
     }
 });

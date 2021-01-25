@@ -7,7 +7,7 @@ const client = new Discord.Client({ partials: ['MESSAGE', 'CHANNEL', 'REACTION']
 client.login(config.credentials.discordApiKey);
 
 client.on("ready", () => {
-    try /*need to check if needed*/{
+    try {
         FetchDefaultCatchErrorChannel(client);
         var guild = client.guilds.cache.get(config.guilds.main);
         AsyncSetRolesToEveryMember(guild);
@@ -16,6 +16,6 @@ client.on("ready", () => {
             process.exit();
         }, 1200000);
     } catch (e) {
-        CatchError(e);
+        CatchCronError(e);
     }
 });
