@@ -2,6 +2,7 @@ import fs from "fs";
 import config from "./config.json";
 import fetch from "node-fetch";
 import { CatchError } from "./catcherror.js";
+import { FetchFullPath } from "./directories.js";
 
 export async function AsyncShowResetEnglish(channel) {
 	try{
@@ -51,8 +52,7 @@ export function GiveForumRole(message) {
 }
 
 export function SaveForumLinkAndPublish(link, client) {
-	var directory = config.credentials.directory ?? "./";
-	fs.writeFile(directory + ".data/forumlink.txt", link, function (err) {
+	fs.writeFile(FetchFullPath(".data/forumlink.txt"), link, function (err) {
 		if (err) CatchError(err); // если возникла ошибка
 	});
 	var channel_news = client.channels.cache.get(config.channels.clannews);
@@ -65,8 +65,7 @@ export function SaveForumLinkAndPublish(link, client) {
 
 export function PublishDailyMessage(client) {
 	var channel = client.channels.cache.get(config.channels.flood);
-	var directory = config.credentials.directory ?? "./";
-	fs.readFile(directory + ".data/forumlink.txt", 'utf8', function (err, data) {
+	fs.readFile(FetchFullPath(".data/forumlink.txt"), 'utf8', function (err, data) {
 		if (err) CatchError(err);
 		channel.send(
 			"Уважаемые Стражи! А точнее те из вас, кто <@&" + config.roles.forum_tag + ">\n" +
@@ -88,8 +87,7 @@ export function SetMaximumTriumphsScore(message, args) {
 		message.channel.send("Введенное значение не является числом.");
 		return;
 	}
-	var directory = config.credentials.directory ?? "./";
-	fs.writeFile(directory + ".data/maxtriumphs.json", args[1], function (err) {
+	fs.writeFile(FetchFullPath(".data/maxtriumphs.json"), args[1], function (err) {
 		if (err) CatchError(err);
 	});
 }

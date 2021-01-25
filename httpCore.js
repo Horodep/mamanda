@@ -2,6 +2,7 @@ import fs from "fs";
 import { XMLHttpRequest } from "xmlhttprequest";
 import config from "./config.json";
 import { CatchError, CatchBadResponce, CatchHttpResponce } from "./catcherror.js";
+import { FetchFullPath } from "./directories.js";
 
 const accessTokenFileName = '.data/access_token.json';
 
@@ -21,12 +22,10 @@ class AccessToken{
         return this.#tokenObject.refresh_token;
     }
     static ReadFile(){
-        var directory = config.credentials.directory ?? "./";
-        this.#tokenObject = JSON.parse(fs.readFileSync(directory + accessTokenFileName));
+        this.#tokenObject = JSON.parse(fs.readFileSync(FetchFullPath(accessTokenFileName)));
     }
     static WriteFile(){
-        var directory = config.credentials.directory ?? "./";
-        fs.writeFile(directory + accessTokenFileName, JSON.stringify(this.#tokenObject), (err) => {
+        fs.writeFile(FetchFullPath(accessTokenFileName), JSON.stringify(this.#tokenObject), (err) => {
             if (err) CatchError(err);
         });
     }

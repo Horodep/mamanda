@@ -22,8 +22,7 @@ export class ManifestManager {
     }
 
     static Cache() {
-        var directory = config.credentials.directory ?? "./";
-        this.manifest = JSON.parse(fs.readFileSync(directory + '.data/destiny2.json'));
+        this.manifest = JSON.parse(fs.readFileSync(FetchFullPath('.data/destiny2.json')));
     }
 
     static CleanCache() {
