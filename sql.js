@@ -13,26 +13,18 @@ const pool = new Pool({
 });
 
 export async function AsyncGetMemberDetailedVoice(days, discordMemberId) {
-    try /*need to check if needed*/{
-        var results = await pool.query(memberVoiceDetailsQuery.replace('$2', days), [discordMemberId]);
-        console.log("member voice online - ok");
-    } catch (err) {
-        CatchError(err)
-    }
+    var results = await pool.query(memberVoiceDetailsQuery.replace('$2', days), [discordMemberId]);
+    console.log("member voice online - ok");
     return results;
 }
 
 export async function AsyncGetClanVoiceSummary(days) {
-    try /*need to check if needed*/{
-        var clanVoiceSummary = [];
-        var results = await pool.query(guildVoiceSummaryQuery.replace('$2', days), []);
-        results.rows.forEach(function (row) {
-            clanVoiceSummary[row.id] = row.online;
-        });
-        console.log("guild voice online - ok");
-    } catch (err) {
-        CatchError(err)
-    }
+    var clanVoiceSummary = [];
+    var results = await pool.query(guildVoiceSummaryQuery.replace('$2', days), []);
+    results.rows.forEach(function (row) {
+        clanVoiceSummary[row.id] = row.online;
+    });
+    console.log("guild voice online - ok");
     return clanVoiceSummary;
 }
 /*
