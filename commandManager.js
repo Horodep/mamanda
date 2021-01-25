@@ -166,11 +166,9 @@ export class CommandManager {
             //raidleader.rl(message.channel, (args.length > 1 ? args[1] : message.member.user.id), (args.length > 2 ? args[2] : 7));	break;
         });
         this.AddCommand("restricted", 0, true, "roles", "!roles / !roles @DiscordTag", "отображение и выдача стражу заслуженных медалей;", async function (args, message) {
-            AsyncRoles(message, args);
+            await AsyncRoles(message, args);
         });
-        this.AddCommand("restricted", 0, true, "roles id:", "!roles id:type/id", "отображение и выдача заслуженных медалей по bungie id;", async function (args, message) {
-            AsyncRoles(message, args);
-        });
+        this.AddCommand("restricted", 0, true, "roles id:", "!roles id:type/id", "отображение и выдача заслуженных медалей по bungie id;", async function (args, message) { });
         this.AddCommand("restricted", 0, true, "record", "!record TRIUMPH_HASH", "отобразить стражей клана, получивших конкретный триумф или предмет;", async function (args, message) { 
             ShowRecordStat(message.channel, args.length > 1 ? args[1] : null)
         });

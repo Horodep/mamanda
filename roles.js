@@ -8,57 +8,38 @@ import { ClanMember, GetDiscordMemberByMention } from "./clanMember.js";
 import { FormRolesEmbed } from "./embeds/rolesEmbed.js";
 
 export async function AsyncRoles(message, args) {
-	// TODO: #31 Do not repeate, use shorts @Horodep
-	if (args[1]?.startsWith('id:')) {
-		await AsyncRolesByMembershipId(message.channel, args[1]);
-	} else {
+	var clanMember = 
+		args[1]?.startsWith('id:') ?
+		await AsyncRolesByMembershipId(message.channel, args[1]) :
 		await AsyncRolesByDiscordMention(message.channel, args.length > 1 ? args[1] : message.member.id);
-	}
+	await AsyncGetShowAndSetRoles(clanMember, message.channel);
 }
 
-// TODO@Horodep #32 Make it return clanMember
 async function AsyncRolesByDiscordMention(channel, discordMention) {
-	try /*need to check if needed*/{
-		var discordMember = GetDiscordMemberByMention(channel.guild, discordMention);
-		var member = await AsyncGetMemberByDiscordName(discordMember.displayName);
-		var clanMember = new ClanMember(member);
-		clanMember.SetDiscordMember(discordMember);
-		await AsyncGetShowAndSetRoles(clanMember, channel);
-	} catch (e) {
-		CatchError(e, channel);
-	}
+	var discordMember = GetDiscordMemberByMention(channel.guild, discordMention);
+	var member = await AsyncGetMemberByDiscordName(discordMember.displayName);
+
+	var clanMember = new ClanMember(member);
+	clanMember.SetDiscordMember(discordMember);
+	return clanMember;
 }
 
 async function AsyncRolesByMembershipId(channel, membership) {
-	try /*need to check if needed*/{
-		var membershipType = membership.replace('id:', '').split('/')[0];
-		var membershipId = membership.replace('id:', '').split('/')[1];
-
-		var member = await AsyncGetProfileData(membershipType, membershipId);
-		if (member == null) {
-			channel.send('Игровой профиль не найден.');
-			return;
-		}
-
-		var clanMember = new ClanMember(member.data);
-		clanMember.FetchDiscordMember(channel.guild);
-
-		await AsyncGetShowAndSetRoles(clanMember, channel);
-	} catch (e) {
-		CatchError(e, channel);
-	}
+	var membershipType = membership.replace('id:', '').split('/')[0];
+	var membershipId = membership.replace('id:', '').split('/')[1];
+	var member = await AsyncGetProfileData(membershipType, membershipId);
+	if (member == null) throw 'Игровой профиль не найден.';
+	
+	var clanMember = new ClanMember(member.data);
+	clanMember.FetchDiscordMember(channel.guild);
+	return clanMember;
 }
 
 export async function AsyncGetShowAndSetRoles(clanMember, channel) {
-	try /*need to check if needed*/{
-		var rolesData = await AsyncGetRolesData(clanMember.membershipType, clanMember.membershipId);
-
-		console.log(rolesData);
-		if (channel != null) channel.send(FormRolesEmbed(clanMember, rolesData));
-		SetRoles(clanMember, rolesData?.characterDetails, rolesData?.medals);
-	} catch (e) {
-		CatchError(e, channel);
-	}
+	var rolesData = await AsyncGetRolesData(clanMember.membershipType, clanMember.membershipId);
+	console.log(rolesData);
+	if (channel != null) channel.send(FormRolesEmbed(clanMember, rolesData));
+	SetRoles(clanMember, rolesData?.characterDetails, rolesData?.medals);
 }
 
 async function AsyncGetRolesData(membershipType, membershipId) {
