@@ -38,9 +38,5 @@ function EmbedFormField(data) {
 }
 
 function EmbedFormLine(data) {
-	try /*need to check if needed*/{
-		return (data.state ? "🔶 " : "🔷 ") + data.text;
-	} catch {
-		return "🔷 not defined";
-	}
+	return (data.state ? "🔶 " : "🔷 ") + data.text;
 }
