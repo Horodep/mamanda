@@ -1,4 +1,5 @@
-import maxtriumphs from "./.data/maxtriumphs.json"; //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//TODO@Horodep #34 reading json triumphs with import do not work
+import maxtriumphs from "./.data/maxtriumphs.json";
 import config from "./config.json";
 import jimp from "jimp";
 import fs from "fs";
