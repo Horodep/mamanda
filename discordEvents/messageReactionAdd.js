@@ -3,21 +3,18 @@ import { AddRaidMember, RemoveRaidMember, KickRaidMember, CancelRaid } from "../
 import { CatchError } from "../catcherror.js";
 
 export async function AsyncMessageReactionAdd(reaction, user) {
-	if(user.bot) return;
-	if (reaction.partial) {
-		try /*need to check if needed*/{
-			await reaction.fetch();
-		} catch (error) {
-			error.name = 'Something went wrong when fetching the reaction: ' + error.name;
-			CatchError(error);
-			return;
-		}
-	}
-	console.log(`${user.username} set reaction ${reaction._emoji.name}.`);
+	try {
+		if(user.bot) return;
+		if (reaction.partial) await reaction.fetch();
+		console.log(`${user.username} set reaction ${reaction._emoji.name}.`);
 
-	if (reaction.message.channel.id == config.channels.wishes) HandleWishes(reaction, user);
-	else if (reaction.message.embeds[0]?.footer?.text.startsWith("Собрал")) HandleRaids(reaction, user);
-	else HandleOther(reaction, user);
+		if (reaction.message.channel.id == config.channels.wishes) HandleWishes(reaction, user);
+		else if (reaction.message.embeds[0]?.footer?.text.startsWith("Собрал")) HandleRaids(reaction, user);
+		else HandleOther(reaction, user);
+	} catch (error) {
+		CatchErrorAndDeleteByTimeout(error, reaction?.message?.channel, 15000);
+		return;
+	}
 };
 
 function HandleOther(reaction, user) {

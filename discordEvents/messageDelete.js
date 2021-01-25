@@ -3,7 +3,7 @@ import { CatchError } from "../catcherror.js";
 
 export function MessageDelete(message) {
 	console.log("messageDeleted");
-	try /*need to check if needed*/{
+	try {
 		if (message.author?.bot ?? true) return;
 		if (message.channel.id == config.channels.raids) return;
 		if (message.channel.id == config.channels.lfg) return;

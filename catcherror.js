@@ -18,13 +18,13 @@ export function CatchCronError(e) {
 	ShowErrorWithStack(e, sandbox);
 }
 
-export function ShowErrorWithStack(e, channel) {
+function ShowErrorWithStack(e, channel) {
 	console.error(e);
 	channel.send(`<@${config.users.developer}>`);
 	channel.send(`Ошибка ${e.name}: ${e.message}\n\n${e.stack}`, { code: 'elixir' });
 }
 
-export function ShowInfoMessage(e, channel) {
+function ShowInfoMessage(e, channel) {
 	console.log(e);
 	channel.send(e);
 }
@@ -46,12 +46,13 @@ export function CatchHttpResponce(e, url, responce, channel){
 	validChannel.send(`${e.stack}`, { code: 'elixir' });
 }
 
-export function CatchErrorWithTimeout(e, channel, timeout){
-	var line = "Произошла ошибка: " + e.name.toLowerCase() + 
-		"\n" + e.message + 
-		"\n Попробуйте еще раз. Если ошибка повторится, обратитесь к <@" + config.users.developer + "> " + 
+export function CatchErrorAndDeleteByTimeout(e, channel, timeout){
+	var validChannel = channel ?? sandbox;
+	var line = "Данное сообщение будет удалено через " + Math.floor(timeout/1000) + " секунд." + 
+		"\nПроизошла ошибка " + e.name + ": " + e.message + 
+		"\nПопробуйте еще раз. Если ошибка повторится, обратитесь к <@" + config.users.developer + "> со скрином ошибки." + 
 		"\n```js\n" + e.stack + "```";
-	channel.send(line).then((msg) => {
+	validChannel.send(line).then((msg) => {
 		setTimeout(() => { msg.delete(); }, timeout);
 	});
 }

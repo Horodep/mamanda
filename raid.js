@@ -1,4 +1,4 @@
-import { CatchError, CatchErrorWithTimeout } from "./catcherror.js";
+import { CatchError, CatchErrorAndDeleteByTimeout } from "./catcherror.js";
 import config from "./config.json";
 import { MessageEmbed } from "discord.js";
 import { SendPrivateMessage } from "./sendMessage.js";
@@ -39,7 +39,7 @@ export function AddRaidMember(message, user) {
         data.RemoveFromLeftField(user.id);
         message.edit(CreateRaidEmbed(data));
     } catch (e) {
-        CatchErrorWithTimeout(e, message.channel, 15000);
+        CatchErrorAndDeleteByTimeout(e, message.channel, 15000);
     }
 }
 
@@ -51,7 +51,7 @@ export function RemoveRaidMember(message, user, showAsLeaver) {
         if (showAsLeaver) data.AddToLeftField(user.id);
         message.edit(CreateRaidEmbed(data));
     } catch (e) {
-        CatchErrorWithTimeout(e, message.channel, 15000);
+        CatchErrorAndDeleteByTimeout(e, message.channel, 15000);
     }
 }
 

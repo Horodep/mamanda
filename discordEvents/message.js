@@ -3,7 +3,7 @@ import { CatchError } from "../catcherror.js";
 import { CommandManager } from "../commandManager.js";
 
 export function Message(message){
-	try /*need to check if needed*/{
+	try {
 		if (message.author.bot || !message.content.startsWith("!")) return;
 		
 		if (message.channel.type != "text") {
