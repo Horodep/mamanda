@@ -9,12 +9,10 @@ import { FormRolesEmbed } from "./embeds/rolesEmbed.js";
 
 export async function AsyncRoles(message, args) {
 	// TODO: #31 Do not repeate, use shorts @Horodep
-	if (args.length == 1) {
-		await AsyncRolesByDiscordMention(message.channel, message.member.id);
-	} else if (args[1].startsWith('id:')) {
+	if (args[1]?.startsWith('id:')) {
 		await AsyncRolesByMembershipId(message.channel, args[1]);
 	} else {
-		await AsyncRolesByDiscordMention(message.channel, args[1]);
+		await AsyncRolesByDiscordMention(message.channel, args.length > 1 ? args[1] : message.member.id);
 	}
 }
 
