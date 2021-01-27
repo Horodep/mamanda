@@ -1,8 +1,7 @@
 import { MessageEmbed } from "discord.js";
-import { CatchError } from "./catcherror.js";
-import { GetActivitiesFromApi, GetCoreMemberData, GetProfileData } from "./bungieApi.js";
-import { GetMemberByDiscordName } from "./clan.js";
-import { GetClanVoiceSummary, GetMemberDetailedVoice } from "./sql.js"
+import { AsyncGetActivitiesFromApi, AsyncGetCoreMemberData, AsyncGetProfileData } from "./bungieApi.js";
+import { AsyncGetMemberByDiscordName } from "./clan.js";
+import { AsyncGetClanVoiceSummary, AsyncGetMemberDetailedVoice } from "./sql.js"
 import config from "./config.json";
 /*
 #crossSaveOverride;
@@ -89,17 +88,17 @@ export class ClanMember {
     }
 
     async GetRecordDataState(triumphId) {
-        var coreData = await GetCoreMemberData(this.#destinyUserInfo.membershipType, this.#destinyUserInfo.membershipId);
+        var coreData = await AsyncGetCoreMemberData(this.#destinyUserInfo.membershipType, this.#destinyUserInfo.membershipId);
 
         return coreData?.profileRecords?.data?.records[triumphId]?.state % 2 == 1;
     }
 
     async FetchCharacterIds() {
-        var profileWithCharacters = await GetProfileData(this.#destinyUserInfo.membershipType, this.#destinyUserInfo.membershipId);
+        var profileWithCharacters = await AsyncGetProfileData(this.#destinyUserInfo.membershipType, this.#destinyUserInfo.membershipId);
         this.#characterIds = profileWithCharacters.data.characterIds;
     }
     async FetchActiveScore() {
-        var coreMemberData = await GetCoreMemberData(this.#destinyUserInfo.membershipType, this.#destinyUserInfo.membershipId);
+        var coreMemberData = await AsyncGetCoreMemberData(this.#destinyUserInfo.membershipType, this.#destinyUserInfo.membershipId);
         this.#activeScore = coreMemberData?.profileRecords?.data?.activeScore ?? 0;
     }
 
@@ -215,54 +214,50 @@ export class ClanMember {
 export function GetDiscordMemberByMention(guild, discordMention) {
     var discordId = discordMention.replace(/\D/g, '');
     var discordMember = guild.members.cache.find(member => member.user.id == discordId);
-    if (discordMember == null) throw { message: 'Дискорд профиль не найден.' };
+    if (discordMember == null) throw 'Дискорд профиль не найден.';
     console.log(discordMember.displayName);
     return discordMember;
 }
 
-export async function GetClanMemberOnlineTime(message, days, discordMention, isDetailed) {
-    try {
-        var discordName = discordMention == null
-            ? message.member.displayName
-            : GetDiscordMemberByMention(message.guild, discordMention).displayName;
+export async function AsyncGetClanMemberOnlineTime(message, days, discordMention, isDetailed) {
+    var discordName = discordMention == null
+        ? message.member.displayName
+        : GetDiscordMemberByMention(message.guild, discordMention).displayName;
 
-        var apiMember = await GetMemberByDiscordName(discordName);
-        var clanMember = new ClanMember(apiMember);
-        await clanMember.FetchCharacterIds();
-        clanMember.FetchDiscordMember(message.guild);
+    var apiMember = await AsyncGetMemberByDiscordName(discordName);
+    var clanMember = new ClanMember(apiMember);
+    await clanMember.FetchCharacterIds();
+    clanMember.FetchDiscordMember(message.guild);
 
-        var clanVoiceSummary = await GetClanVoiceSummary(days);
-        clanMember.AddToVoiceOnline(clanVoiceSummary[clanMember.discordMemberId]);
+    var clanVoiceSummary = await AsyncGetClanVoiceSummary(days);
+    clanMember.AddToVoiceOnline(clanVoiceSummary[clanMember.discordMemberId]);
 
-        var activities = await GetAllActivities(clanMember, days);
-        activities.forEach(a => clanMember.AddToGameOnline(a.values.timePlayedSeconds.basic.value))
+    var activities = await AsyncGetAllActivities(clanMember, days);
+    activities.forEach(a => clanMember.AddToGameOnline(a.values.timePlayedSeconds.basic.value))
 
-        if (isDetailed) {
-            var detailedVoiceResults = await GetMemberDetailedVoice(days, clanMember.discordMemberId);
-            var lines = clanMember.FormLinesForDetailedVoice(detailedVoiceResults)
-            message.channel.send(clanMember.GetMemberTimeEmbed(lines));
-        }
-        else message.channel.send(clanMember.GetMemberTimeString());
-    } catch (e) {
-        CatchError(e, message.channel);
+    if (isDetailed) {
+        var detailedVoiceResults = await AsyncGetMemberDetailedVoice(days, clanMember.discordMemberId);
+        var lines = clanMember.FormLinesForDetailedVoice(detailedVoiceResults)
+        message.channel.send(clanMember.GetMemberTimeEmbed(lines));
     }
+    else message.channel.send(clanMember.GetMemberTimeString());
 }
 
-export async function GetAllActivities(clanMember, days) {
+export async function AsyncGetAllActivities(clanMember, days) {
     var deltaDate = new Date();
     deltaDate.setDate(deltaDate.getDate() - days);
 
     var activities = [];
     var promises = clanMember.characterIds.map(async characterId => {
-        Array.prototype.push.apply(activities, await GetCharacterActivities(clanMember, characterId, 0, 'None', deltaDate));
+        Array.prototype.push.apply(activities, await AsyncGetCharacterActivities(clanMember, characterId, 0, 'None', deltaDate));
     });
     await Promise.all(promises);
     return activities;
 }
 
-async function GetCharacterActivities(clanMember, characterId, page, mode, deltaDate) {
+async function AsyncGetCharacterActivities(clanMember, characterId, page, mode, deltaDate) {
     var filteredActivities = [];
-    var responceActivities = await GetActivitiesFromApi(clanMember.membershipType, clanMember.membershipId, characterId, page, mode);
+    var responceActivities = await AsyncGetActivitiesFromApi(clanMember.membershipType, clanMember.membershipId, characterId, page, mode);
 
     if (responceActivities.ErrorCode == 1665) {
         clanMember.access = false;
@@ -280,6 +275,6 @@ async function GetCharacterActivities(clanMember, characterId, page, mode, delta
             isLastPage = true;
         }
     });
-    if (!isLastPage) Array.prototype.push.apply(filteredActivities, await GetCharacterActivities(clanMember, characterId, ++page, mode, deltaDate));
+    if (!isLastPage) Array.prototype.push.apply(filteredActivities, await AsyncGetCharacterActivities(clanMember, characterId, ++page, mode, deltaDate));
     return filteredActivities;
 }

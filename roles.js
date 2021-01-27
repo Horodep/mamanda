@@ -1,68 +1,48 @@
 import config from "./config.json";
-import { CatchError } from "./catcherror.js";
-import { GetFullMemberData, GetProfileData } from "./bungieApi.js";
-import { GetMemberByDiscordName } from "./clan.js";
+import { AsyncGetFullMemberData, AsyncGetProfileData } from "./bungieApi.js";
+import { AsyncGetMemberByDiscordName } from "./clan.js";
 import * as BungieApiLogic from "./coreLogic/bungieApiData.js";
 import { LogRolesGranting, CheckAndProcessRole, CheckAndProcessRoleBlock, SumMedals } from "./coreLogic/rolesLogic.js";
 import { ClanMember, GetDiscordMemberByMention } from "./clanMember.js";
 import { FormRolesEmbed } from "./embeds/rolesEmbed.js";
 
-export function Roles(message, args) {
-	if (args.length == 1) {
-		RolesByDiscordMention(message.channel, message.member.id);
-	} else if (args[1].startsWith('id:')) {
-		RolesByMembershipId(message.channel, args[1]);
-	} else {
-		RolesByDiscordMention(message.channel, args[1]);
-	}
+export async function AsyncRoles(message, args) {
+	var clanMember = 
+		args[1]?.startsWith('id:') ?
+		await AsyncRolesByMembershipId(message.channel, args[1]) :
+		await AsyncRolesByDiscordMention(message.channel, args.length > 1 ? args[1] : message.member.id);
+	await AsyncGetShowAndSetRoles(clanMember, message.channel);
 }
 
-export async function RolesByDiscordMention(channel, discordMention) {
-	try {
-		var discordMember = GetDiscordMemberByMention(channel.guild, discordMention);
-		var member = await GetMemberByDiscordName(discordMember.displayName);
-		var clanMember = new ClanMember(member);
-		clanMember.SetDiscordMember(discordMember);
-		await GetShowAndSetRoles(clanMember, channel);
-	} catch (e) {
-		CatchError(e, channel);
-	}
+async function AsyncRolesByDiscordMention(channel, discordMention) {
+	var discordMember = GetDiscordMemberByMention(channel.guild, discordMention);
+	var member = await AsyncGetMemberByDiscordName(discordMember.displayName);
+
+	var clanMember = new ClanMember(member);
+	clanMember.SetDiscordMember(discordMember);
+	return clanMember;
 }
 
-export async function RolesByMembershipId(channel, membership) {
-	try {
-		var membershipType = membership.replace('id:', '').split('/')[0];
-		var membershipId = membership.replace('id:', '').split('/')[1];
-
-		var member = await GetProfileData(membershipType, membershipId);
-		if (member == null) {
-			channel.send('Игровой профиль не найден.');
-			return;
-		}
-
-		var clanMember = new ClanMember(member.data);
-		clanMember.FetchDiscordMember(channel.guild);
-
-		await GetShowAndSetRoles(clanMember, channel);
-	} catch (e) {
-		CatchError(e, channel);
-	}
+async function AsyncRolesByMembershipId(channel, membership) {
+	var membershipType = membership.replace('id:', '').split('/')[0];
+	var membershipId = membership.replace('id:', '').split('/')[1];
+	var member = await AsyncGetProfileData(membershipType, membershipId);
+	if (member == null) throw 'Игровой профиль не найден.';
+	
+	var clanMember = new ClanMember(member.data);
+	clanMember.FetchDiscordMember(channel.guild);
+	return clanMember;
 }
 
-export async function GetShowAndSetRoles(clanMember, channel) {
-	try {
-		var rolesData = await GetRolesData(clanMember.membershipType, clanMember.membershipId);
-
-		console.log(rolesData);
-		if (channel != null) channel.send(FormRolesEmbed(clanMember, rolesData));
-		SetRoles(clanMember, rolesData?.characterDetails, rolesData?.medals);
-	} catch (e) {
-		CatchError(e, channel);
-	}
+export async function AsyncGetShowAndSetRoles(clanMember, channel) {
+	var rolesData = await AsyncGetRolesData(clanMember.membershipType, clanMember.membershipId);
+	console.log(rolesData);
+	if (channel != null) channel.send(FormRolesEmbed(clanMember, rolesData));
+	SetRoles(clanMember, rolesData?.characterDetails, rolesData?.medals);
 }
 
-async function GetRolesData(membershipType, membershipId) {
-	var response = await GetFullMemberData(membershipType, membershipId);
+async function AsyncGetRolesData(membershipType, membershipId) {
+	var response = await AsyncGetFullMemberData(membershipType, membershipId);
 	if (!response.profileRecords.data) return null;
 
 	var data = {
@@ -78,7 +58,7 @@ async function GetRolesData(membershipType, membershipId) {
 			legacy: {}
 		}
 	};
-	var characterDetails = BungieApiLogic.get_character_details(response);
+	var characterDetails = BungieApiLogic.FetchCharacterDetails(response);
 
 	if (!characterDetails.CharactersExist()) return { characterDetails: characterDetails, medals: null };
 

@@ -2,15 +2,12 @@ import fs from "fs";
 import config from "./config.json";
 import fetch from "node-fetch";
 import { CatchError } from "./catcherror.js";
+import { FetchFullPath } from "./directories.js";
 
-export async function ResetEnglish(channel) {
-	try{
-		var response = await fetch("http://kyber3000.com/Reset");
-		channel.send("Reset by Kyber3000");
-		channel.send(response.url);
-	}catch(e){
-		CatchError(e);
-	}
+export async function AsyncShowResetEnglish(channel) {
+	var response = await fetch("http://kyber3000.com/Reset");
+	channel.send("Reset by Kyber3000");
+	channel.send(response.url);
 }
 
 export function DropPvpRole(guild) {
@@ -51,13 +48,10 @@ export function GiveForumRole(message) {
 }
 
 export function SaveForumLinkAndPublish(link, client) {
-	var directory = config.credentials.directory ?? "./";
-	fs.writeFile(directory + ".data/forumlink.txt", link, function (err) {
-		if (err) CatchError(err); // если возникла ошибка
-	});
+	fs.writeFileSync(FetchFullPath(".data/forumlink.txt"), link);
 	var channel_news = client.channels.cache.get(config.channels.clannews);
-	channel_news.send("Не важно, <@&"+config.roles.guardians[0]+"> ты, <@&"+config.roles.guest+"> или @everyone другой, мы верим, что ты хочешь помочь клану! <@&"+config.roles.separators.footer+">\n" +
-		"Проще всего это сделать подняв тему о наборе на форуме, нажав на стрелочку вверх.\n" +	link + "\n" + 
+	channel_news.send("Не важно, <@&" + config.roles.guardians[0] + "> ты, <@&" + config.roles.guest + "> или @everyone другой, мы верим, что ты хочешь помочь клану! <@&" + config.roles.separators.footer + ">\n" +
+		"Проще всего это сделать подняв тему о наборе на форуме, нажав на стрелочку вверх.\n" + link + "\n" +
 		"p.s. Для того, чтобы снять роль прожмите эмоцию `🆗` под данным сообщением.").then((msg) => {
 			msg.react("🆗");
 		});
@@ -65,33 +59,21 @@ export function SaveForumLinkAndPublish(link, client) {
 
 export function PublishDailyMessage(client) {
 	var channel = client.channels.cache.get(config.channels.flood);
-	var directory = config.credentials.directory ?? "./";
-	fs.readFile(directory + ".data/forumlink.txt", 'utf8', function (err, data) {
-		if (err) CatchError(err);
-		channel.send(
-			"Уважаемые Стражи! А точнее те из вас, кто <@&" + config.roles.forum_tag + ">\n" +
-			"Пожалуйста, сделайте это! Это очень важно для клана!\n\n" +
-			"p.s. Для того, чтобы снять роль прожмите эмоцию `🆗` под данным сообщением.\n" +
-			data).then((msg) => {
-				msg.react("🆗");
-			});
-	})
+	var data = fs.readFileSync(FetchFullPath(".data/forumlink.txt"), 'utf8');
+	channel.send(
+		"Уважаемые Стражи! А точнее те из вас, кто <@&" + config.roles.forum_tag + ">\n" +
+		"Пожалуйста, сделайте это! Это очень важно для клана!\n\n" +
+		"p.s. Для того, чтобы снять роль прожмите эмоцию `🆗` под данным сообщением.\n" +
+		data).then((msg) => {
+			msg.react("🆗");
+		});
 }
 
 export function SetMaximumTriumphsScore(message, args) {
-	if (args.length < 2) {
-		message.channel.send("Укажите значение.");
-		return;
-	}
+	if (args.length < 2) throw "Укажите значение.";
 	var score = Number(args[1]);
-	if (Number.isNaN(score)) {
-		message.channel.send("Введенное значение не является числом.");
-		return;
-	}
-	var directory = config.credentials.directory ?? "./";
-	fs.writeFile(directory + ".data/maxtriumphs.json", args[1], function (err) {
-		if (err) CatchError(err);
-	});
+	if (Number.isNaN(score)) throw "Введенное значение не является числом.";
+	fs.writeFileSync(FetchFullPath(".data/maxtriumphs.json"), args[1]);
 }
 
 export function ShowNewbieList(message) {
@@ -104,7 +86,7 @@ export function ShowNewbieList(message) {
 	newbieList.sort();
 	message.channel.send(newbieList.join('\n'));
 }
-export async function ShowQueueList(message) {
+export async function AsyncShowQueueList(message) {
 	var queueList = [];
 	await message.guild.members.fetch();
 	message.guild.members.cache.filter(m => m.roles.cache.size == 1).forEach(function (member) {
@@ -115,7 +97,7 @@ export async function ShowQueueList(message) {
 	queueList.sort();
 	message.channel.send(queueList.join('\n'));
 }
-export async function ShowQueueReqestsList(message) {
+export async function AsyncShowQueueReqestsList(message) {
 	var counterOfMessagesByUser = [];
 	var counterOfReactsOnMessage = [];
 	await message.guild.members.fetch();
@@ -131,30 +113,31 @@ export async function ShowQueueReqestsList(message) {
 			var queueChannel = message.client.channels.cache.get(config.channels.entrance);
 			counterOfMessagesByUser[member.id] = 0;
 			queueChannel.messages.fetch({ limit: 100 }).then(messages => {
-				messages
+				var userMessages = messages
 					.sort((a, b) => a.id > b.id ? 1 : -1)
-					.filter(m => m.author.id == member.user.id)
-					.forEach(async function (requestMessage) {
-						try {
-							counterOfMessagesByUser[member.id]++;
-							counterOfReactsOnMessage[requestMessage.id] = 0;
-							requestBody += requestMessage.content;
+					.filter(m => m.author.id == member.user.id);
+				userMessages.forEach(async function (requestMessage) {
+					try /*need to check if needed*/ {
+						counterOfMessagesByUser[member.id]++;
+						counterOfReactsOnMessage[requestMessage.id] = 0;
+						requestBody += '\n' + requestMessage.content;
 
-							requestMessage.reactions.cache.each(async function (reaction) {
-								counterOfReactsOnMessage[requestMessage.id]++;
-								emojis += ` ${reaction.emoji}`;
-								var users = await reaction.users.fetch();
-								for (let user of users) {
-									emojis += " **" + user[1].username + "**";
-								}
+						requestMessage.reactions.cache.each(async function (reaction) {
+							counterOfReactsOnMessage[requestMessage.id]++;
+							emojis += ` ${reaction.emoji}`;
+							var users = await reaction.users.fetch();
+							for (let user of users) {
+								emojis += " **" + user[1].username + "**";
+							}
+							if(counterOfMessagesByUser[member.id] == userMessages.size)
 								message.channel.send(headerText + emojis + "```" + requestBody + " ```");
-							})
-							if (counterOfReactsOnMessage[requestMessage.id] == 0)
-								message.channel.send(headerText + emojis + "```" + requestBody + " ```");
-						} catch (e) {
-							CatchError(e, message.channel);
-						}
-					});
+						})
+						if (counterOfMessagesByUser[member.id] == userMessages.size && counterOfReactsOnMessage[requestMessage.id] == 0)
+							message.channel.send(headerText + emojis + "```" + requestBody + " ```");
+					} catch (e) {
+						CatchError(e, message.channel); //emojis
+					}
+				});
 				return headerText + emojis + "```" + requestBody + " ```";
 			}).then(messageText => {
 				if (messageText.endsWith("``` ```")) messageText = messageText.replace("``` ```", "```нет заявки```");

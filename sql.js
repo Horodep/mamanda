@@ -1,7 +1,6 @@
 import pkg from 'pg';
 const { Pool } = pkg;
 import config from "./config.json";
-import { CatchError } from "./catcherror.js";
 
 const pool = new Pool({
     host: config.sql.host,
@@ -12,27 +11,19 @@ const pool = new Pool({
     max: 10
 });
 
-export async function GetMemberDetailedVoice(days, discordMemberId) {
-    try {
-        var results = await pool.query(memberVoiceDetailsQuery.replace('$2', days), [discordMemberId]);
-        console.log("member voice online - ok");
-    } catch (err) {
-        CatchError(err)
-    }
+export async function AsyncGetMemberDetailedVoice(days, discordMemberId) {
+    var results = await pool.query(memberVoiceDetailsQuery.replace('$2', days), [discordMemberId]);
+    console.log("member voice online - ok");
     return results;
 }
 
-export async function GetClanVoiceSummary(days) {
-    try {
-        var clanVoiceSummary = [];
-        var results = await pool.query(guildVoiceSummaryQuery.replace('$2', days), []);
-        results.rows.forEach(function (row) {
-            clanVoiceSummary[row.id] = row.online;
-        });
-        console.log("guild voice online - ok");
-    } catch (err) {
-        CatchError(err)
-    }
+export async function AsyncGetClanVoiceSummary(days) {
+    var clanVoiceSummary = [];
+    var results = await pool.query(guildVoiceSummaryQuery.replace('$2', days), []);
+    results.rows.forEach(function (row) {
+        clanVoiceSummary[row.id] = row.online;
+    });
+    console.log("guild voice online - ok");
     return clanVoiceSummary;
 }
 /*
@@ -56,25 +47,6 @@ var query2 = connection.query('SELECT * FROM members WHERE id = ?',  id, functio
         connection.release();
     }
 });*/
-
-function bruh() {
-    pool.query('SELECT * FROM public.members WHERE id = $1', [member.id], (err, results) => {
-        if (err) throw err;
-        if (results.length == 0) {
-            pool.connect().query('INSERT INTO public.members (id, name, inVoice) VALUES ($1, $2, false)', [member.id, ''], (err) => {
-                if (err) CatchError(err);
-                console.log("WaitingQuery: " + pool.waitingCount + "; insert member " + member.displayName);
-            });
-        }
-
-
-        pool.query('UPDATE public.members SET inVoice=$1 WHERE id = $2', [inVoice, member.id], (err) => {
-            if (err) CatchError(err);
-            console.log("WaitingQuery: " + pool.waitingCount + "; update member " + member.displayName);
-        });
-    });
-}
-
 
 const memberVoiceDetailsQuery =
     `SELECT 

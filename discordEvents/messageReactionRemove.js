@@ -1,20 +1,17 @@
 import config from "../config.json";
 import { CatchError } from "../catcherror.js";
 
-export async function MessageReactionRemove(reaction, user) {
-	if(user.bot) return;
-	if (reaction.partial) {
-		try {
-			await reaction.fetch();
-		} catch (error) {
-			error.name = 'Something went wrong when fetching the reaction: ' + error.name;
-			CatchError(error);
-			return;
-		}
-	}
-	console.log(`${user.username} removed reaction ${reaction._emoji.name}.`);
+export async function AsyncMessageReactionRemove(reaction, user) {
+	try {
+		if(user.bot) return;
+		if (reaction.partial) await reaction.fetch();
+		console.log(`${user.username} removed reaction ${reaction._emoji.name}.`);
 
-	if (reaction.message.channel.id == config.channels.wishes) HandleWishes(reaction, user);
+		if (reaction.message.channel.id == config.channels.wishes) HandleWishes(reaction, user);
+	} catch (error) {
+		CatchErrorAndDeleteByTimeout(error, reaction?.message?.channel, 15000);
+		return;
+	}
 };
 
 function HandleWishes(reaction, user) {

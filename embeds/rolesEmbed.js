@@ -38,9 +38,5 @@ function EmbedFormField(data) {
 }
 
 function EmbedFormLine(data) {
-	try {
-		return (data.state ? "🔶 " : "🔷 ") + data.text;
-	} catch {
-		return "🔷 not defined";
-	}
+	return (data.state ? "🔶 " : "🔷 ") + data.text;
 }

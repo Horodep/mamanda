@@ -28,7 +28,7 @@ export function Message(message){
 			if(guildMasterRole.position <= message.member.roles.highest.position) {
 				CommandManager.Run(args, message);
 			}else{
-				message.channel.send('У вас нет прав на это действие.');
+				throw 'У вас нет прав на это действие.';
 			}
 		}
 		if (CommandManager.IsRestrictedCommand(commandName)) {

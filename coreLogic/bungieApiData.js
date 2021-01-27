@@ -1,5 +1,3 @@
-import { CatchError } from "../catcherror.js";
-
 class CharacterDetails {
 	titan = { light: 0, id: null };
 	hunter = { light: 0, id: null };
@@ -22,8 +20,7 @@ class CharacterDetails {
 function GetDataAndHandleErrors(textprefix, callback) {
 	try {
 		return callback();
-	} catch (e) {
-		//CatchError(e);
+	} catch {
 		return {
 			state: false,
 			error: true,
@@ -32,7 +29,7 @@ function GetDataAndHandleErrors(textprefix, callback) {
 	}
 }
 
-export function get_character_details(response) {
+export function FetchCharacterDetails(response) {
 	var charactersDetails = new CharacterDetails();
 	var characterIds = response.profile.data.characterIds;
 	var characters = response.characters.data;
