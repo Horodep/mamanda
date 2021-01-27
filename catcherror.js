@@ -14,7 +14,8 @@ export function CatchError(e, channel) {
 	else ShowErrorWithStack(e, validChannel);
 }
 
-export function CatchCronError(e) {
+export function CatchCronError(e, client) {
+	FetchDefaultCatchErrorChannel(client);
 	sandbox.send(`This is a cron code error.`);
 	ShowErrorWithStack(e, sandbox);
 }
