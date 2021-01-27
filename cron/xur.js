@@ -6,11 +6,11 @@ import { CatchError, FetchDefaultCatchErrorChannel } from "../catcherror.js";
 const client = new Discord.Client({ partials: ['MESSAGE', 'CHANNEL', 'REACTION'] });
 client.login(config.credentials.discordApiKey);
 
-client.on("ready", () => {
+client.on("ready", async () => {
     try {
         FetchDefaultCatchErrorChannel(client);
         const channel = client.channels.cache.get(config.channels.gamenews);
-        AsyncDrawXur(channel);
+        await AsyncDrawXur(channel);
         setTimeout(() => {
             client.destroy();
             process.exit();

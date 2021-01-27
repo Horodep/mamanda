@@ -38,7 +38,6 @@ function SendAndUpdateEmbed(channel, requestTimeout, updateFrequency, formData, 
 	var iterator = 0;
 	var arrayWithData = [];
 	channel.send(new MessageEmbed()).then((msg) => {
-		//TODO@Horodep #33 How to handle errors here?
 		var firstError = true;
 		AsyncExecuteForEveryMember(requestTimeout, async function (member, i, members) {
 			try {
@@ -47,7 +46,7 @@ function SendAndUpdateEmbed(channel, requestTimeout, updateFrequency, formData, 
 				if (iterator % updateFrequency == 0 || iterator == members.length) {
 					msg.edit(createEmbed(arrayWithData.filter(m => m != null), iterator, members.length));
 				}
-				if (iterator == members.length && finalAction != null) finalAction(arrayWithData.filter(m => m != null), msg);
+				if (iterator == members.length && finalAction != null) await finalAction(arrayWithData.filter(m => m != null), msg);
 			}
 			catch (e) {
 				if (firstError) {
@@ -109,10 +108,10 @@ export function ShowTopTriumphScore(channel, showImage) {
 		(array, i, size) => {
 			return showImage ? Math.floor(100 * i / size) + "%" : FormTopTriumphScoreEmbed(array, i, size);
 		},
-		(array, message) => {
+		async (array, message) => {
 			if (showImage) {
 				message.delete();
-				AsyncDrawTriumphs(array, channel);
+				await AsyncDrawTriumphs(array, channel);
 			}
 		})
 }
