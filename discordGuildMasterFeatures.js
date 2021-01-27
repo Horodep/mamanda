@@ -125,30 +125,31 @@ export async function AsyncShowQueueReqestsList(message) {
 			var queueChannel = message.client.channels.cache.get(config.channels.entrance);
 			counterOfMessagesByUser[member.id] = 0;
 			queueChannel.messages.fetch({ limit: 100 }).then(messages => {
-				messages
+				var userMessages = messages
 					.sort((a, b) => a.id > b.id ? 1 : -1)
-					.filter(m => m.author.id == member.user.id)
-					.forEach(async function (requestMessage) {
-						try /*need to check if needed*/{
-							counterOfMessagesByUser[member.id]++;
-							counterOfReactsOnMessage[requestMessage.id] = 0;
-							requestBody += requestMessage.content;
+					.filter(m => m.author.id == member.user.id);
+				userMessages.forEach(async function (requestMessage) {
+					try /*need to check if needed*/ {
+						counterOfMessagesByUser[member.id]++;
+						counterOfReactsOnMessage[requestMessage.id] = 0;
+						requestBody += '\n' + requestMessage.content;
 
-							requestMessage.reactions.cache.each(async function (reaction) {
-								counterOfReactsOnMessage[requestMessage.id]++;
-								emojis += ` ${reaction.emoji}`;
-								var users = await reaction.users.fetch();
-								for (let user of users) {
-									emojis += " **" + user[1].username + "**";
-								}
+						requestMessage.reactions.cache.each(async function (reaction) {
+							counterOfReactsOnMessage[requestMessage.id]++;
+							emojis += ` ${reaction.emoji}`;
+							var users = await reaction.users.fetch();
+							for (let user of users) {
+								emojis += " **" + user[1].username + "**";
+							}
+							if(counterOfMessagesByUser[member.id] == userMessages.size)
 								message.channel.send(headerText + emojis + "```" + requestBody + " ```");
-							})
-							if (counterOfReactsOnMessage[requestMessage.id] == 0)
-								message.channel.send(headerText + emojis + "```" + requestBody + " ```");
-						} catch (e) {
-							CatchError(e, message.channel);
-						}
-					});
+						})
+						if (counterOfMessagesByUser[member.id] == userMessages.size && counterOfReactsOnMessage[requestMessage.id] == 0)
+							message.channel.send(headerText + emojis + "```" + requestBody + " ```");
+					} catch (e) {
+						CatchError(e, message.channel); //emojis
+					}
+				});
 				return headerText + emojis + "```" + requestBody + " ```";
 			}).then(messageText => {
 				if (messageText.endsWith("``` ```")) messageText = messageText.replace("``` ```", "```нет заявки```");
