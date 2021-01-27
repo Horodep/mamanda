@@ -19,7 +19,7 @@ export function CreateRaid(message, args) {
         });
         message.delete();
     } catch (e) {
-        if (typeof(e) == 'object') CatchError(e, message.channel);
+        if (typeof (e) == 'object') CatchError(e, message.channel);
         else CatchRaidError(e, message.content, message.channel);
         message.delete();
     }
@@ -70,24 +70,24 @@ export function CancelRaid(message, user, reaction) {
     message.delete();
 }
 
-export function ForcedAddRaidMember(message, args){
-    if(args.length < 3){
+export function ForcedAddRaidMember(message, args) {
+    if (args.length < 3) {
         message.channel.send('Указаны не все параметры');
         return;
     }
     message.channel.messages.fetch(args[1]).then(msg => {
-        AddRaidMember(msg, {id: args[2]});
+        AddRaidMember(msg, { id: args[2] });
         setTimeout(() => { message.delete(); }, 5000);
     });
 }
 
-export function ForcedRemoveRaidMember(message, args){
-    if(args.length < 3){
+export function ForcedRemoveRaidMember(message, args) {
+    if (args.length < 3) {
         message.channel.send('Указаны не все параметры');
         return;
     }
     message.channel.messages.fetch(args[1]).then(msg => {
-        RemoveRaidMember(msg, {id: args[2]});
+        RemoveRaidMember(msg, { id: args[2] });
         var member = message.guild.members.cache.find(user => user.id == args[2]);
         setTimeout(() => { message.delete(); }, 5000);
         var data = GetDataFromEmbed(msg.embeds[0]);
@@ -96,48 +96,48 @@ export function ForcedRemoveRaidMember(message, args){
 }
 
 export function ClearRaidList(client) {
-	var raid_channel = client.channels.cache.get(config.channels.raids); 
+    var raid_channel = client.channels.cache.get(config.channels.raids);
     var history_channel = client.channels.cache.get(config.channels.raid_history);
-    
-	raid_channel.messages.fetch({ limit: 50 }).then(messages => {
+
+    raid_channel.messages.fetch({ limit: 50 }).then(messages => {
         var today = new Date();
         console.log("now:", today);
-		var tagMessage;
-		messages.sort((a, b) => a.id > b.id ? 1 : -1).forEach(message => {
-            if(message.pinned) return;
+        var tagMessage;
+        messages.sort((a, b) => a.id > b.id ? 1 : -1).forEach(message => {
+            if (message.pinned) return;
             console.log(message.content, message.author.bot);
-            if(!message.author.bot) {
+            if (!message.author.bot) {
                 console.log("message deleted");
                 message.delete();
                 return;
             }
-            if(message.content != ""){
+            if (message.content != "") {
                 tagMessage = message;
-            }else{
+            } else {
                 var data = GetDataFromEmbed(message.embeds[0]);
-                
+
                 console.log(data.date, data.header);
-                if(data.date < today){
+                if (data.date < today) {
                     console.log("have to be moved");
-                    
+
                     history_channel.send(CreateRaidEmbed(data, message.createdAt));
                     message.delete();
                     tagMessage.delete();
                 }
             }
-		});
-	})
+        });
+    })
 }
 
-export async function AsyncGetPlannedRaids(message, discordMention){
-	var discordId = discordMention.replace(/\D/g, '');
+export async function AsyncGetPlannedRaids(message, discordMention) {
+    var discordId = discordMention.replace(/\D/g, '');
 
-	var raid_channel = message.client.channels.cache.get(config.channels.raids);
+    var raid_channel = message.client.channels.cache.get(config.channels.raids);
     var messages = (await raid_channel.messages.fetch({ limit: 50 })).filter(m => m.embeds.length > 0);
     var raids = messages.map(m => GetDataFromEmbed(m.embeds[0])).sort((a, b) => a.date - b.date);
     var myraids = raids.filter(r => r?.members?.includes(discordId));
-    message.channel.send(myraids.length == 0 
-        ? 'Вы никуда не записаны.' 
+    message.channel.send(myraids.length == 0
+        ? 'Вы никуда не записаны.'
         : myraids.map(r => "`" + r.dateString + "` Активность: **" + r.raidName + "**").join('\n'));
 }
 
@@ -168,32 +168,32 @@ function ParseCommandAndGetData(args, member) {
 }
 
 function GetDataFromEmbed(embed) {
-    var dateString = embed.author.name.split(' Активность: ')[0].replace(/,.*? в /g," ");
+    var dateString = embed.author.name.split(' Активность: ')[0].replace(/,.*? в /g, " ");
     var arr = dateString.split(/[ .:]/g);
-    var date = new Date(arr[2], arr[1]-1, arr[0], arr[3], arr[4]);
+    var date = new Date(arr[2], arr[1] - 1, arr[0], arr[3], arr[4]);
     var linesArray = (embed.fields[0].value + "\n" + embed.fields[1].value).replace(/[<@>]/g, '').split('\n');
-    var left = embed.fields.length == 2 ? [] : 
+    var left = embed.fields.length == 2 ? [] :
         embed.fields[2].value.split('\n').map(function (line) {
-            try{
-                var date = new Date(line.match(new RegExp("\`.*?\`"))[0].substring(1,12));
+            try {
+                var date = new Date(line.match(new RegExp("\`.*?\`"))[0].substring(1, 12));
                 var id = line.match(new RegExp("<.*?>"))[0].replace(/\D/g, '');
-                return {date: date, id: id}; 
-            }catch(e){
+                return { date: date, id: id };
+            } catch (e) {
                 CatchError(e);
             }
         });
 
     return new RaidData(
-        embed.author.name.split(' Активность: ')[1], 
-        embed.description, 
-        "", 
-        date, 
-        linesArray.length, 
-        linesArray.filter(line => line != "слот свободен"), 
-        left, 
+        embed.author.name.split(' Активность: ')[1],
+        embed.description,
+        "",
+        date,
+        linesArray.length,
+        linesArray.filter(line => line != "слот свободен"),
+        left,
         {
             displayName: embed.footer.text.split(' | ')[0].replace("Собрал: ", ""),
-            id:  embed.footer.text.split(' | ')[1].replace("id: ", "")
+            id: embed.footer.text.split(' | ')[1].replace("id: ", "")
         },
         embed.footer.iconURL
     );
@@ -207,7 +207,7 @@ function CreateRaidEmbed(data, customTimestamp) {
     else if (data.numberOfPlaces == 1)
         throw 'Активность можно собрать не менее, чем на двоих участников.';
 
-    var {field0, field1, left} = data.FormFields()
+    var { field0, field1, left } = data.FormFields()
     var embed = new MessageEmbed()
         .setAuthor(data.header)
         .setColor(0x00AE86)
