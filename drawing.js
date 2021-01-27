@@ -14,7 +14,7 @@ export async function AsyncDrawTriumphs(members, channel) {
 	var maxtriumphs = fs.readFileSync(FetchFullPath(".data/maxtriumphs.json"), 'utf8');
     var delta = maxtriumphs - min;
 
-    var image = await jimp.read(FetchFullPath(".data/templates/bg1.png"));
+    var image = await jimp.read(FetchFullPath(".data/templates/bg.png"));
     for (var i = 0; i < top.length; i++) {
         await AsyncDrawText(image, 10, 20 + 17 * i - 5, FetchFullPath('.data/fonts/calibri_light_22.fnt'), top[i].displayName);
         await AsyncDrawText(image, 130, 20 + 17 * i - 5, FetchFullPath('.data/fonts/calibri_light_22.fnt'), top[i].activeScore);
