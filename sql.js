@@ -1,7 +1,6 @@
 import pkg from 'pg';
 const { Pool } = pkg;
 import config from "./config.json";
-import { CatchError } from "./catcherror.js";
 
 const pool = new Pool({
     host: config.sql.host,
@@ -48,25 +47,6 @@ var query2 = connection.query('SELECT * FROM members WHERE id = ?',  id, functio
         connection.release();
     }
 });*/
-
-function bruh() {
-    pool.query('SELECT * FROM public.members WHERE id = $1', [member.id], (err, results) => {
-        if (err) throw err;
-        if (results.length == 0) {
-            pool.connect().query('INSERT INTO public.members (id, name, inVoice) VALUES ($1, $2, false)', [member.id, ''], (err) => {
-                if (err) CatchError(err);
-                console.log("WaitingQuery: " + pool.waitingCount + "; insert member " + member.displayName);
-            });
-        }
-
-
-        pool.query('UPDATE public.members SET inVoice=$1 WHERE id = $2', [inVoice, member.id], (err) => {
-            if (err) CatchError(err);
-            console.log("WaitingQuery: " + pool.waitingCount + "; update member " + member.displayName);
-        });
-    });
-}
-
 
 const memberVoiceDetailsQuery =
     `SELECT 

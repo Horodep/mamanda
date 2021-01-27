@@ -1,8 +1,8 @@
-import { MessageEmbed } from "discord.js";
 import config from "./config.json";
 import nodePackage from "./package.json";
-import { AsyncGetGlobalAlerts } from "./bungieApi.js";
 import { execSync } from "child_process";
+import { MessageEmbed } from "discord.js";
+import { AsyncGetGlobalAlerts } from "./bungieApi.js";
 import { DropPvpRole, GiveForumRole, SaveForumLinkAndPublish, SetMaximumTriumphsScore, ShowNewbieList, AsyncShowQueueList, AsyncShowQueueReqestsList, AsyncShowResetEnglish } from "./discordGuildMasterFeatures.js"
 import { AsyncShowClanSize, AsyncShowClanTime, AsyncShowNicknames, SetRolesToEveryMember, ShowRecordStat, ShowTopTriumphScore } from "./clan.js"
 import { AsyncRoles } from "./roles.js"
@@ -23,7 +23,7 @@ export class CommandManager {
             if (command?.status > 1) message.channel.send("Команда отключена");
             else await command?.callback(args, message);
         } catch (e) {
-            CatchError(e, message.channel);
+            CatchError(e, message.channel); //main run 
         }
     }
     static AddCommand(rights, status, apiDependency, name, title, description, callback) {
@@ -129,7 +129,9 @@ export class CommandManager {
         this.AddCommand("developer", 0, false, "code", "!code", "сохранить код авторизации;", async function (args, message) {
             NewAuthToken(args[1]);
         });
-
+        this.AddCommand("developer", 1, false, "test", "!test", "тестовая команда;", async function (args, message) {
+            // empty for any test code
+        });
 
         this.AddCommand("common", 0, false, "ping", "!ping", "testing functionality", async function (args, message) {
             message.channel.send('pong ' + args[0]);

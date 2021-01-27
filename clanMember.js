@@ -1,5 +1,4 @@
 import { MessageEmbed } from "discord.js";
-import { CatchError } from "./catcherror.js";
 import { AsyncGetActivitiesFromApi, AsyncGetCoreMemberData, AsyncGetProfileData } from "./bungieApi.js";
 import { AsyncGetMemberByDiscordName } from "./clan.js";
 import { AsyncGetClanVoiceSummary, AsyncGetMemberDetailedVoice } from "./sql.js"

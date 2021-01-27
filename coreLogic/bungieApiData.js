@@ -1,5 +1,3 @@
-import { CatchError } from "../catcherror.js";
-
 class CharacterDetails {
 	titan = { light: 0, id: null };
 	hunter = { light: 0, id: null };

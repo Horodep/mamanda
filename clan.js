@@ -50,7 +50,7 @@ function SendAndUpdateEmbed(channel, requestTimeout, updateFrequency, formData, 
 			}
 			catch (e) {
 				if (firstError) {
-					CatchError(e, channel);
+					CatchError(e, channel); //catch in sync loading
 					firstError = false;
 				}
 			}
