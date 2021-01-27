@@ -89,6 +89,7 @@ export function ForcedRemoveRaidMember(message, args) {
     });
 }
 
+//TODO@Horodep #35 Delete redundunt mentions in raids
 export function ClearRaidList(client) {
     var raid_channel = client.channels.cache.get(config.channels.raids);
     var history_channel = client.channels.cache.get(config.channels.raid_history);
