@@ -49,9 +49,10 @@ function SendAndUpdateEmbed(channel, requestTimeout, updateFrequency, formData, 
 	});
 }
 
-export async function AsyncClanSize() {
-	return config.clans[0].name + ": " + (await AsyncGetClanMembers(config.clans[0].id)).length + "\n" +
-		config.clans[1].name + ": " + (await AsyncGetClanMembers(config.clans[1].id)).length;
+export async function AsyncShowClanSize(message) {
+	message.channel.send(
+		config.clans[0].name + ": " + (await AsyncGetClanMembers(config.clans[0].id)).length + "\n" +
+		config.clans[1].name + ": " + (await AsyncGetClanMembers(config.clans[1].id)).length);
 }
 
 export async function AsyncGetMemberByDiscordName(discordName) {
@@ -74,15 +75,9 @@ export function AsyncSetRolesToEveryMember(guild) {
 }
 
 export function ShowRecordStat(channel, triumphId) {
-	if (triumphId == null) {
-		channel.send("Вы не обозначили искомый триумф.");
-		return;
-	}
+	if (triumphId == null) throw "Вы не обозначили искомый триумф.";
 	var recordData = ManifestManager.GetRecordData(triumphId);
-	if (recordData == null) {
-		channel.send("Триумф не найден.");
-		return;
-	}
+	if (recordData == null) throw "Триумф не найден.";
 
 	SendAndUpdateEmbed(channel, 300, 15,
 		async (member) => {

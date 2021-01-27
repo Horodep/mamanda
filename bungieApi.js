@@ -30,25 +30,25 @@ export async function AsyncGetProfileData(membershipType, membershipId) {
 }
 
 export async function AsyncGetActivitiesFromApi(membershipType, membershipId, characterId, page, mode) {
-	try /*need to check if needed*/{
+	try {
 		mode = mode ? mode : "None";
-		var result = await AsyncRequestWithPromise('GET',
+		var response = await AsyncRequestWithPromise('GET',
 			`https://www.bungie.net/Platform/Destiny2/${membershipType}/Account/${membershipId}/Character/${characterId}/Stats/Activities/?mode=${mode}&count=250&page=${page}`);
-		return result;
-	} catch (responce) {
-		console.error("Rejected: " + responce.ErrorStatus + " id: " + membershipId);
-		return responce;
+		return response;
+	} catch (e) {
+		console.error("Rejected: " + e.response.ErrorStatus + " id: " + membershipId);
+		return e.response;
 	}
 }
 
-export async function AsyncGetVendor(vendorId, componentsArray){
+export async function AsyncGetVendor(vendorId, componentsArray) {
 	var cred = config.credentials.game_defaults;
 	var components = componentsArray.join(",");
-	return (await AsyncRequestWithPromise('GET', 
+	return (await AsyncRequestWithPromise('GET',
 		`https://www.bungie.net/Platform/Destiny2/${cred.membershipType}/Profile/${cred.membershipId}/Character/${cred.characterId}/Vendors/${vendorId}/?components=${components}`,
 		true /*auth*/));
 }
 
-export async function AsyncGetXurData(){
-	return await AsyncGetVendor(2190858386, [402,304]);
+export async function AsyncGetXurData() {
+	return await AsyncGetVendor(2190858386, [402, 304]);
 }
