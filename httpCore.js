@@ -25,9 +25,7 @@ class AccessToken {
         this.#tokenObject = JSON.parse(fs.readFileSync(FetchFullPath(accessTokenFileName)));
     }
     static WriteFile() {
-        fs.writeFile(FetchFullPath(accessTokenFileName), JSON.stringify(this.#tokenObject), (err) => {
-            if (err) CatchError(err);
-        });
+        fs.writeFileSync(FetchFullPath(accessTokenFileName), JSON.stringify(this.#tokenObject));
     }
 }
 

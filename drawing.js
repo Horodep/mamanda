@@ -1,10 +1,6 @@
-//TODO@Horodep #34 reading json triumphs with import do not work
-import maxtriumphs from "./.data/maxtriumphs.json";
-import config from "./config.json";
 import jimp from "jimp";
 import fs from "fs";
 import fetch from "node-fetch";
-import { CatchError } from "./catcherror.js";
 import { AsyncGetXurData } from "./bungieApi.js";
 import { ManifestManager } from "./manifest.js";
 import { AsyncRefreshAuthToken } from "./httpCore.js";
@@ -15,6 +11,7 @@ export async function AsyncDrawTriumphs(members, channel) {
         .sort((a, b) => (a.activeScore > b.activeScore ? -1 : 1))
         .filter((_, i) => i < 15);
     var min = top[top.length - 1].activeScore - 100;
+	var maxtriumphs = fs.readFileSync(FetchFullPath(".data/maxtriumphs.json"), 'utf8');
     var delta = maxtriumphs - min;
 
     var image = await jimp.read(FetchFullPath(".data/templates/bg1.png"));
@@ -100,7 +97,7 @@ async function AsyncCacheOrGetImage(hash, img_url) {
         var url = 'https://www.bungie.net' + img_url;
         var response = await fetch(url);
         var buffer = await response.buffer();
-        fs.writeFile(FetchFullPath(filename), buffer, () => {});
+        fs.writeFileSync(FetchFullPath(filename), buffer);
         return jimp.read(buffer);
     }
 }

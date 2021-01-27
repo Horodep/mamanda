@@ -48,12 +48,10 @@ export function GiveForumRole(message) {
 }
 
 export function SaveForumLinkAndPublish(link, client) {
-	fs.writeFile(FetchFullPath(".data/forumlink.txt"), link, function (err) {
-		if (err) CatchError(err); // если возникла ошибка
-	});
+	fs.writeFileSync(FetchFullPath(".data/forumlink.txt"), link);
 	var channel_news = client.channels.cache.get(config.channels.clannews);
-	channel_news.send("Не важно, <@&"+config.roles.guardians[0]+"> ты, <@&"+config.roles.guest+"> или @everyone другой, мы верим, что ты хочешь помочь клану! <@&"+config.roles.separators.footer+">\n" +
-		"Проще всего это сделать подняв тему о наборе на форуме, нажав на стрелочку вверх.\n" +	link + "\n" + 
+	channel_news.send("Не важно, <@&" + config.roles.guardians[0] + "> ты, <@&" + config.roles.guest + "> или @everyone другой, мы верим, что ты хочешь помочь клану! <@&" + config.roles.separators.footer + ">\n" +
+		"Проще всего это сделать подняв тему о наборе на форуме, нажав на стрелочку вверх.\n" + link + "\n" +
 		"p.s. Для того, чтобы снять роль прожмите эмоцию `🆗` под данным сообщением.").then((msg) => {
 			msg.react("🆗");
 		});
@@ -61,16 +59,14 @@ export function SaveForumLinkAndPublish(link, client) {
 
 export function PublishDailyMessage(client) {
 	var channel = client.channels.cache.get(config.channels.flood);
-	fs.readFile(FetchFullPath(".data/forumlink.txt"), 'utf8', function (err, data) {
-		if (err) CatchError(err);
-		channel.send(
-			"Уважаемые Стражи! А точнее те из вас, кто <@&" + config.roles.forum_tag + ">\n" +
-			"Пожалуйста, сделайте это! Это очень важно для клана!\n\n" +
-			"p.s. Для того, чтобы снять роль прожмите эмоцию `🆗` под данным сообщением.\n" +
-			data).then((msg) => {
-				msg.react("🆗");
-			});
-	})
+	var data = fs.readFileSync(FetchFullPath(".data/forumlink.txt"), 'utf8');
+	channel.send(
+		"Уважаемые Стражи! А точнее те из вас, кто <@&" + config.roles.forum_tag + ">\n" +
+		"Пожалуйста, сделайте это! Это очень важно для клана!\n\n" +
+		"p.s. Для того, чтобы снять роль прожмите эмоцию `🆗` под данным сообщением.\n" +
+		data).then((msg) => {
+			msg.react("🆗");
+		});
 }
 
 export function SetMaximumTriumphsScore(message, args) {
@@ -83,9 +79,7 @@ export function SetMaximumTriumphsScore(message, args) {
 		message.channel.send("Введенное значение не является числом.");
 		return;
 	}
-	fs.writeFile(FetchFullPath(".data/maxtriumphs.json"), args[1], function (err) {
-		if (err) CatchError(err);
-	});
+	fs.writeFileSync(FetchFullPath(".data/maxtriumphs.json"), args[1]);
 }
 
 export function ShowNewbieList(message) {
