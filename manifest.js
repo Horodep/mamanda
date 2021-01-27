@@ -1,7 +1,7 @@
 import AdmZip from "adm-zip";
 import fs from "fs";
 import https from "https";
-import config from "./config.json";
+import { FetchFullPath } from "./directories.js";
 
 export class ManifestManager {
     static manifest = null;

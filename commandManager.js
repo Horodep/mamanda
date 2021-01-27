@@ -4,7 +4,7 @@ import nodePackage from "./package.json";
 import { AsyncGetGlobalAlerts } from "./bungieApi.js";
 import { execSync } from "child_process";
 import { DropPvpRole, GiveForumRole, SaveForumLinkAndPublish, SetMaximumTriumphsScore, ShowNewbieList, AsyncShowQueueList, AsyncShowQueueReqestsList, AsyncShowResetEnglish } from "./discordGuildMasterFeatures.js"
-import { AsyncShowClanSize, AsyncShowClanTime, AsyncShowNicknames, AsyncSetRolesToEveryMember, ShowRecordStat, ShowTopTriumphScore } from "./clan.js"
+import { AsyncShowClanSize, AsyncShowClanTime, AsyncShowNicknames, SetRolesToEveryMember, ShowRecordStat, ShowTopTriumphScore } from "./clan.js"
 import { AsyncRoles } from "./roles.js"
 import { NewAuthToken } from "./httpCore.js"
 import { AsyncGetClanMemberOnlineTime } from "./clanMember.js";
@@ -205,7 +205,7 @@ export class CommandManager {
             ClearRaidList(message.client);
          });
         this.AddCommand("guildmaster", 0, true, "csr", "!csr", "ручной запуск выдачи ролей всему клану;", async function (args, message) {
-            await AsyncSetRolesToEveryMember(message.guild);
+            SetRolesToEveryMember(message.guild);
         });
         this.AddCommand("guildmaster", 0, false, "engreset", "!engreset", "генерация ссылок на англоязычные изображения еженедельного ресета в текущий канал;", async function (args, message) {
             await AsyncShowResetEnglish(message.channel);

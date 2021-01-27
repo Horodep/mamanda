@@ -5,13 +5,9 @@ import { CatchError } from "./catcherror.js";
 import { FetchFullPath } from "./directories.js";
 
 export async function AsyncShowResetEnglish(channel) {
-	try{
-		var response = await fetch("http://kyber3000.com/Reset");
-		channel.send("Reset by Kyber3000");
-		channel.send(response.url);
-	}catch(e){
-		CatchError(e);
-	}
+	var response = await fetch("http://kyber3000.com/Reset");
+	channel.send("Reset by Kyber3000");
+	channel.send(response.url);
 }
 
 export function DropPvpRole(guild) {

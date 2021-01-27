@@ -12,6 +12,7 @@ import { FromRecordStatEmbed } from "./embeds/recordStatEmbed.js";
 import { FormTopTriumphScoreEmbed } from "./embeds/topTriumphScoreEmbed.js";
 import { FormNicknamesEmbed } from "./embeds/nicknamesEmbed.js";
 import { AsyncDrawTriumphs } from "./drawing.js";
+import { CatchError } from "./catcherror.js";
 
 async function AsyncGetFullApiClanMemberList() {
 	var members = [];
@@ -38,13 +39,22 @@ function SendAndUpdateEmbed(channel, requestTimeout, updateFrequency, formData, 
 	var arrayWithData = [];
 	channel.send(new MessageEmbed()).then((msg) => {
 		//TODO@Horodep #33 How to handle errors here?
+		var firstError = true;
 		AsyncExecuteForEveryMember(requestTimeout, async function (member, i, members) {
-			arrayWithData.push(await formData(member));
-			iterator++;
-			if (iterator % updateFrequency == 0 || iterator == members.length) {
-				msg.edit(createEmbed(arrayWithData.filter(m => m != null), iterator, members.length));
+			try {
+				arrayWithData.push(await formData(member));
+				iterator++;
+				if (iterator % updateFrequency == 0 || iterator == members.length) {
+					msg.edit(createEmbed(arrayWithData.filter(m => m != null), iterator, members.length));
+				}
+				if (iterator == members.length && finalAction != null) finalAction(arrayWithData.filter(m => m != null), msg);
 			}
-			if (iterator == members.length && finalAction != null) finalAction(arrayWithData.filter(m => m != null), msg);
+			catch (e) {
+				if (firstError) {
+					CatchError(e, channel);
+					firstError = false;
+				}
+			}
 		});
 	});
 }
@@ -57,16 +67,16 @@ export async function AsyncShowClanSize(message) {
 
 export async function AsyncGetMemberByDiscordName(discordName) {
 	var members = await AsyncGetFullApiClanMemberList();
-	for(var i = 0; i < members.length; i++) {
+	for (var i = 0; i < members.length; i++) {
 		if (discordName.startsWith(members[i].destinyUserInfo.LastSeenDisplayName + " ") ||
 			discordName == members[i].destinyUserInfo.LastSeenDisplayName) {
-				return members[i];
+			return members[i];
 		}
 	};
 	throw 'Игровой профиль не найден.';
 }
 
-export function AsyncSetRolesToEveryMember(guild) {
+export function SetRolesToEveryMember(guild) {
 	AsyncExecuteForEveryMember(5000, (member) => {
 		var clanMember = new ClanMember(member);
 		clanMember.FetchDiscordMember(guild);
@@ -97,7 +107,7 @@ export function ShowTopTriumphScore(channel, showImage) {
 			return clanMember;
 		},
 		(array, i, size) => {
-			return showImage ? Math.floor(100*i/size)+"%" : FormTopTriumphScoreEmbed(array, i, size);
+			return showImage ? Math.floor(100 * i / size) + "%" : FormTopTriumphScoreEmbed(array, i, size);
 		},
 		(array, message) => {
 			if (showImage) {
