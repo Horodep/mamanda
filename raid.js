@@ -71,10 +71,7 @@ export function CancelRaid(message, user, reaction) {
 }
 
 export function ForcedAddRaidMember(message, args) {
-    if (args.length < 3) {
-        message.channel.send('Указаны не все параметры');
-        return;
-    }
+    if (args.length < 3) throw 'Указаны не все параметры';
     message.channel.messages.fetch(args[1]).then(msg => {
         AddRaidMember(msg, { id: args[2] });
         setTimeout(() => { message.delete(); }, 5000);
@@ -82,10 +79,7 @@ export function ForcedAddRaidMember(message, args) {
 }
 
 export function ForcedRemoveRaidMember(message, args) {
-    if (args.length < 3) {
-        message.channel.send('Указаны не все параметры');
-        return;
-    }
+    if (args.length < 3) throw 'Указаны не все параметры';
     message.channel.messages.fetch(args[1]).then(msg => {
         RemoveRaidMember(msg, { id: args[2] });
         var member = message.guild.members.cache.find(user => user.id == args[2]);

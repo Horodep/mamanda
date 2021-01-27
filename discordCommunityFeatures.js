@@ -32,40 +32,30 @@ export function ShowLegendarySectors(channel) {
 export function InviteFriend(message, discordMention) {
 	var topRole = message.member.roles.highest.position;
 	var minRole = message.guild.roles.cache.find(role => role.id == config.roles.guardians[1]).position;
+	if (minRole > topRole) throw 'У вас нет прав на это действие.';
 
-	if (minRole <= topRole) {
-		var discordId = discordMention.replace(/\D/g, '')
-		var discordMember = message.guild.members.cache.find(member => member.user.id == discordId);
+	var discordId = discordMention.replace(/\D/g, '')
+	var discordMember = message.guild.members.cache.find(member => member.user.id == discordId);
+	if (discordMember == null) throw 'Страж не найден.';
 
-		if (discordMember == null) {
-			message.channel.send('Страж не найден.');
-			return;
-		}
-
-		if (discordMember.roles.cache.size == 1) {
-			discordMember.roles.add(config.roles.guest);
-			message.channel.send(`Стража <@${discordId}> пустили на сервер.`);
-		}
-	} else {
-		message.channel.send('У вас нет прав на это действие.');
-	};
+	if (discordMember.roles.cache.size == 1) {
+		discordMember.roles.add(config.roles.guest);
+		message.channel.send(`Стража <@${discordId}> пустили на сервер.`);
+	}
 }
 
 export function ChangeRegion(message) {
 	var topRole = message.member.roles.highest.position;
 	var minRole = message.guild.roles.cache.find(role => role.id == config.roles.afk).position;
+	if (minRole > topRole) throw 'У вас нет прав на это действие.';
 
-	if (minRole <= topRole) {
-		if (message.guild.region == "russia") {
-			message.guild.setRegion("eu-central");
-			message.channel.send('Регион дискорда сменен на Европу');
-		} else {
-			message.guild.setRegion("russia");
-			message.channel.send('Регион дискорда сменен на Россию');
-		}
+	if (message.guild.region == "russia") {
+		message.guild.setRegion("eu-central");
+		message.channel.send('Регион дискорда сменен на Европу');
 	} else {
-		message.channel.send('У вас нет прав на это действие.');
-	};
+		message.guild.setRegion("russia");
+		message.channel.send('Регион дискорда сменен на Россию');
+	}
 }
 
 export function ChangeChannelCap(message, limit) {
