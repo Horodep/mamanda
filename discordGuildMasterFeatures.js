@@ -73,7 +73,7 @@ export function SetMaximumTriumphsScore(message, args) {
 	if (args.length < 2) throw "Укажите значение.";
 	var score = Number(args[1]);
 	if (Number.isNaN(score)) throw "Введенное значение не является числом.";
-	fs.writeFileSync(FetchFullPath(".data/maxtriumphs.json"), args[1]);
+	fs.writeFileSync(FetchFullPath(".data/maxtriumphs.json"), score);
 }
 
 export function ShowNewbieList(message) {
