@@ -4,13 +4,11 @@ import { CatchError } from "../catcherror.js";
 export function MessageDelete(message) {
 	console.log("messageDeleted");
 	try {
-		console.log('check for bot');
 		if (message?.author?.bot ?? true) return;
-		console.log('not bot');
 		if (message.channel.id == config.channels.raids) return;
 		if (message.channel.id == config.channels.lfg) return;
-		console.log('not bot, is valid for logging');
 
+		console.log('logging started');
 		var channelDeleted = message.client.channels.cache.get(config.channels.deleted);
 		channelDeleted.send("<@" + message.author?.id + "> в <#"+message.channel.id+">: " + message.content.split("@").join(""));
 		for (var value of message.attachments.values()) {
