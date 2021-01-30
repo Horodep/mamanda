@@ -57,7 +57,7 @@ export function KickRaidMember(message, user, reaction) {
     message.edit(CreateRaidEmbed(data));
 }
 
-export function CancelRaid(message, user, reaction) {
+export function CancelRaid(message, user) {
     console.log('get raid data');
     var data = GetDataFromEmbed(message.embeds[0]);
     if (data.author.id != user.id) {
@@ -69,7 +69,7 @@ export function CancelRaid(message, user, reaction) {
         SendPrivateMessage(member, FormCancelationMessage(data, "Рейд на который вы записывались был отменен рейд лидером."));
     });
     console.log('delete message');
-    message.delete();
+    setTimeout(() => { message.delete(); }, 50);
 }
 
 export function ForcedAddRaidMember(message, args) {
