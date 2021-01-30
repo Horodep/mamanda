@@ -58,6 +58,7 @@ export function KickRaidMember(message, user, reaction) {
 }
 
 export function CancelRaid(message, user, reaction) {
+    console.log('get raid data');
     var data = GetDataFromEmbed(message.embeds[0]);
     if (data.author.id != user.id) {
         user.send("Вы не являетесь автором сбора. Вы не можете его отменить.");
@@ -67,6 +68,7 @@ export function CancelRaid(message, user, reaction) {
         var member = message.guild.members.cache.find(user => user.id == discord_id);
         SendPrivateMessage(member, FormCancelationMessage(data, "Рейд на который вы записывались был отменен рейд лидером."));
     });
+    console.log('delete message');
     message.delete();
 }
 
