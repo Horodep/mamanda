@@ -69,7 +69,7 @@ export function CancelRaid(message, user) {
         SendPrivateMessage(member, FormCancelationMessage(data, "Рейд на который вы записывались был отменен рейд лидером."));
     });
     console.log('delete message');
-    setTimeout(() => { message.delete(); }, 50);
+    setTimeout(() => { message.delete(); }, 150);
 }
 
 export function ForcedAddRaidMember(message, args) {

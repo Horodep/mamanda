@@ -39,7 +39,7 @@ function HandleRaids(reaction, user) {
 			break;
 		case "🚫":
 			console.log('ive got an emoji');
-			//if (typeof (reaction.message) != "undefined") reaction.users.remove(user);
+			if (typeof (reaction.message) != "undefined") reaction.users.remove(user);
 			console.log('emoji deleted');
 			CancelRaid(reaction.message, user);
 			break;
