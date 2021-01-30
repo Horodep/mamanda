@@ -5,7 +5,7 @@ export function MessageDelete(message) {
 	console.log("messageDeleted");
 	try {
 		console.log('check for bot');
-		if (message.author?.bot ?? true) return;
+		if (message?.author?.bot ?? true) return;
 		console.log('not bot');
 		if (message.channel.id == config.channels.raids) return;
 		if (message.channel.id == config.channels.lfg) return;
