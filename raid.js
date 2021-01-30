@@ -107,6 +107,7 @@ export function ClearRaidList(client) {
                 return;
             }
             if (message.content != "") {
+                if (tagMessage) tagMessage.delete();
                 tagMessage = message;
             } else {
                 var data = GetDataFromEmbed(message.embeds[0]);
@@ -118,6 +119,8 @@ export function ClearRaidList(client) {
                     history_channel.send(CreateRaidEmbed(data, message.createdAt));
                     message.delete();
                     tagMessage.delete();
+                } else {
+                    tagMessage = null;
                 }
             }
         });
