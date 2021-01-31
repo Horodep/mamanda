@@ -35,22 +35,16 @@ export async function AsyncRequestWithPromise(method, url, setAuth) {
         xhr.open(method, url, true);
         xhr.setRequestHeader("X-API-Key", config.credentials.d2apiKey);
         if (setAuth == true) xhr.setRequestHeader("Authorization", "Bearer " + AccessToken.access_token);
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState == 4) {
-                try {
-                    var responce = JSON.parse(xhr.responseText);
-
-                    if (xhr.status >= 300) {
-                        throw Error('BadResponce');
-                    } else {
-                        if (responce.ErrorCode != 1) throw Error('BadResponce');
-                        resolve(responce);
-                    }
-                } catch (e) {
-                    e.url = url;
-                    e.response = responce ?? xhr.responseText;
-                    reject(e);
-                }
+        xhr.onload = function () {
+            try {
+                var responce = JSON.parse(xhr.responseText);
+                if (xhr.status >= 300) throw Error('BadResponce');
+                if (responce.ErrorCode != 1) throw Error('BadResponce');
+                resolve(responce);
+            } catch (e) {
+                e.url = url;
+                e.response = responce ?? xhr.responseText;
+                reject(e);
             }
         }
         xhr.send();
@@ -62,17 +56,15 @@ async function AsyncAuthRequestWithPromise(body) {
         var authpost = new XMLHttpRequest();
         authpost.open("POST", "https://www.bungie.net/Platform/App/OAuth/Token/", true);
         authpost.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-        authpost.onreadystatechange = function () {
-            if (this.readyState === 4 && this.status === 200) {
-                AccessToken.SetTokenJson(this.responseText);
-                if (AccessToken.token_exists) {
-                    AccessToken.WriteFile();
-                }
-                console.log("TOKEN!");
-                resolve(this.responseText);
-            } else {
-                console.log(`    ${this.readyState} ${this.status} ${this.responseText}`);
-            }
+        authpost.onload = function () {
+            console.log(`Auth HTTP Status: ${this.status}; Responce: ${this.responseText}`);
+            if (this.status != 200) reject(this.responseText);
+
+            AccessToken.SetTokenJson(this.responseText);
+            if (!AccessToken.token_exists) reject(this.responseText);
+            AccessToken.WriteFile();
+            console.log("Got new auth token!");
+            resolve(this.responseText);
         }
         authpost.send(body);
     });
