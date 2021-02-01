@@ -52,3 +52,7 @@ export async function AsyncGetVendor(vendorId, componentsArray) {
 export async function AsyncGetXurData() {
 	return await AsyncGetVendor(2190858386, [402, 304]);
 }
+
+export async function AsyncGetManifestLinks() {
+	return (await AsyncRequestWithPromise('GET', `https://www.bungie.net/Platform/Destiny2/Manifest/`));
+}
