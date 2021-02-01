@@ -1,24 +1,28 @@
-import AdmZip from "adm-zip";
 import fs from "fs";
 import https from "https";
+import fetch from "node-fetch";
+import { AsyncGetManifestLinks } from "./bungieApi.js";
 import { FetchFullPath } from "./directories.js";
 
 export class ManifestManager {
     static manifest = null;
 
-    static Refresh() {
-        var uri = "https://www.d2checklist.com/assets/destiny2.zip";
-        var filename = 'manifest.zip';
+    static async Refresh() {
+        var apiLinks = await AsyncGetManifestLinks();
+        if (apiLinks.ErrorCode != 1) return;
+        var urls = apiLinks.Response?.jsonWorldComponentContentPaths.ru;
+        
+        var manifest = {};
+        manifest.version = apiLinks.Response?.version;
+	    manifest.Record = await fetch(getFullUrl(urls.DestinyRecordDefinition)).then(res => res.json());
+	    manifest.InventoryItem = await fetch(getFullUrl(urls.DestinyInventoryItemDefinition)).then(res => res.json());
+	    manifest.Activity = await fetch(getFullUrl(urls.DestinyActivityDefinition)).then(res => res.json());
+	    manifest.ActivityModifier = await fetch(getFullUrl(urls.DestinyActivityModifierDefinition)).then(res => res.json());
 
-        const file = fs.createWriteStream(`./.data/${filename}`);
-        https.get(uri, response => {
-            response.pipe(file)
-                .on("finish", function () {
-                    var zip = new AdmZip(`./.data/${filename}`);
-                    zip.extractAllTo("./.data/", /*overwrite*/true);
-                    console.log("Manifest refreshed!");
-                });
-        });
+        fs.writeFileSync(FetchFullPath('.data/destiny2.json'), JSON.stringify(manifest));
+        console.log("Manifest refreshed!");
+
+        function getFullUrl(url) { return "https://www.bungie.net" + url;}
     }
 
     static Cache() {
