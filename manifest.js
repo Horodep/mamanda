@@ -10,7 +10,7 @@ export class ManifestManager {
     static async Refresh() {
         var apiLinks = await AsyncGetManifestLinks();
         if (apiLinks.ErrorCode != 1) return;
-        var urls = apiLinks.Response?.jsonWorldComponentContentPaths.ru;
+        var urls = apiLinks.Response?.jsonWorldComponentContentPaths.en;
         
         var manifest = {};
         manifest.version = apiLinks.Response?.version;
