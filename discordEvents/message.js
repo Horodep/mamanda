@@ -4,13 +4,15 @@ import { CommandManager } from "../commandManager.js";
 
 export function Message(message){
 	try {
-		if (message.author.bot || !message.content.startsWith("!")) return;
+		if (message.author.bot) return;
 		
 		if (message.channel.type != "text") {
-			channel_sandbox = client.channels.cashe.get(config.channels.sandbox);
+			var channel_sandbox = message.client.channels.cache.get(config.channels.sandbox);
 			channel_sandbox.send("**" + message.author.username + "** написал в ЛС:\n" + message.content);
 			return;
 		}
+
+		if (!message.content.startsWith("!")) return;
 
 		console.log((message.member != null ? message.member.displayName : message.author.username), message.content);
 		var args = message.content.substring(1).split(' ').filter(item => item);
