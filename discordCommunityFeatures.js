@@ -22,10 +22,11 @@ export function ShowLegendarySectors(channel) {
 
 	var embed = new MessageEmbed()
 		.setAuthor("Legendary sectors")
+		.setDescription("The rotation is not defined.")
 		.setColor(0x00AE86)
 		.setTimestamp()
-		.addField(legend.displayProperties.name, legendReward.name + '\n\n' + legendModifiers.join('\n'), true)
-		.addField(master.displayProperties.name, masterReward.name + '\n\n' + masterModifiers.join('\n'), true)
+	//	.addField(legend.displayProperties.name, legendReward.name + '\n\n' + legendModifiers.join('\n'), true)
+	//	.addField(master.displayProperties.name, masterReward.name + '\n\n' + masterModifiers.join('\n'), true)
 	channel.send(embed)
 }
 
