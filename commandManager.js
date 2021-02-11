@@ -240,7 +240,7 @@ export class CommandManager {
             SendPrivateMessageByRole(message.guild, args);
         });
         this.AddCommand("guildmaster", 0, false, "pvpdrop", "!pvpdrop", "снять все пвп роли;", async function (args, message) {
-            DropPvpRole(message.guild);
+            DropPvpRole(message);
         });
         this.AddCommand("guildmaster", 0, false, "q", "!q", "список стражей в очереди;", async function (args, message) {
             await AsyncShowQueueList(message);
