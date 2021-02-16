@@ -115,15 +115,15 @@ export function GetFullDiscordClanMemberList(guild) {
 
 // ordered legend, master
 const SECTOR_ROTATION_MAP = {    // legend is
-	0: [912873277, 3911969233],  // Concealed Void
+	0: [912873277, 3911969238],  // Concealed Void
 	1: [1648125541, 912873274],  // Bunker E15
 	2: [1070981430, 1648125538], // Perdition
 	3: [2936791996, 1070981425], // Exodus Garden 2A
 	4: [3094493720, 2936791995], // Veles Labyrinth
-	5: [567131512, 3094493720],  // K1 Logistics,
-	6: [2829206727, 567131512],  // K1 Communion
-	7: [184186581, 2829206727],  // K1 Crew Quarters
-	8: [3911969233, 184186581]   // K1 Revelation
+	5: [567131512, 3094493727],  // K1 Logistics,
+	6: [2829206727, 567131519],  // K1 Communion
+	7: [184186581, 2829206720],  // K1 Crew Quarters
+	8: [3911969233, 184186578]   // K1 Revelation
 };
 
 const SECTOR_REWARD_ROTATION_MAP = {
