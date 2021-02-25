@@ -1,7 +1,6 @@
 import fs from "fs";
 import config from "./config.json";
 import fetch from "node-fetch";
-import { CatchError } from "./catcherror.js";
 import { FetchFullPath } from "./directories.js";
 
 export async function AsyncShowResetEnglish(channel) {
@@ -15,7 +14,7 @@ export function DropPvpRole(message) {
 	var topPvpRole = message.guild.roles.cache.find(role => role.id == config.roles.medals.category_first_role.crucible);
 	for (var rolePosition = topPvpRole.position - 1; rolePosition > topPvpRole.position - 7; rolePosition--) {
 		var role = message.guild.roles.cache.find(role => role.position == rolePosition);
-		role.members.forEach(member => { list.push({member: member, role: role}); });
+		role.members.forEach(member => { list.push({ member: member, role: role }); });
 	}
 	var i = 0;
 	var dropRole = function () {
@@ -23,7 +22,7 @@ export function DropPvpRole(message) {
 			list[i].member.roles.remove(list[i].role);
 			i++;
 			setTimeout(dropRole, 1000);
-		}else{
+		} else {
 			message.channel.send("Пвп роли сняты");
 		}
 	}
@@ -85,65 +84,4 @@ export function ShowNewbieList(message) {
 	});
 	newbieList.sort();
 	message.channel.send(newbieList.join('\n'));
-}
-export async function AsyncShowQueueList(message) {
-	var queueList = [];
-	await message.guild.members.fetch();
-	message.guild.members.cache.filter(m => m.roles.cache.size == 1).forEach(function (member) {
-		var secondsOnServer = Date.now() - member.joinedTimestamp;
-		var daysOnServer = Math.floor(secondsOnServer / (1000 * 60 * 60 * 24));
-		queueList.push("`" + daysOnServer + "d` <@" + member.user.id + ">");
-	});
-	queueList.sort();
-	message.channel.send(queueList.join('\n'));
-}
-export async function AsyncShowQueueReqestsList(message) {
-	var counterOfMessagesByUser = [];
-	var counterOfReactsOnMessage = [];
-	await message.guild.members.fetch();
-	message.guild.members.cache.filter(m => m.roles.cache.size == 1)
-		.sort(function (a, b) { return a.joinedTimestamp > b.joinedTimestamp ? 1 : -1 })
-		.forEach(function (member) {
-			var secondsOnServer = Date.now() - member.joinedTimestamp;
-			var daysOnServer = Math.floor(secondsOnServer / (1000 * 60 * 60 * 24));
-			var headerText = `Заявка от <@${member.user.id}> (дней на сервере: ${daysOnServer}) `;
-			var emojis = "";
-			var requestBody = "";
-
-			var queueChannel = message.client.channels.cache.get(config.channels.entrance);
-			counterOfMessagesByUser[member.id] = 0;
-			queueChannel.messages.fetch({ limit: 100 }).then(messages => {
-				var userMessages = messages
-					.sort((a, b) => a.id > b.id ? 1 : -1)
-					.filter(m => m.author.id == member.user.id);
-				userMessages.forEach(async function (requestMessage) {
-					try /*need to check if needed*/ {
-						counterOfMessagesByUser[member.id]++;
-						counterOfReactsOnMessage[requestMessage.id] = 0;
-						requestBody += '\n' + requestMessage.content;
-
-						requestMessage.reactions.cache.each(async function (reaction) {
-							counterOfReactsOnMessage[requestMessage.id]++;
-							emojis += ` ${reaction.emoji}`;
-							var users = await reaction.users.fetch();
-							for (let user of users) {
-								emojis += " **" + user[1].username + "**";
-							}
-							if(counterOfMessagesByUser[member.id] == userMessages.size)
-								message.channel.send(headerText + emojis + "```" + requestBody + " ```");
-						})
-						if (counterOfMessagesByUser[member.id] == userMessages.size && counterOfReactsOnMessage[requestMessage.id] == 0)
-							message.channel.send(headerText + emojis + "```" + requestBody + " ```");
-					} catch (e) {
-						CatchError(e, message.channel); //emojis
-					}
-				});
-				return headerText + emojis + "```" + requestBody + " ```";
-			}).then(messageText => {
-				if (messageText.endsWith("``` ```")) messageText = messageText.replace("``` ```", "```нет заявки```");
-				setTimeout(function () {
-					if (counterOfMessagesByUser[member.id] == 0) message.channel.send(messageText);
-				}, 500);
-			})
-		});
 }
