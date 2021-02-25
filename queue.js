@@ -76,6 +76,7 @@ function FormGuildRequestEmbed(member, text, url, reactions) {
 		.addField(`Заявка`, text == "" ? "нет заявки" : text, true)
 		.addField(`Инфо`, dataField, true)
 		.setColor(0x00AE86)
-		.setFooter(`дней на сервере: ${daysOnServer}`);
+		.setFooter(`дней на сервере: ${daysOnServer}`)
+		.setTimestamp(member.joinedTimestamp);
 	return embed;
 }
