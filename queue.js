@@ -73,8 +73,8 @@ function FormGuildRequestEmbed(member, text, url, reactions) {
 		(url ? "[message link](" + url + ")\n" : "") +
 		(reactions ?? "");
 	var color = 0x00BFFF;
-	if (reactions.includes('no')) color = 0xC40000;
-	if (reactions.includes('yes')) color = 0x228B22;
+	if (reactions.includes('no')) color = 0xDE0C00;
+	if (reactions.includes('yes')) color = 0x1AAA00;
 	var embed = new MessageEmbed()
 		.addField(`Заявка`, text == "" ? "нет заявки" : text, true)
 		.addField(`Инфо`, dataField, true)
