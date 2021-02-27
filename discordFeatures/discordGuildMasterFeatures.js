@@ -1,5 +1,5 @@
 import fs from "fs";
-import config from "./config.json";
+import config from "../config.json";
 import fetch from "node-fetch";
 import { FetchFullPath } from "../directories.js";
 

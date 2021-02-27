@@ -1,5 +1,5 @@
 import { CatchError, CatchErrorAndDeleteByTimeout, CatchRaidError } from "../../catcherror.js";
-import config from "./config.json";
+import config from "../../config.json";
 import { MessageEmbed } from "discord.js";
 import { SendPrivateMessage } from "../messaging.js";
 import { RaidData } from "./raidData.js";

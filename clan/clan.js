@@ -1,5 +1,5 @@
 import { MessageEmbed } from "discord.js";
-import config from "./config.json";
+import config from "../config.json";
 import { AsyncGetClanMembers } from "../http/bungieApi.js";
 import { AsyncGetShowAndSetRoles } from "./clanMember/roles.js";
 import { ClanMember, AsyncGetAllActivities } from "./clanMember/clanMember.js";

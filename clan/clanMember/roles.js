@@ -1,4 +1,4 @@
-import config from "./config.json";
+import config from "../../config.json";
 import { AsyncGetFullMemberData, AsyncGetProfileData } from "../../http/bungieApi.js";
 import { AsyncGetMemberByDiscordName } from "../clan.js";
 import * as BungieApiLogic from "./bungieApiData.js";
