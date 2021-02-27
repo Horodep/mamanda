@@ -1,7 +1,7 @@
 import fs from "fs";
 import config from "./config.json";
 import fetch from "node-fetch";
-import { FetchFullPath } from "./directories.js";
+import { FetchFullPath } from "../directories.js";
 
 export async function AsyncShowResetEnglish(channel) {
 	var response = await fetch("http://kyber3000.com/Reset");

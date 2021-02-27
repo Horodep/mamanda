@@ -1,6 +1,6 @@
 import config from "./config.json";
 import { MessageEmbed } from "discord.js";
-import { CatchError } from "./catcherror.js";
+import { CatchError } from "../catcherror.js";
 
 export async function AsyncShowQueueList(message) {
 	var queueList = [];

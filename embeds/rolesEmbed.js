@@ -1,5 +1,5 @@
 import { MessageEmbed } from "discord.js";
-import { SumMedals } from "../coreLogic/rolesLogic.js";
+import { SumMedals } from "../clan/clanMember/rolesLogic.js";
 
 export function FormRolesEmbed(clanMember, rolesData) {
 	if (rolesData == null || rolesData.medals == null) {

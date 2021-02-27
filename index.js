@@ -8,7 +8,7 @@ import { AsyncMessageReactionRemove } from "./discordEvents/messageReactionRemov
 import { CommandManager } from "./commandManager.js";
 import { ManifestManager } from "./manifest.js";
 import { FetchDefaultCatchErrorChannel } from "./catcherror.js";
-import { AsyncRefreshAuthToken } from "./httpCore.js";
+import { AsyncRefreshAuthToken } from "./http/httpCore.js";
 
 const client = new Discord.Client({ partials: ['MESSAGE', 'CHANNEL', 'REACTION'] });
 client.login(config.credentials.discordApiKey);

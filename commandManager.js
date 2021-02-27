@@ -2,17 +2,17 @@ import config from "./config.json";
 import nodePackage from "./package.json";
 import { execSync } from "child_process";
 import { MessageEmbed } from "discord.js";
-import { AsyncGetGlobalAlerts } from "./bungieApi.js";
-import { AsyncShowClanSize, AsyncShowClanTime, AsyncShowNicknames, SetRolesToEveryMember, ShowRecordStat, ShowTopTriumphScore } from "./clan.js"
-import { AsyncRoles } from "./roles.js"
-import { NewAuthToken } from "./httpCore.js"
-import { AsyncGetClanMemberOnlineTime } from "./clanMember.js";
+import { AsyncGetGlobalAlerts } from "./http/bungieApi.js";
+import { AsyncShowClanSize, AsyncShowClanTime, AsyncShowNicknames, SetRolesToEveryMember, ShowRecordStat, ShowTopTriumphScore } from "./clan/clan.js"
+import { AsyncRoles } from "./clan/clanMember/roles.js"
+import { NewAuthToken } from "./http/httpCore.js"
+import { AsyncGetClanMemberOnlineTime } from "./clan/clanMember/clanMember.js";
 import { CatchError } from "./catcherror.js";
-import { InviteFriend, ChangeChannelCap, ChangeRegion, ClanMedalsSummary, ShowLegendarySectors } from "./discordCommunityFeatures.js";
-import { DropPvpRole, GiveForumRole, SaveForumLinkAndPublish, SetMaximumTriumphsScore, ShowNewbieList, AsyncShowResetEnglish } from "./discordGuildMasterFeatures.js"
-import { AsyncShowQueueList, AsyncShowQueueReqestsList } from "./queue.js"
-import { SendCustomMessage, SendPrivateMessageByRole } from "./sendMessage.js";
-import { ClearRaidList, CreateRaid, ForcedAddRaidMember, ForcedRemoveRaidMember, AsyncGetPlannedRaids } from "./raid.js"
+import { InviteFriend, ChangeChannelCap, ChangeRegion, ClanMedalsSummary, ShowLegendarySectors } from "./discordFeatures/discordCommunityFeatures.js";
+import { DropPvpRole, GiveForumRole, SaveForumLinkAndPublish, SetMaximumTriumphsScore, ShowNewbieList, AsyncShowResetEnglish } from "./discordFeatures/discordGuildMasterFeatures.js"
+import { AsyncShowQueueList, AsyncShowQueueReqestsList } from "./discordFeatures/queue.js"
+import { SendCustomMessage, SendPrivateMessageByRole } from "./discordFeatures/messaging.js";
+import { ClearRaidList, CreateRaid, ForcedAddRaidMember, ForcedRemoveRaidMember, AsyncGetPlannedRaids } from "./discordFeatures/raid/raid.js"
 import { AsyncDrawXur } from "./drawing/drawXur.js";
 
 export class CommandManager {

@@ -1,8 +1,8 @@
 import fs from "fs";
 import { XMLHttpRequest } from "xmlhttprequest";
 import config from "./config.json";
-import { CatchError } from "./catcherror.js";
-import { FetchFullPath } from "./directories.js";
+import { CatchError } from "../catcherror.js";
+import { FetchFullPath } from "../directories.js";
 
 const accessTokenFileName = '.data/access_token.json';
 

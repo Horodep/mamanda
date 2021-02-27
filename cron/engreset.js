@@ -1,6 +1,6 @@
 import Discord from "discord.js";
 import config from "../config.json";
-import { AsyncShowResetEnglish } from "../discordGuildMasterFeatures.js";
+import { AsyncShowResetEnglish } from "../discordFeatures/discordGuildMasterFeatures.js";
 import { CatchCronError } from "../catcherror.js";
 
 const client = new Discord.Client({ partials: ['MESSAGE', 'CHANNEL', 'REACTION'] });
