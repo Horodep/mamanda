@@ -1,7 +1,7 @@
 import jimp from "jimp";
-import { AsyncGetXurData } from "../bungieApi.js";
+import { AsyncGetXurData } from "../http/bungieApi.js";
 import { ManifestManager } from "../manifest.js";
-import { AsyncRefreshAuthToken } from "../httpCore.js";
+import { AsyncRefreshAuthToken } from "../http/httpCore.js";
 import { FetchFullPath } from "../directories.js";
 import { AsyncCacheOrGetImage, AsyncDrawImage, AsyncDrawText, AsyncDrawWhiteRectangle } from "./drawing.js";
 
