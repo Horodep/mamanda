@@ -85,7 +85,7 @@ export function SetRolesToEveryMember(guild) {
 
 export function ShowRecordStat(channel, triumphId) {
 	if (triumphId == null) throw "Вы не обозначили искомый триумф.";
-	var recordData = ManifestManager.GetRecordData(triumphId);
+	var recordData = ManifestManager.GetRecordData(triumphId)?.displayProperties;
 	if (recordData == null) throw "Триумф не найден.";
 
 	SendAndUpdateEmbed(channel, 300, 15,

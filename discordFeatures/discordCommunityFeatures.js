@@ -12,8 +12,8 @@ export function ShowLegendarySectors(channel) {
 
 	var legend = ManifestManager.GetActivityData(SECTOR_ROTATION_MAP[counter % 9][0], true);
 	var master = ManifestManager.GetActivityData(SECTOR_ROTATION_MAP[counter % 9][1], true);
-	var legendReward = ManifestManager.GetItemData(SECTOR_REWARD_ROTATION_MAP[counter % 4][0], true);
-	var masterReward = ManifestManager.GetItemData(SECTOR_REWARD_ROTATION_MAP[counter % 4][1], true);
+	var legendReward = ManifestManager.GetItemData(SECTOR_REWARD_ROTATION_MAP[counter % 4][0], true).displayProperties;
+	var masterReward = ManifestManager.GetItemData(SECTOR_REWARD_ROTATION_MAP[counter % 4][1], true).displayProperties;
 	var legendModifiers = legend.modifiers.map(m => m.activityModifierHash)
 		.map(hash => `${emojiCache.find(e => e.name == hash)} ` + ManifestManager.GetActivityModifierData(hash, true)?.displayProperties?.name);
 	var masterModifiers = master.modifiers.map(m => m.activityModifierHash)

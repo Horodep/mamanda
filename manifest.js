@@ -42,13 +42,13 @@ export class ManifestManager {
 
     static GetRecordData(hash, doNotClean) {
         return this.GetData(doNotClean, function(){
-            return ManifestManager.manifest?.Record[hash]?.displayProperties; // name, icon, description
+            return ManifestManager.manifest?.Record[hash];
         });
     }
 
     static GetItemData(hash, doNotClean) {
         return this.GetData(doNotClean, function(){
-            return ManifestManager.manifest?.InventoryItem[hash]?.displayProperties; // name, icon, description
+            return ManifestManager.manifest?.InventoryItem[hash]; // name, icon, description
         });
     }
 

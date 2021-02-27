@@ -40,7 +40,7 @@ export async function AsyncDrawXur(channel) {
         var vendorItemIndex = vendorItemIndexes[i];
         var stats = allStats[vendorItemIndex].stats;
         var item = sales[vendorItemIndex];
-        var itemImageUrl = ManifestManager.GetItemData(item.itemHash)?.icon;
+        var itemImageUrl = ManifestManager.GetItemData(item.itemHash)?.displayProperties.icon;
         var itemImage = await AsyncCacheOrGetImage(item.itemHash, itemImageUrl);
 
         await AsyncDrawImage(image, box_coords[i].x, box_coords[i].y, 0, itemImage);
