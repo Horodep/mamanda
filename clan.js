@@ -4,7 +4,7 @@ import { AsyncGetClanMembers } from "./bungieApi.js";
 import { AsyncGetShowAndSetRoles } from "./roles.js";
 import { ClanMember, AsyncGetAllActivities } from "./clanMember.js";
 import { AsyncGetClanVoiceSummary } from "./sql.js";
-import { GetFullDiscordClanMemberList } from "./discordCommunityFeatures.js";
+import { GetFullDiscordClanMemberList } from "./discordFeatures/discordCommunityFeatures.js";
 import { SendPrivateMessagesToArray } from "./sendMessage.js";
 import { ManifestManager } from "./manifest.js";
 import { FormClanTimeEmbed } from "./embeds/clanTimeEmbed.js";

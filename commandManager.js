@@ -8,8 +8,8 @@ import { AsyncRoles } from "./roles.js"
 import { NewAuthToken } from "./httpCore.js"
 import { AsyncGetClanMemberOnlineTime } from "./clanMember.js";
 import { CatchError } from "./catcherror.js";
-import { InviteFriend, ChangeChannelCap, ChangeRegion, ClanMedalsSummary, ShowLegendarySectors } from "./discordCommunityFeatures.js";
-import { DropPvpRole, GiveForumRole, SaveForumLinkAndPublish, SetMaximumTriumphsScore, ShowNewbieList, AsyncShowResetEnglish } from "./discordGuildMasterFeatures.js"
+import { InviteFriend, ChangeChannelCap, ChangeRegion, ClanMedalsSummary, ShowLegendarySectors } from "./discordFeatures/discordCommunityFeatures.js";
+import { DropPvpRole, GiveForumRole, SaveForumLinkAndPublish, SetMaximumTriumphsScore, ShowNewbieList, AsyncShowResetEnglish } from "./discordFeatures/discordGuildMasterFeatures.js"
 import { AsyncShowQueueList, AsyncShowQueueReqestsList } from "./queue.js"
 import { SendCustomMessage, SendPrivateMessageByRole } from "./sendMessage.js";
 import { ClearRaidList, CreateRaid, ForcedAddRaidMember, ForcedRemoveRaidMember, AsyncGetPlannedRaids } from "./raid.js"
