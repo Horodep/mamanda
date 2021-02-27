@@ -35,12 +35,12 @@ function ShowHttpError(e, channel) {
 	if (e.response.ErrorCode == 1665) return; //DestinyPrivacyRestriction
 
 	console.error(e);
-	if (e.name == "BadResponce") {
-		channel.send(`Ошибка взаимодействия с API Bungie:\n> Error ${e.response.ErrorCode}: ${e.response.ErrorStatus}\n> ${e.response.Message}`);
-	} else {
+	if (typeof (e.response) == 'string') {
 		channel.send(`<@${config.users.developer}>, API вернуло не JSON:\n\`endpoint: ${e.url}\``);
 		channel.send(`${e.response}`, { code: 'xml' });
 		channel.send(`${e.stack}`, { code: 'elixir' });
+	} else {
+		channel.send(`Ошибка взаимодействия с API Bungie:\n> Error #${e.response.ErrorCode}: ${e.response.ErrorStatus}\n> ${e.response.Message}`);
 	}
 }
 

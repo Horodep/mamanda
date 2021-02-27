@@ -41,16 +41,21 @@ export async function AsyncGetActivitiesFromApi(membershipType, membershipId, ch
 	}
 }
 
-export async function AsyncGetVendor(vendorId, componentsArray) {
+export async function AsyncGetVendor(vendorId, componentsArray, customCharacterId) {
 	var cred = config.credentials.game_defaults;
 	var components = componentsArray.join(",");
+	var characterId = customCharacterId ?? config.credentials.game_defaults.characterId;
 	return (await AsyncRequestWithPromise('GET',
-		`https://www.bungie.net/Platform/Destiny2/${cred.membershipType}/Profile/${cred.membershipId}/Character/${cred.characterId}/Vendors/${vendorId}/?components=${components}`,
+		`https://www.bungie.net/Platform/Destiny2/${cred.membershipType}/Profile/${cred.membershipId}/Character/${characterId}/Vendors/${vendorId}/?components=${components}`,
 		true /*auth*/));
 }
 
 export async function AsyncGetXurData() {
 	return await AsyncGetVendor(2190858386, [402, 304]);
+}
+
+export async function AsyncGetEververseData(customCharacterId) {
+	return await AsyncGetVendor(2190858386, [402, 304], customCharacterId);
 }
 
 export async function AsyncGetManifestLinks() {

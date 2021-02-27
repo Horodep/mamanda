@@ -10,8 +10,8 @@ export function ShowLegendarySectors(channel) {
 	var emojiServer = channel.client.guilds.cache.get(config.guilds.emojis);
     var emojiCache = emojiServer.emojis.cache;
 
-	var legend = ManifestManager.GetActivityData(SECTOR_ROTATION_MAP[counter % 5][0], true);
-	var master = ManifestManager.GetActivityData(SECTOR_ROTATION_MAP[counter % 5][1], true);
+	var legend = ManifestManager.GetActivityData(SECTOR_ROTATION_MAP[counter % 9][0], true);
+	var master = ManifestManager.GetActivityData(SECTOR_ROTATION_MAP[counter % 9][1], true);
 	var legendReward = ManifestManager.GetItemData(SECTOR_REWARD_ROTATION_MAP[counter % 4][0], true);
 	var masterReward = ManifestManager.GetItemData(SECTOR_REWARD_ROTATION_MAP[counter % 4][1], true);
 	var legendModifiers = legend.modifiers.map(m => m.activityModifierHash)
@@ -114,12 +114,16 @@ export function GetFullDiscordClanMemberList(guild) {
 }
 
 // ordered legend, master
-const SECTOR_ROTATION_MAP = {
-	0: [912873277, 3094493727],
-	1: [1648125541, 912873274],
-	2: [1070981430, 1648125538],
-	3: [2936791996, 1070981425],
-	4: [3094493720, 2936791995]
+const SECTOR_ROTATION_MAP = {    // legend is
+	0: [912873277, 3911969238],  // Concealed Void
+	1: [1648125541, 912873274],  // Bunker E15
+	2: [1070981430, 1648125538], // Perdition
+	3: [2936791996, 1070981425], // Exodus Garden 2A
+	4: [3094493720, 2936791995], // Veles Labyrinth
+	5: [567131512, 3094493727],  // K1 Logistics,
+	6: [2829206727, 567131519],  // K1 Communion
+	7: [184186581, 2829206720],  // K1 Crew Quarters
+	8: [3911969233, 184186578]   // K1 Revelation
 };
 
 const SECTOR_REWARD_ROTATION_MAP = {

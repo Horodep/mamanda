@@ -50,8 +50,8 @@ function SendAndUpdateEmbed(channel, requestTimeout, updateFrequency, formData, 
 			}
 			catch (e) {
 				if (firstError) {
-					CatchError(e, channel); //catch in sync loading
 					firstError = false;
+					CatchError(e, channel); //catch in sync loading
 				}
 			}
 		});
@@ -99,7 +99,7 @@ export function ShowRecordStat(channel, triumphId) {
 }
 
 export function ShowTopTriumphScore(channel, showImage) {
-	SendAndUpdateEmbed(channel, 50, 15,
+	SendAndUpdateEmbed(channel, 15, 30,
 		async (member) => {
 			var clanMember = new ClanMember(member);
 			await clanMember.FetchActiveScore();
@@ -119,7 +119,7 @@ export function ShowTopTriumphScore(channel, showImage) {
 export async function AsyncShowClanTime(channel, days, modificators) {
 	var clanVoiceSummary = await AsyncGetClanVoiceSummary(days);
 	await channel.guild.members.fetch();
-	SendAndUpdateEmbed(channel, 500, 20,
+	SendAndUpdateEmbed(channel, 5, 20,
 		async (member) => {
 			var clanMember = new ClanMember(member);
 			await clanMember.FetchCharacterIds();
