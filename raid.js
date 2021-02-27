@@ -1,7 +1,7 @@
 import { CatchError, CatchErrorAndDeleteByTimeout, CatchRaidError } from "./catcherror.js";
 import config from "./config.json";
 import { MessageEmbed } from "discord.js";
-import { SendPrivateMessage } from "./sendMessage.js";
+import { SendPrivateMessage } from "./discordFeatures/messaging.js";
 import { RaidData } from "./raidData.js";
 
 export function CreateRaid(message, args) {

@@ -5,7 +5,7 @@ import { AsyncGetShowAndSetRoles } from "./clanMember/roles.js";
 import { ClanMember, AsyncGetAllActivities } from "./clanMember/clanMember.js";
 import { AsyncGetClanVoiceSummary } from "../http/sql.js";
 import { GetFullDiscordClanMemberList } from "../discordFeatures/discordCommunityFeatures.js";
-import { SendPrivateMessagesToArray } from "../sendMessage.js";
+import { SendPrivateMessagesToArray } from "../discordFeatures/messaging.js";
 import { ManifestManager } from "../manifest.js";
 import { FormClanTimeEmbed } from "../embeds/clanTimeEmbed.js";
 import { FromRecordStatEmbed } from "../embeds/recordStatEmbed.js";
