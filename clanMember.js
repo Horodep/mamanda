@@ -1,7 +1,7 @@
 import { MessageEmbed } from "discord.js";
-import { AsyncGetActivitiesFromApi, AsyncGetCoreMemberData, AsyncGetProfileData } from "./bungieApi.js";
+import { AsyncGetActivitiesFromApi, AsyncGetCoreMemberData, AsyncGetProfileData } from "./http/bungieApi.js";
 import { AsyncGetMemberByDiscordName } from "./clan.js";
-import { AsyncGetClanVoiceSummary, AsyncGetMemberDetailedVoice } from "./sql.js"
+import { AsyncGetClanVoiceSummary, AsyncGetMemberDetailedVoice } from "./http/sql.js"
 import config from "./config.json";
 /*
 #crossSaveOverride;

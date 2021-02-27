@@ -1,5 +1,5 @@
 import config from "./config.json";
-import { AsyncGetFullMemberData, AsyncGetProfileData } from "./bungieApi.js";
+import { AsyncGetFullMemberData, AsyncGetProfileData } from "./http/bungieApi.js";
 import { AsyncGetMemberByDiscordName } from "./clan.js";
 import * as BungieApiLogic from "./coreLogic/bungieApiData.js";
 import { LogRolesGranting, CheckAndProcessRole, CheckAndProcessRoleBlock, SumMedals } from "./coreLogic/rolesLogic.js";

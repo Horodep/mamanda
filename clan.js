@@ -1,9 +1,9 @@
 import { MessageEmbed } from "discord.js";
 import config from "./config.json";
-import { AsyncGetClanMembers } from "./bungieApi.js";
+import { AsyncGetClanMembers } from "./http/bungieApi.js";
 import { AsyncGetShowAndSetRoles } from "./roles.js";
 import { ClanMember, AsyncGetAllActivities } from "./clanMember.js";
-import { AsyncGetClanVoiceSummary } from "./sql.js";
+import { AsyncGetClanVoiceSummary } from "./http/sql.js";
 import { GetFullDiscordClanMemberList } from "./discordFeatures/discordCommunityFeatures.js";
 import { SendPrivateMessagesToArray } from "./sendMessage.js";
 import { ManifestManager } from "./manifest.js";

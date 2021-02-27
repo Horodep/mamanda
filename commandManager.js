@@ -2,10 +2,10 @@ import config from "./config.json";
 import nodePackage from "./package.json";
 import { execSync } from "child_process";
 import { MessageEmbed } from "discord.js";
-import { AsyncGetGlobalAlerts } from "./bungieApi.js";
+import { AsyncGetGlobalAlerts } from "./http/bungieApi.js";
 import { AsyncShowClanSize, AsyncShowClanTime, AsyncShowNicknames, SetRolesToEveryMember, ShowRecordStat, ShowTopTriumphScore } from "./clan.js"
 import { AsyncRoles } from "./roles.js"
-import { NewAuthToken } from "./httpCore.js"
+import { NewAuthToken } from "./http/httpCore.js"
 import { AsyncGetClanMemberOnlineTime } from "./clanMember.js";
 import { CatchError } from "./catcherror.js";
 import { InviteFriend, ChangeChannelCap, ChangeRegion, ClanMedalsSummary, ShowLegendarySectors } from "./discordFeatures/discordCommunityFeatures.js";

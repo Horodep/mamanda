@@ -1,7 +1,7 @@
 import fs from "fs";
 import https from "https";
 import fetch from "node-fetch";
-import { AsyncGetManifestLinks } from "./bungieApi.js";
+import { AsyncGetManifestLinks } from "./http/bungieApi.js";
 import { FetchFullPath } from "./directories.js";
 
 export class ManifestManager {
