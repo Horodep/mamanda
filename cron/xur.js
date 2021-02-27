@@ -1,6 +1,6 @@
 import Discord from "discord.js";
 import config from "../config.json";
-import { AsyncDrawXur } from "../drawing.js";
+import { AsyncDrawXur } from "../drawing/drawXur.js";
 import { CatchCronError } from "../catcherror.js";
 
 const client = new Discord.Client({ partials: ['MESSAGE', 'CHANNEL', 'REACTION'] });

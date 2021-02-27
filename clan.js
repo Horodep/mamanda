@@ -11,7 +11,7 @@ import { FormClanTimeEmbed } from "./embeds/clanTimeEmbed.js";
 import { FromRecordStatEmbed } from "./embeds/recordStatEmbed.js";
 import { FormTopTriumphScoreEmbed } from "./embeds/topTriumphScoreEmbed.js";
 import { FormNicknamesEmbed } from "./embeds/nicknamesEmbed.js";
-import { AsyncDrawTriumphs } from "./drawing.js";
+import { AsyncDrawTriumphs } from "./drawing/drawTriumphs.js";
 import { CatchError } from "./catcherror.js";
 
 async function AsyncGetFullApiClanMemberList() {

@@ -13,7 +13,7 @@ import { DropPvpRole, GiveForumRole, SaveForumLinkAndPublish, SetMaximumTriumphs
 import { AsyncShowQueueList, AsyncShowQueueReqestsList } from "./queue.js"
 import { SendCustomMessage, SendPrivateMessageByRole } from "./sendMessage.js";
 import { ClearRaidList, CreateRaid, ForcedAddRaidMember, ForcedRemoveRaidMember, AsyncGetPlannedRaids } from "./raid.js"
-import { AsyncDrawXur } from "./drawing.js";
+import { AsyncDrawXur } from "./drawing/drawXur.js";
 
 export class CommandManager {
     static commandList = [];
