@@ -72,11 +72,13 @@ function FormGuildRequestEmbed(member, text, url, reactions) {
 	var dataField = "<@" + member.user.id + ">\n" +
 		(url ? "[message link](" + url + ")\n" : "") +
 		(reactions ?? "");
+	var color = 0x00BFFF;
+	if (reactions.includes('no')) color = 0xDE0C00;
+	if (reactions.includes('yes')) color = 0x1AAA00;
 	var embed = new MessageEmbed()
 		.addField(`Заявка`, text == "" ? "нет заявки" : text, true)
 		.addField(`Инфо`, dataField, true)
-		.setColor(0x00AE86)
-		.setFooter(`дней на сервере: ${daysOnServer}`)
-		.setTimestamp(member.joinedTimestamp);
+		.setColor(color)
+		.setFooter(`дней на сервере: ${daysOnServer}`);
 	return embed;
 }
