@@ -1,6 +1,6 @@
 import { MessageEmbed } from "discord.js";
 import { GetFullDiscordClanMemberList } from "../discordFeatures/discordCommunityFeatures.js";
-import { filterClanMembersData } from "../clan.js";
+import { filterClanMembersData } from "../clan/clan.js";
 
 export function FormClanTimeEmbed(clanMembers, modificators) {
 	var guild = clanMembers[0].discordMember.guild;

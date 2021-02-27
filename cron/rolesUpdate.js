@@ -1,6 +1,6 @@
 import Discord from "discord.js";
 import config from "../config.json";
-import { SetRolesToEveryMember } from "../clan.js";
+import { SetRolesToEveryMember } from "../clan/clan.js";
 import { CatchCronError } from "../catcherror.js";
 
 const client = new Discord.Client({ partials: ['MESSAGE', 'CHANNEL', 'REACTION'] });

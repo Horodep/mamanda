@@ -1,18 +1,18 @@
 import { MessageEmbed } from "discord.js";
 import config from "./config.json";
-import { AsyncGetClanMembers } from "./http/bungieApi.js";
-import { AsyncGetShowAndSetRoles } from "./roles.js";
-import { ClanMember, AsyncGetAllActivities } from "./clanMember.js";
-import { AsyncGetClanVoiceSummary } from "./http/sql.js";
-import { GetFullDiscordClanMemberList } from "./discordFeatures/discordCommunityFeatures.js";
-import { SendPrivateMessagesToArray } from "./sendMessage.js";
-import { ManifestManager } from "./manifest.js";
-import { FormClanTimeEmbed } from "./embeds/clanTimeEmbed.js";
-import { FromRecordStatEmbed } from "./embeds/recordStatEmbed.js";
-import { FormTopTriumphScoreEmbed } from "./embeds/topTriumphScoreEmbed.js";
-import { FormNicknamesEmbed } from "./embeds/nicknamesEmbed.js";
-import { AsyncDrawTriumphs } from "./drawing/drawTriumphs.js";
-import { CatchError } from "./catcherror.js";
+import { AsyncGetClanMembers } from "../http/bungieApi.js";
+import { AsyncGetShowAndSetRoles } from "./clanMember/roles.js";
+import { ClanMember, AsyncGetAllActivities } from "./clanMember/clanMember.js";
+import { AsyncGetClanVoiceSummary } from "../http/sql.js";
+import { GetFullDiscordClanMemberList } from "../discordFeatures/discordCommunityFeatures.js";
+import { SendPrivateMessagesToArray } from "../sendMessage.js";
+import { ManifestManager } from "../manifest.js";
+import { FormClanTimeEmbed } from "../embeds/clanTimeEmbed.js";
+import { FromRecordStatEmbed } from "../embeds/recordStatEmbed.js";
+import { FormTopTriumphScoreEmbed } from "../embeds/topTriumphScoreEmbed.js";
+import { FormNicknamesEmbed } from "../embeds/nicknamesEmbed.js";
+import { AsyncDrawTriumphs } from "../drawing/drawTriumphs.js";
+import { CatchError } from "../catcherror.js";
 
 async function AsyncGetFullApiClanMemberList() {
 	var members = [];
