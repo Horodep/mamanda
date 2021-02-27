@@ -14,6 +14,7 @@ import { AsyncShowQueueList, AsyncShowQueueReqestsList } from "./discordFeatures
 import { SendCustomMessage, SendPrivateMessageByRole } from "./discordFeatures/messaging.js";
 import { ClearRaidList, CreateRaid, ForcedAddRaidMember, ForcedRemoveRaidMember, AsyncGetPlannedRaids } from "./discordFeatures/raid/raid.js"
 import { AsyncDrawXur } from "./drawing/drawXur.js";
+import { AsyncDrawEververse } from "./drawing/drawEververse.js";
 
 export class CommandManager {
     static commandList = [];
@@ -191,6 +192,9 @@ export class CommandManager {
         this.AddCommand("restricted", 0, false, "", "!сбор ДД.ММ ЧЧ:ММ [N] название активности, комментарии", "создание сбора на активность на N человек;", async function (args, message) { });
 
 
+        this.AddCommand("guildmaster", 1, true, "eververse", "!eververse", "геренация изображения товаров Эверверс в текущий канал;", async function (args, message) {
+            await AsyncDrawEververse(message.channel);
+        });
         this.AddCommand("guildmaster", 2, false, "checksync", "!______________", "_______________;", async function (args, message) { });
         this.AddCommand("guildmaster", 0, true, "ck", "", "", async function (args, message) {
             await AsyncShowClanTime(message.channel, (args.length > 1 ? args[1] : 7), 'full');
