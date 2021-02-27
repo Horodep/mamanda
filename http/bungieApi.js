@@ -1,5 +1,5 @@
 import { AsyncRequestWithPromise } from "./httpCore.js";
-import config from "./config.json";
+import config from "../config.json";
 
 export async function AsyncGetGlobalAlerts() {
 	return (await AsyncRequestWithPromise('GET', `https://www.bungie.net/Platform/GlobalAlerts/`));

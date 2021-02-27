@@ -1,6 +1,6 @@
 import fs from "fs";
 import { XMLHttpRequest } from "xmlhttprequest";
-import config from "./config.json";
+import config from "../config.json";
 import { CatchError } from "../catcherror.js";
 import { FetchFullPath } from "../directories.js";
 
