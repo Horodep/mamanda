@@ -1,5 +1,5 @@
 import config from "../config.json";
-import { AddRaidMember, RemoveRaidMember, KickRaidMember, CancelRaid } from "../raid.js";
+import { AddRaidMember, RemoveRaidMember, KickRaidMember, CancelRaid } from "../discordFeatures/raid/raid.js";
 import { CatchError } from "../catcherror.js";
 
 export async function AsyncMessageReactionAdd(reaction, user) {

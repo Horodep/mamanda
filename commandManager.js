@@ -12,7 +12,7 @@ import { InviteFriend, ChangeChannelCap, ChangeRegion, ClanMedalsSummary, ShowLe
 import { DropPvpRole, GiveForumRole, SaveForumLinkAndPublish, SetMaximumTriumphsScore, ShowNewbieList, AsyncShowResetEnglish } from "./discordFeatures/discordGuildMasterFeatures.js"
 import { AsyncShowQueueList, AsyncShowQueueReqestsList } from "./discordFeatures/queue.js"
 import { SendCustomMessage, SendPrivateMessageByRole } from "./discordFeatures/messaging.js";
-import { ClearRaidList, CreateRaid, ForcedAddRaidMember, ForcedRemoveRaidMember, AsyncGetPlannedRaids } from "./raid.js"
+import { ClearRaidList, CreateRaid, ForcedAddRaidMember, ForcedRemoveRaidMember, AsyncGetPlannedRaids } from "./discordFeatures/raid/raid.js"
 import { AsyncDrawXur } from "./drawing/drawXur.js";
 
 export class CommandManager {
