@@ -55,7 +55,7 @@ export async function AsyncGetXurData() {
 }
 
 export async function AsyncGetEververseData(customCharacterId) {
-	return await AsyncGetVendor(3361454721, [402], customCharacterId);
+	return await AsyncGetVendor(3361454721, [402, 401], customCharacterId);
 }
 
 export async function AsyncGetManifestLinks() {

@@ -4,10 +4,9 @@ import { AsyncGetEververseData, AsyncGetProfileData } from "../http/bungieApi.js
 import { ManifestManager } from "../manifest.js";
 import { AsyncRefreshAuthToken } from "../http/httpCore.js";
 import { FetchFullPath } from "../directories.js";
-import { AsyncCacheOrGetImage, AsyncDrawImage, AsyncDrawText, AsyncDrawWhiteRectangle } from "./drawing.js";
+import { AsyncCacheOrGetImage, AsyncDrawImage, AsyncDrawText } from "./drawing.js";
 
-const DUST_HASH = 2817410917;
-const SILVER_HASH = 3147280338;
+const DUST_CATEGORIES = [2, 7, 8];
 const IGNORED_HASHES = [353932628, 2638689062, 3187955025];
 const WEAPON_ORNAMENT = 3124752623;
 
@@ -15,9 +14,9 @@ const SALES_PER_LINE = 6;
 
 const TOTAL_WIDTH = 400;
 const ITEM_WIDTH = 48;
-const OUTER_PADDING = 21;
+const OUTER_PADDING = 6;
 const TOP_PADDING = 3;
-const HORIZONTAL_SPACING = 14;
+const HORIZONTAL_SPACING = 20;
 const VERTICAL_SPACING = 28;
 
 export async function AsyncDrawEververse(channel) {
@@ -31,6 +30,7 @@ export async function AsyncDrawEververse(channel) {
     }
     var sectionPadding = (ITEM_WIDTH + VERTICAL_SPACING) * lineNumber;
     await AsyncDrawSalesLine(armor_sales, image, 0, sectionPadding);
+    ManifestManager.CleanCache();
 
     image.write(FetchFullPath('.data/images/eververse_filled.png'));
     channel.send({ files: [FetchFullPath('.data/images/eververse_filled.png')] });
@@ -77,15 +77,20 @@ async function AsyncGetEververseAssortment() {
     var profile = await AsyncGetProfileData(config.credentials.game_defaults.membershipType, config.credentials.game_defaults.membershipId);
     var promises = profile.data.characterIds.map(async characterId => {
         var data = await AsyncGetEververseData(characterId);
-        Array.prototype.push.apply(sales, Object.values(data.Response.sales.data));
+        var categories = data.Response.categories.data.categories;
+        for (var i = 0; i < categories.length; i++) {
+            if (DUST_CATEGORIES.includes(categories[i].displayCategoryIndex)) {
+                Array.prototype.push.apply(sales, categories[i].itemIndexes.map(index => data.Response.sales.data[index]));
+            }
+        }
     });
     await Promise.all(promises);
-    
-    var dust_only = sales.filter(i => i.costs[0]?.itemHash == DUST_HASH || i.costs[1]?.itemHash == DUST_HASH);
-    var filtered_dust_sales = dust_only.filter((item, index) => dust_only.findIndex(i => i.itemHash === item.itemHash) === index)
+
+    var filtered_sales = sales
+        .filter((item, index) => sales.findIndex(i => i.itemHash === item.itemHash) === index)
         .filter(i => !IGNORED_HASHES.includes(i.itemHash))
         .sort((a, b) => a.costs[0].quantity - b.costs[0].quantity);
-    var manifested_sales = filtered_dust_sales.map((e) => {
+    var manifested_sales = filtered_sales.map((e) => {
         e.manifestData = ManifestManager.GetItemData(e.itemHash, true);
         return e;
     });
