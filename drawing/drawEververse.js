@@ -66,9 +66,9 @@ async function AsyncDrawSalesPosition(item, image, x, y) {
 
     await AsyncDrawImage(image, x, y, ITEM_WIDTH, itemImage);
     await AsyncDrawText(image,
-        x + (ITEM_WIDTH / 2) - (9 * price.toString().length / 2),
+        x + (ITEM_WIDTH / 2) - (8 * price.toString().length / 2),
         y + (ITEM_WIDTH + 1),
-        FetchFullPath('.data/fonts/calibri_light_22.fnt'), price);
+        FetchFullPath('.data/fonts/lato_bold_18.fnt'), price);
 }
 
 async function AsyncGetEververseAssortment() {

@@ -52,17 +52,17 @@ export async function AsyncDrawXur(channel) {
 
             var left = box_coords[i].x + left_margin;
             var top = box_coords[i].y + (line_height + line_spacing) * k;
-            var space = stat < 10 ? 9 : 0;
+            var space = stat < 10 ? 8 : 0;
 
-            await AsyncDrawText(image, left - 24 + space, top - 5,
-                FetchFullPath('.data/fonts/calibri_light_22.fnt'), stat);
+            await AsyncDrawText(image, left - 22 + space, top - 4,
+                FetchFullPath('.data/fonts/lato_black_18.fnt'), stat);
             await AsyncDrawWhiteRectangle(image,
                 left, top, 4 * stat, line_height);
         }
         await AsyncDrawText(image,
             box_coords[i].x + 235,
-            box_coords[i].y + (line_height + line_spacing) * 5 - 5,
-            FetchFullPath('.data/fonts/calibri_light_22.fnt'),
+            box_coords[i].y + (line_height + line_spacing) * 5 - 3,
+            FetchFullPath('.data/fonts/lato_black_18.fnt'),
             statHashes.map(s => stats[s].value).reduce((a, b) => a + b, 0));
 
     }
