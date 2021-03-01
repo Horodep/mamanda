@@ -182,10 +182,10 @@ export class CommandManager {
         this.AddCommand("restricted", 0, false, "status", "!status", "статус бота;", async function (args, message) {
             message.channel.send(await CommandManager.GetStatus());
         });
-        this.AddCommand("restricted", 0, true, "toptriumphs", "!triumphs", "топ 15 стражей клана по очкам триумфов текстом;", async function (args, message) {
+        this.AddCommand("restricted", 0, true, "toptriumphs", "!toptriumphs", "топ 15 стражей клана по очкам триумфов текстом;", async function (args, message) {
             ShowTopTriumphScore(message.channel, args.length > 1 ? true : false);
         });
-        this.AddCommand("restricted", 0, true, "toptriumphs img", "!triumphs gimmeimageplz", "топ 15 стражей клана по очкам триумфов графиком;", async function (args, message) { });
+        this.AddCommand("restricted", 0, true, "toptriumphs img", "!toptriumphs gimmeimageplz", "топ 15 стражей клана по очкам триумфов графиком;", async function (args, message) { });
         this.AddCommand("restricted", 0, false, "сбор", "!сбор ДД.ММ ЧЧ:ММ название активности, комментарии", "создание сбора на активность на 6 человек;", async function (args, message) {
             CreateRaid(message, args);
         });
