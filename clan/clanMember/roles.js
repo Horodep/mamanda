@@ -90,7 +90,7 @@ async function AsyncGetRolesData(membershipType, membershipId) {
 	data.legacy_triumphs.t120k = BungieApiLogic.GetProfileRecordsCore(response, "legacyScore", 120000, "");
 	data.season.seal = BungieApiLogic.GetNodeData(records, 1321008463, "Смотритель");
 	data.season.triumphs = BungieApiLogic.GetNodeDataFiltered(records, 2255100699, [],
-		[91071118, 1951157616, 4186991151, 3518211070, 975308347, 25634498], "Триумфы");
+		[1951157616, 4186991151, 3518211070, 975308347, 25634498], "Триумфы");
 	data.extra.poi = BungieApiLogic.GetIfPersonOfInterest(records);
 	data.extra.legacy.season8 = BungieApiLogic.GetNodeData(records, 955166374, "Undying");
 	data.extra.legacy.season9 = BungieApiLogic.GetNodeData(records, 955166375, "Dawn");
