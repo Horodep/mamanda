@@ -142,7 +142,7 @@ function SetRoles(clanMember, characterDetails, medals) {
 	CheckAndProcessRoleBlock(discordMember, config.roles.medals.category_first_role.triumphs, 3, medals.triumphs);
 	CheckAndProcessRoleBlock(discordMember, config.roles.medals.category_first_role.legacy_triumphs, 3, medals.legacy_triumphs);
 	CheckAndProcessRoleBlock(discordMember, config.roles.medals.category_first_role.season, 2, medals.season);
-	CheckAndProcessRoleBlock(discordMember, config.roles.medals.category_first_role.extralegacy, 4, medals.extra.legacy);
+	CheckAndProcessRoleBlock(discordMember, config.roles.medals.category_first_role.extralegacy, 5, medals.extra.legacy);
 
 	if (discordMember.roles.cache.find(role => role.id == config.roles.guildleader) != null) return;
 	if (discordMember.roles.cache.find(role => role.id == config.roles.guildmaster) != null) return;
