@@ -89,6 +89,7 @@ async function AsyncGetRolesData(membershipType, membershipId) {
 	data.legacy_triumphs.t100k = BungieApiLogic.GetProfileRecordsCore(response, "legacyScore", 100000, "");
 	data.legacy_triumphs.t120k = BungieApiLogic.GetProfileRecordsCore(response, "legacyScore", 120000, "");
 	data.season.season12 = BungieApiLogic.GetNodeDataFiltered(records, 2255100699, [], [
+			91071118, // glory winstreak
 			1951157616, // 25 nightfalls
 			4186991151, 3518211070, 975308347, 25634498, // osiris
 			467599901, 1260338084, 3716806862, 3054857469, 632127367, 2363370539 // grandmasters
