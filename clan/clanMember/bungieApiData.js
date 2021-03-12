@@ -33,27 +33,25 @@ export function GetNodeData(data, nodeHash, textprefix) {
 	return GetNodeDataFiltered(data, nodeHash, [], [], textprefix);
 }
 
+function SafeGetValue(data, dataArrayName, hash, valueName) {
+	return data["profile"+dataArrayName][hash]
+		? data["profile"+dataArrayName][hash][valueName]
+		: data["character"+dataArrayName][hash][valueName];
+}
+
 export function GetNodeDataFiltered(data, nodeHash, additionalRecords, ignoredRecords, textprefix, minCompletionValue) {
 	return GetDataAndHandleErrors(textprefix, () => {
-		var progress = data.profileNodes[nodeHash]
-			? data.profileNodes[nodeHash].progressValue
-			: data.characterNodes[nodeHash].progressValue;
-		var completion = data.profileNodes[nodeHash]
-			? data.profileNodes[nodeHash].completionValue
-			: data.characterNodes[nodeHash].completionValue;
+		var progress = SafeGetValue(data, "Nodes", nodeHash, "progressValue");
+		var completion = SafeGetValue(data, "Nodes", nodeHash, "completionValue");
 
 		for (var recordHash of additionalRecords) {
 			completion++;
-			progress += data.profileRecords[recordHash]
-				? data.profileRecords[recordHash].state % 2
-				: data.characterRecords[recordHash].state % 2;
+			progress += SafeGetValue(data, "Records", recordHash, "state") % 2;
 		}
 
 		for (var recordHash of ignoredRecords) {
 			completion--;
-			progress -= data.profileRecords[recordHash]
-				? (data.profileRecords[recordHash].state) % 2
-				: (data.characterRecords[recordHash].state) % 2;
+			progress -= SafeGetValue(data, "Records", recordHash, "state") % 2;
 		}
 
 		if (minCompletionValue > completion) completion = minCompletionValue;
