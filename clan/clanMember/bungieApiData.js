@@ -33,7 +33,7 @@ export function GetNodeData(data, nodeHash, textprefix) {
 	return GetNodeDataFiltered(data, nodeHash, [], [], textprefix);
 }
 
-export function GetNodeDataFiltered(data, nodeHash, additionalRecords, ignoredRecords, textprefix) {
+export function GetNodeDataFiltered(data, nodeHash, additionalRecords, ignoredRecords, textprefix, minCompletionValue) {
 	return GetDataAndHandleErrors(textprefix, () => {
 		var progress = data.profileNodes[nodeHash]
 			? data.profileNodes[nodeHash].progressValue
@@ -41,17 +41,23 @@ export function GetNodeDataFiltered(data, nodeHash, additionalRecords, ignoredRe
 		var completion = data.profileNodes[nodeHash]
 			? data.profileNodes[nodeHash].completionValue
 			: data.characterNodes[nodeHash].completionValue;
+
 		for (var recordHash of additionalRecords) {
 			completion++;
 			progress += data.profileRecords[recordHash]
 				? data.profileRecords[recordHash].state % 2
 				: data.characterRecords[recordHash].state % 2;
 		}
+
 		for (var recordHash of ignoredRecords) {
-			completion -= data.profileRecords[recordHash]
-				? (data.profileRecords[recordHash].state+1) % 2
-				: (data.characterRecords[recordHash].state+1) % 2;
+			completion--;
+			progress -= data.profileRecords[recordHash]
+				? (data.profileRecords[recordHash].state) % 2
+				: (data.characterRecords[recordHash].state) % 2;
 		}
+
+		if (minCompletionValue > completion) completion = minCompletionValue;
+
 		return {
 			state: progress == completion,
 			text: textprefix + ": " + progress + "/" + completion

@@ -69,18 +69,18 @@ async function AsyncGetRolesData(membershipType, membershipId) {
 	data.locations.dc = BungieApiLogic.GetNodeData(records, 3483405511, "Город Грез");
 	data.locations.moon = BungieApiLogic.GetNodeData(records, 1473265108, "Луна");
 	data.locations.euro = BungieApiLogic.GetNodeDataFiltered(records, 2647590440, [3560923614], [], "Европа");
-	data.triumphs.tier1 = BungieApiLogic.GetProfileRecordsCore(response, "activeScore", 12000, "");
-	data.triumphs.tier2 = BungieApiLogic.GetProfileRecordsCore(response, "activeScore", 14000, "");
-	data.triumphs.tier3 = BungieApiLogic.GetProfileRecordsCore(response, "activeScore", 16000, "");
+	data.triumphs.tier1 = BungieApiLogic.GetProfileRecordsCore(response, "activeScore", 14000, "");
+	data.triumphs.tier2 = BungieApiLogic.GetProfileRecordsCore(response, "activeScore", 16000, "");
+	data.triumphs.tier3 = BungieApiLogic.GetProfileRecordsCore(response, "activeScore", 18000, "");
 	data.seals.cursebreaker = BungieApiLogic.GetNodeData(records, 560097044, "Гроза");
 	data.seals.harbinger = BungieApiLogic.GetNodeData(records, 379405979, "Посланник");
 	data.seals.splintered = BungieApiLogic.GetNodeData(records, 79180995, "Раскол");
 	data.seals.dredgen = BungieApiLogic.GetNodeData(records, 3665267419, "Дреджен");
-	data.seals.conqueror = BungieApiLogic.GetBestNode(records, [3212358005, 1376640684, 581214566], "Завоеватель");
+	data.seals.conqueror = BungieApiLogic.GetBestNode(records, [3212358005, 1376640684, 581214566, 3776992251], "Завоеватель");
 	data.crucible.glory2100 = BungieApiLogic.GetProgressionData(progressions, 2000925172, 2100, "Ранкед");
 	data.crucible.glory3500 = BungieApiLogic.GetProgressionData(progressions, 2000925172, 3500, "Ранкед");
 	data.crucible.glory5450 = BungieApiLogic.GetProgressionData(progressions, 2000925172, 5450, "Ранкед");
-	data.crucible.flawless = BungieApiLogic.GetBestNode(records, [3251218484, 2086100423, 1276693937], "Безупречный");
+	data.crucible.flawless = BungieApiLogic.GetBestNode(records, [3251218484, 2086100423, 1276693937, 1733555826], "Безупречный");
 	data.legacy_seals.lore = BungieApiLogic.GetNodeData(records, 3680676656, "Летописец");
 	data.legacy_seals.blacksmith = BungieApiLogic.GetNodeData(records, 450166688, "Кузнец");
 	data.legacy_seals.reconeer = BungieApiLogic.GetNodeData(records, 2978379966, "Вершитель");
@@ -88,14 +88,23 @@ async function AsyncGetRolesData(membershipType, membershipId) {
 	data.legacy_triumphs.t80k = BungieApiLogic.GetProfileRecordsCore(response, "legacyScore", 80000, "");
 	data.legacy_triumphs.t100k = BungieApiLogic.GetProfileRecordsCore(response, "legacyScore", 100000, "");
 	data.legacy_triumphs.t120k = BungieApiLogic.GetProfileRecordsCore(response, "legacyScore", 120000, "");
-	data.season.seal = BungieApiLogic.GetNodeData(records, 1321008463, "Смотритель");
-	data.season.triumphs = BungieApiLogic.GetNodeDataFiltered(records, 2255100699, [],
-		[1951157616, 4186991151, 3518211070, 975308347, 25634498], "Триумфы");
+	data.season.season12 = BungieApiLogic.GetNodeDataFiltered(records, 2255100699, [], [
+			1951157616, // 25 nightfalls
+			4186991151, 3518211070, 975308347, 25634498, // osiris
+			467599901, 1260338084, 3716806862, 3054857469, 632127367, 2363370539 // grandmasters
+		], "«Охота»", 57);
+	data.season.season13 = BungieApiLogic.GetNodeDataFiltered(records, 2580432868, [], [
+			94652195, // glory winstreak
+			1664067591, 3805764118, 955580899, 2904638730 // osiris
+		], "«Избранный»");
+	data.season.season14 = { state: false, text: "[ЗАСЕКРЕЧЕНО]: 0/??" };
+	data.season.season15 = { state: false, text: "[ЗАСЕКРЕЧЕНО]: 0/??" };
 	data.extra.poi = BungieApiLogic.GetIfPersonOfInterest(records);
 	data.extra.legacy.season8 = BungieApiLogic.GetNodeData(records, 955166374, "Undying");
 	data.extra.legacy.season9 = BungieApiLogic.GetNodeData(records, 955166375, "Dawn");
 	data.extra.legacy.season10 = BungieApiLogic.GetNodeData(records, 1321008461, "Almighty");
 	data.extra.legacy.season11 = BungieApiLogic.GetNodeData(records, 1321008460, "Arrivals");
+	data.extra.legacy.season12 = BungieApiLogic.GetNodeData(records, 1321008463, "Hunt");
 
 	return { characterDetails: characterDetails, medals: data };
 }

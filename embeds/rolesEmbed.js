@@ -19,10 +19,10 @@ export function FormRolesEmbed(clanMember, rolesData) {
 			.addField("Триумфы", EmbedFormField(rolesData.medals.triumphs), true)
 			.addField("Наследные триумфы", EmbedFormField(rolesData.medals.legacy_triumphs), true)
 			.addField("Горнило", EmbedFormField(rolesData.medals.crucible), true)
-			.addField("Сезон 12", EmbedFormField(rolesData.medals.season), true)
+			.addField("Сезоны", EmbedFormField(rolesData.medals.season), true)
 			.addField('\u200B', '\u200B', true)
 			.addField("Ссылки", "[Raid Report](https://raid.report/pc/" + clanMember.membershipId + ")"
-				+ " | [Braytech](https://beta.braytech.org/" + clanMember.membershipType + "/" + clanMember.membershipId + "/" + rolesData.characterDetails.GetBestCharacterId() + "/)"
+				+ " | [Braytech](https://braytech.org/" + clanMember.membershipType + "/" + clanMember.membershipId + "/" + rolesData.characterDetails.GetBestCharacterId() + "/)"
 				+ " | [D2 Checklist](https://www.d2checklist.com/" + clanMember.membershipType + "/" + clanMember.membershipId + "/triumphs)"
 				+ " | [Destiny Tracker](https://destinytracker.com/destiny-2/profile/steam/" + clanMember.membershipId + "/overview)");
 		return embed;
