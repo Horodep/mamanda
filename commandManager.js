@@ -11,7 +11,7 @@ import { CatchError } from "./catcherror.js";
 import { InviteFriend, ChangeChannelCap, ChangeRegion, ClanMedalsSummary, ShowLegendarySectors } from "./discordFeatures/discordCommunityFeatures.js";
 import { DropPvpRole, GiveForumRole, SaveForumLinkAndPublish, SetMaximumTriumphsScore, ShowNewbieList, AsyncShowResetEnglish } from "./discordFeatures/discordGuildMasterFeatures.js"
 import { AsyncShowQueueList, AsyncShowQueueReqestsList } from "./discordFeatures/queue.js"
-import { SendCustomMessage, SendPrivateMessageByRole } from "./discordFeatures/messaging.js";
+import { SendCustomMessage, SendPrivateMessageByRole, SendPrivateMessage } from "./discordFeatures/messaging.js";
 import { ClearRaidList, CreateRaid, ForcedAddRaidMember, ForcedRemoveRaidMember, AsyncGetPlannedRaids } from "./discordFeatures/raid/raid.js"
 import { AsyncDrawXur } from "./drawing/drawXur.js";
 import { AsyncDrawEververse } from "./drawing/drawEververse.js";
@@ -240,6 +240,9 @@ export class CommandManager {
         });
         this.AddCommand("guildmaster", 0, true, "nicknames", "!nicknames", "проверка никнеймов стражей;", async function (args, message) {
             await AsyncShowNicknames(message.channel);
+        });
+        this.AddCommand("guildmaster", 0, false, "pm", "!pm", "сообщение в личку юзеру;", async function (args, message) {
+            SendPrivateMessage(message.guild, args);
         });
         this.AddCommand("guildmaster", 0, false, "pmspam", "!pmspam", "спам говном в личку по роли;", async function (args, message) {
             SendPrivateMessageByRole(message.guild, args);

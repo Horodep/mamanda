@@ -1,7 +1,7 @@
 import { CatchError, CatchErrorAndDeleteByTimeout, CatchRaidError } from "../../catcherror.js";
 import config from "../../config.json";
 import { MessageEmbed } from "discord.js";
-import { SendPrivateMessage } from "../messaging.js";
+import { SendPrivateMessageToMember } from "../messaging.js";
 import { RaidData } from "./raidData.js";
 
 export function CreateRaid(message, args) {
@@ -52,7 +52,7 @@ export function KickRaidMember(message, user, reaction) {
 
     if (userId?.length > 0) {
         var member = message.guild.members.cache.find(user => user.id == userId);
-        SendPrivateMessage(member, FormCancelationMessage(data, "Рейд лидер отказался от вашего участия в рейде, в который вы записывались."));
+        SendPrivateMessageToMember(member, FormCancelationMessage(data, "Рейд лидер отказался от вашего участия в рейде, в который вы записывались."));
     }
     message.edit(CreateRaidEmbed(data));
 }
@@ -65,7 +65,7 @@ export function CancelRaid(message, user) {
     }
     data.members.forEach(function (discord_id) {
         var member = message.guild.members.cache.find(user => user.id == discord_id);
-        SendPrivateMessage(member, FormCancelationMessage(data, "Рейд на который вы записывались был отменен рейд лидером."));
+        SendPrivateMessageToMember(member, FormCancelationMessage(data, "Рейд на который вы записывались был отменен рейд лидером."));
     });
     setTimeout(() => { message.delete(); }, 150);
 }
@@ -85,7 +85,7 @@ export function ForcedRemoveRaidMember(message, args) {
         var member = message.guild.members.cache.find(user => user.id == args[2]);
         setTimeout(() => { message.delete(); }, 5000);
         var data = GetDataFromEmbed(msg.embeds[0]);
-        SendPrivateMessage(member, FormCancelationMessage(data, "Гильдмастер отказался от вашего участия в рейде, в который вы записывались."));
+        SendPrivateMessageToMember(member, FormCancelationMessage(data, "Гильдмастер отказался от вашего участия в рейде, в который вы записывались."));
     });
 }
 

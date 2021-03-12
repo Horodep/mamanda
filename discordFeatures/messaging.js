@@ -22,7 +22,7 @@ export function SendPrivateMessagesToArray(textedMembers){
 	var i = 0;
 	var sending = function () {
 		if (i < textedMembers.length) {
-            SendPrivateMessage(textedMembers[i].discordMember, textedMembers[i].text);
+            SendPrivateMessageToMember(textedMembers[i].discordMember, textedMembers[i].text);
 			i++;
 			setTimeout(sending, 2000);
 		}
@@ -30,7 +30,16 @@ export function SendPrivateMessagesToArray(textedMembers){
 	sending();
 }
 
-export function SendPrivateMessage(discordMember, text){
+export function SendPrivateMessage(guild, args){ 
+    if (args.length < 3) return;  
+	var memberId = args[1].replace(/\D/g, '');
+    var member = guild.members.cache.find(m => m.id == memberId);
+    var text = args.filter((_,i) => i > 1).join(" ");
+    
+    SendPrivateMessageToMember(member, text);
+}
+
+export function SendPrivateMessageToMember(discordMember, text){
     discordMember.send(text);
     console.log("pm " + discordMember.displayName);
     Logging(discordMember, text);
