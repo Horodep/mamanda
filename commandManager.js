@@ -28,7 +28,7 @@ export class CommandManager {
     }
     static AddFieldsWithCommands(embed, title, constructorName, apiAlerts) {
         var commands = this.commandList
-            .filter(c => c.constructor.name == constructorName && c.name != "")
+            .filter(c => c.constructor.name == constructorName && c.name != "" && c.callback != null)
             .map(c => this.GetEmojiStatus(c, apiAlerts) + " " + c.name);
         embed.addField(title, commands.filter((_, i) => i < commands.length / 3).join("\n"), true)
         embed.addField('\u200B', commands.filter((_, i) => i < 2 * commands.length / 3 && i >= commands.length / 3).join("\n"), true)
