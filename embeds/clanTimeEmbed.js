@@ -1,5 +1,5 @@
 import { MessageEmbed } from "discord.js";
-import { GetFullDiscordClanMemberList } from "../discordFeatures/discordCommunityFeatures.js";
+import { GetDiscordClanMemberList } from "../discordFeatures/getDiscordClanMemberList.js";
 import { filterClanMembersData } from "../clan/clan.js";
 
 export function FormClanTimeEmbed(clanMembers, modificators) {
@@ -29,7 +29,7 @@ export function FormClanTimeEmbed(clanMembers, modificators) {
 	if (!modificators.includes("final"))
 		return embed;
 
-	var discordMembers = GetFullDiscordClanMemberList(guild);
+	var discordMembers = GetDiscordClanMemberList(guild);
 	var left = "";
 	discordMembers.forEach(function (member) {
 		if (clanMembers.filter(m => member.displayName.startsWith(m.displayName)).length == 0) {

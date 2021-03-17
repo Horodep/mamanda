@@ -4,7 +4,10 @@ import config from "../config.json";
 import { CommandManager } from "../commandManager.js"
 import { AsyncShowClanSize, AsyncShowClanTime, AsyncShowNicknames, SetRolesToEveryMember } from "../clan/clan.js"
 import { AsyncGetClanMemberOnlineTime } from "../clan/clanMember/clanMember.js";
-import { DropPvpRole, GiveForumRole, SaveForumLinkAndPublish, SetMaximumTriumphsScore, ShowNewbieList, AsyncShowResetEnglish } from "../discordFeatures/discordGuildMasterFeatures.js"
+import { ChangeMaxTriumphsScore } from "../discordFeatures/change/changeMaxTriumphsScore.js";
+import { DropPvpRole } from "../discordFeatures/dropPvpRole.js";
+import { AsyncShowResetEnglish } from "../discordFeatures/show/showResetEnglish";
+import { GiveForumRole, SaveForumLinkAndPublish } from "../discordFeatures/forum.js";
 import { AsyncShowQueueList, AsyncShowQueueReqestsList } from "../discordFeatures/queue.js"
 import { SendCustomMessage, SendPrivateMessageByRole, SendPrivateMessage } from "../discordFeatures/messaging.js";
 import { ClearRaidList, ForcedAddRaidMember, ForcedRemoveRaidMember } from "../discordFeatures/raid/raid.js"
@@ -71,9 +74,6 @@ export function GetGuildmasterCommandsArray() {
     array.push(new GuildmasterCommand("!message channel_id текст", on, false, "отправить сообщение в канал;", async function (args, message) {
         SendCustomMessage(message.client, args);
     }));
-    array.push(new GuildmasterCommand("!n", on, false, "список новичков в клане;", async function (args, message) {
-        ShowNewbieList(message);
-    }));
     array.push(new GuildmasterCommand("!nicknames", on, true, "проверка никнеймов стражей;", async function (args, message) {
         await AsyncShowNicknames(message.channel);
     }));
@@ -100,7 +100,7 @@ export function GetGuildmasterCommandsArray() {
     }));
     array.push(new GuildmasterCommand("!reset", off, true, "генерация текстового еженедельного ресета в текущий канал;", async function (args, message) { }));
     array.push(new GuildmasterCommand("!setmaxtriumphs NUMBER", on, false, "обновить значение максимального количества триумфов;", async function (args, message) {
-        SetMaximumTriumphsScore(message, args);
+        ChangeMaxTriumphsScore(message, args);
     }));
     array.push(new GuildmasterCommand("!size", on, true, "количество стражей в составах;", async function (args, message) {
         await AsyncShowClanSize(message);

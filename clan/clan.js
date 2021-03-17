@@ -4,7 +4,7 @@ import { AsyncGetClanMembers } from "../http/bungieApi.js";
 import { AsyncGetShowAndSetRoles } from "./clanMember/roles.js";
 import { ClanMember, AsyncGetAllActivities } from "./clanMember/clanMember.js";
 import { AsyncGetClanVoiceSummary } from "../http/sql.js";
-import { GetFullDiscordClanMemberList } from "../discordFeatures/discordCommunityFeatures.js";
+import { GetDiscordClanMemberList } from "../discordFeatures/getDiscordClanMemberList.js";
 import { SendPrivateMessagesToArray } from "../discordFeatures/messaging.js";
 import { ManifestManager } from "../manifest.js";
 import { FormClanTimeEmbed } from "../embeds/clanTimeEmbed.js";
@@ -200,7 +200,7 @@ export function filterClanMembersData(clanMembers) {
 
 export async function AsyncShowNicknames(channel, isReminder) {
 	var gameMembers = await AsyncGetFullApiClanMemberList();
-	var discordMembers = GetFullDiscordClanMemberList(channel.guild);
+	var discordMembers = GetDiscordClanMemberList(channel.guild);
 
 	var discordList = [];
 	var discordPsnList = [];
