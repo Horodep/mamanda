@@ -2,11 +2,13 @@ import { Command } from "./command.js";
 import config from "../config.json";
 
 import { CommandManager } from "../commandManager.js"
-import { AsyncShowClanSize, AsyncShowClanTime, AsyncShowNicknames, SetRolesToEveryMember } from "../clan/clan.js"
+import { AsyncShowClanSize, SetRolesToEveryMember } from "../clan/clan.js"
+import { AsyncCheckAndShowNicknames } from "../clan/checkAndShowNicknames.js";
+import { AsyncShowClanTime } from "../clan/showClanTime.js";
 import { AsyncGetClanMemberOnlineTime } from "../clan/clanMember/clanMember.js";
 import { ChangeMaxTriumphsScore } from "../discordFeatures/change/changeMaxTriumphsScore.js";
 import { DropPvpRole } from "../discordFeatures/dropPvpRole.js";
-import { AsyncShowResetEnglish } from "../discordFeatures/show/showResetEnglish";
+import { AsyncShowResetEnglish } from "../discordFeatures/show/showResetEnglish.js";
 import { GiveForumRole, SaveForumLinkAndPublish } from "../discordFeatures/forum.js";
 import { AsyncShowQueueList, AsyncShowQueueReqestsList } from "../discordFeatures/queue.js"
 import { SendCustomMessage, SendPrivateMessageByRole, SendPrivateMessage } from "../discordFeatures/messaging.js";
@@ -75,7 +77,7 @@ export function GetGuildmasterCommandsArray() {
         SendCustomMessage(message.client, args);
     }));
     array.push(new GuildmasterCommand("!nicknames", on, true, "проверка никнеймов стражей;", async function (args, message) {
-        await AsyncShowNicknames(message.channel);
+        await AsyncCheckAndShowNicknames(message.channel);
     }));
     array.push(new GuildmasterCommand("!pm", on, false, "сообщение в личку юзеру;", async function (args, message) {
         SendPrivateMessage(message.guild, args);
