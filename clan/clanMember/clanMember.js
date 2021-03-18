@@ -3,13 +3,8 @@ import { AsyncGetActivitiesFromApi, AsyncGetCoreMemberData, AsyncGetProfileData 
 import { AsyncGetMemberByDiscordName } from "../clan.js";
 import { AsyncGetClanVoiceSummary, AsyncGetMemberDetailedVoice } from "../../http/sql.js"
 import config from "../../config.json";
-/*
-#crossSaveOverride;
-#applicableMembershipTypes;
-#isPublic;
-#membershipType;
-#membershipId;
-#displayName;*/
+
+//TODO@Horodep: #49 Refactor ClanMember ASAP
 export class ClanMember {
     #destinyUserInfo;
     #clanId;

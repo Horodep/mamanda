@@ -4,8 +4,8 @@ import { AsyncGetClanMembers } from "../http/bungieApi.js";
 import { AsyncGetShowAndSetRoles } from "./clanMember/roles.js";
 import { ClanMember } from "./clanMember/clanMember.js";
 import { ManifestManager } from "../manifest.js";
-import { FromRecordStatEmbed } from "../embeds/recordStatEmbed.js";
-import { FormTopTriumphScoreEmbed } from "../embeds/topTriumphScoreEmbed.js";
+import { CreateEmbedForRecordStatistics } from "../embeds/recordStatEmbed.js";
+import { CreateTopTriumphScoreEmbed } from "../embeds/topTriumphScoreEmbed.js";
 import { AsyncDrawTriumphs } from "../drawing/drawTriumphs.js";
 import { CatchError } from "../catcherror.js";
 
@@ -46,14 +46,14 @@ async function AsyncExecuteForEveryMember(timeout, callback) {
 	iteration();
 }
 
-export function SendAndUpdateEmbed({channel, requestTimeout, updateFrequency, formData, createEmbed, finalAction}) {
+export function SendAndUpdateEmbed({channel, requestTimeout, updateFrequency, fetchDataPerMember, createEmbed, finalAction}) {
 	var iterator = 0;
 	var arrayWithData = [];
 	channel.send(new MessageEmbed()).then((msg) => {
 		var firstError = true;
 		AsyncExecuteForEveryMember(requestTimeout, async function (member, i, members) {
 			try {
-				arrayWithData.push(await formData(member));
+				arrayWithData.push(await fetchDataPerMember(member));
 				iterator++;
 				if (iterator % updateFrequency == 0 || iterator == members.length) {
 					msg.edit(createEmbed(arrayWithData.filter(m => m != null), iterator, members.length));
@@ -78,7 +78,7 @@ export function SetRolesToEveryMember(guild) {
 	});
 }
 
-export function ShowRecordStat(channel, triumphId) {
+export function ShowRecordStatistics(channel, triumphId) {
 	if (triumphId == null) throw "Вы не обозначили искомый триумф.";
 	var recordData = ManifestManager.GetRecordData(triumphId)?.displayProperties;
 	if (recordData == null) throw "Триумф не найден.";
@@ -87,11 +87,11 @@ export function ShowRecordStat(channel, triumphId) {
 		channel: channel, 
 		requestTimeout: 300, 
 		updateFrequency: 15,
-		formData: async (member) => {
+		fetchDataPerMember: async (member) => {
 			var clanMember = new ClanMember(member);
 			return (await clanMember.GetRecordDataState(triumphId)) ? clanMember : null;
 		},
-		createEmbed: (array, i, size) => FromRecordStatEmbed(array, i, size, recordData)
+		createEmbed: (array, i, size) => CreateEmbedForRecordStatistics(array, i, size, recordData)
 	})
 }
 
@@ -100,13 +100,13 @@ export function ShowTopTriumphScore(channel, showImage) {
 		channel: channel, 
 		requestTimeout: 15, 
 		updateFrequency: 30,
-		formData: async (member) => {
+		fetchDataPerMember: async (member) => {
 			var clanMember = new ClanMember(member);
 			await clanMember.FetchActiveScore();
 			return clanMember;
 		},
 		createEmbed: (array, i, size) => {
-			return showImage ? Math.floor(100 * i / size) + "%" : FormTopTriumphScoreEmbed(array, i, size);
+			return showImage ? Math.floor(100 * i / size) + "%" : CreateTopTriumphScoreEmbed(array, i, size);
 		},
 		finalAction: async (array, message) => {
 			if (showImage) {

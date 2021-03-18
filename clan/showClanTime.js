@@ -2,7 +2,7 @@ import config from "../config.json";
 import { ClanMember, AsyncGetAllActivities } from "./clanMember/clanMember.js";
 import { AsyncGetClanVoiceSummary } from "../http/sql.js";
 import { SendPrivateMessagesToArray } from "../discordFeatures/messaging.js";
-import { FormClanTimeEmbed } from "../embeds/clanTimeEmbed.js";
+import { CreateEmbedForClanStatistics } from "../embeds/clanTimeEmbed.js";
 import { SendAndUpdateEmbed } from "./clan.js";
 
 
@@ -13,7 +13,7 @@ export async function AsyncShowClanTime(channel, days, modificators) {
 		channel: channel,
 		requestTimeout: 5,
 		updateFrequency: 20,
-		formData: async (member) => {
+		fetchDataPerMember: async (member) => {
 			var clanMember = new ClanMember(member);
 			await clanMember.FetchCharacterIds();
 			clanMember.FetchDiscordMember(channel.guild);
@@ -23,7 +23,7 @@ export async function AsyncShowClanTime(channel, days, modificators) {
 			return clanMember;
 		},
 		createEmbed: (array, i, size) => {
-			return FormClanTimeEmbed(array, modificators + (i == size ? ' final' : ''));
+			return CreateEmbedForClanStatistics(array, modificators + (i == size ? ' final' : ''));
 		},
 		finalAction: (array) => {
 			if (modificators.includes("pm")) {

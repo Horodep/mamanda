@@ -2,7 +2,7 @@ import { MessageEmbed } from "discord.js";
 import { GetDiscordClanMemberList } from "../discordFeatures/getDiscordClanMemberList.js";
 import { filterClanMembersData } from "../clan/showClanTime.js";
 
-export function FormClanTimeEmbed(clanMembers, modificators) {
+export function CreateEmbedForClanStatistics(clanMembers, modificators) {
 	var guild = clanMembers[0].discordMember.guild;
 	var embed = new MessageEmbed()
 		.setAuthor("Clankick " + (modificators.includes("final") ? "" : clanMembers.length))

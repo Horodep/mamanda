@@ -2,7 +2,7 @@ import { Command } from "./command.js";
 import config from "../config.json";
 
 import { CommandManager } from "../commandManager.js"
-import { ShowRecordStat, ShowTopTriumphScore } from "../clan/clan.js"
+import { ShowRecordStatistics, ShowTopTriumphScore } from "../clan/clan.js"
 import { AsyncRoles } from "../clan/clanMember/roles.js"
 import { AsyncGetClanMemberOnlineTime } from "../clan/clanMember/clanMember.js";
 import { ShowMedalsSummary } from "../discordFeatures/show/showMedalsSummary.js";
@@ -57,7 +57,7 @@ export function GetRestrictedCommandsArray() {
     }));
     array.push(new RestrictedCommand("!roles id:type/id", on, true, "отображение и выдача заслуженных медалей по bungie id;", null));
     array.push(new RestrictedCommand("!record TRIUMPH_HASH", on, true, "отобразить стражей клана, получивших конкретный триумф или предмет;", async function (args, message) {
-        ShowRecordStat(message.channel, args.length > 1 ? args[1] : null)
+        ShowRecordStatistics(message.channel, args.length > 1 ? args[1] : null)
     }));
     array.push(new RestrictedCommand("!sectors", on, false, "легендарные сектора;", async function (args, message) {
         ShowLegendarySectors(message.channel);

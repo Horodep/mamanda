@@ -3,7 +3,7 @@ import config from "../config.json";
 
 import { CommandManager } from "../commandManager.js"
 import { AsyncShowClanSize, SetRolesToEveryMember } from "../clan/clan.js"
-import { AsyncCheckAndShowNicknames } from "../clan/checkAndShowNicknames.js";
+import { AsyncCompareAndShowNicknames } from "../clan/checkAndShowNicknames.js";
 import { AsyncShowClanTime } from "../clan/showClanTime.js";
 import { AsyncGetClanMemberOnlineTime } from "../clan/clanMember/clanMember.js";
 import { ChangeMaxTriumphsScore } from "../discordFeatures/change/changeMaxTriumphsScore.js";
@@ -77,7 +77,7 @@ export function GetGuildmasterCommandsArray() {
         SendCustomMessage(message.client, args);
     }));
     array.push(new GuildmasterCommand("!nicknames", on, true, "проверка никнеймов стражей;", async function (args, message) {
-        await AsyncCheckAndShowNicknames(message.channel);
+        await AsyncCompareAndShowNicknames(message.channel);
     }));
     array.push(new GuildmasterCommand("!pm", on, false, "сообщение в личку юзеру;", async function (args, message) {
         SendPrivateMessage(message.guild, args);

@@ -1,6 +1,6 @@
 import { MessageEmbed } from "discord.js";
 
-export function FormTopTriumphScoreEmbed(members, i, size) {
+export function CreateTopTriumphScoreEmbed(members, i, size) {
 	const embed = new MessageEmbed()
 		.setAuthor("Triumphs score [top 15]:" + (i == size ? "" : " [" + i + "/" + size + "]"))
 		.setColor(0x00AE86)

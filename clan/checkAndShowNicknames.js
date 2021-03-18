@@ -1,9 +1,9 @@
 import { GetDiscordClanMemberList } from "../discordFeatures/getDiscordClanMemberList.js";
-import { FormNicknamesEmbed } from "../embeds/nicknamesEmbed.js";
+import { CreateNicknameComparisonEmbed } from "../embeds/nicknamesEmbed.js";
 import { AsyncGetFullApiClanMemberList } from "./clan.js";
 
 
-export async function AsyncCheckAndShowNicknames(channel, isReminder) {
+export async function AsyncCompareAndShowNicknames(channel, isReminder) {
 	var gameMembers = await AsyncGetFullApiClanMemberList();
 	var discordMembers = GetDiscordClanMemberList(channel.guild);
 
@@ -28,7 +28,7 @@ export async function AsyncCheckAndShowNicknames(channel, isReminder) {
 	});
 
 	if (!isReminder)
-		channel.send(FormNicknamesEmbed(discordPsnList, discordList, gameList, gameMembers.length));
+		channel.send(CreateNicknameComparisonEmbed(discordPsnList, discordList, gameList, gameMembers.length));
 	else if (discordList.length > 0)
 		channel.send(discordList.join(", ") + "\n\nОбращаю ваше внимание, что ваш никнейм в дискорде не соответствует игровому.");
 }

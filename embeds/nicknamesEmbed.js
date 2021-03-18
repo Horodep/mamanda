@@ -1,6 +1,6 @@
 import { MessageEmbed } from "discord.js";
 
-export function FormNicknamesEmbed(discordPsnList, discordList, gameList, size) {
+export function CreateNicknameComparisonEmbed(discordPsnList, discordList, gameList, size) {
 	const embed = new MessageEmbed()
 		.setAuthor("Aurora")
 		.setColor(0x00AE86)

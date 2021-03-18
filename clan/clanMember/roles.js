@@ -4,7 +4,7 @@ import { AsyncGetMemberByDiscordName } from "../clan.js";
 import * as BungieApiLogic from "./fetchingBungieApiData.js";
 import { LogRolesGranting, CheckAndProcessRole, CheckAndProcessRoleBlock, SumMedals } from "./rolesManagement.js";
 import { ClanMember, GetDiscordMemberByMention } from "./clanMember.js";
-import { FormRolesEmbed } from "../../embeds/rolesEmbed.js";
+import { CreateMemberRolesEmbed } from "../../embeds/rolesEmbed.js";
 
 export async function AsyncRoles(message, args) {
 	var clanMember = 
@@ -37,7 +37,7 @@ async function AsyncRolesByMembershipId(channel, membership) {
 export async function AsyncGetShowAndSetRoles(clanMember, channel) {
 	var rolesData = await AsyncGetRolesData(clanMember.membershipType, clanMember.membershipId);
 	console.log(rolesData);
-	if (channel != null) channel.send(FormRolesEmbed(clanMember, rolesData));
+	if (channel != null) channel.send(CreateMemberRolesEmbed(clanMember, rolesData));
 	SetRoles(clanMember, rolesData?.characterDetails, rolesData?.medals);
 }
 

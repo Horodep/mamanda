@@ -1,7 +1,7 @@
 import { MessageEmbed } from "discord.js";
 import { SumMedals } from "../clan/clanMember/rolesManagement.js";
 
-export function FormRolesEmbed(clanMember, rolesData) {
+export function CreateMemberRolesEmbed(clanMember, rolesData) {
 	if (rolesData == null || rolesData.medals == null) {
 		return 'Данные профиля не были получены. Вероятно профиль закрыт настройками приватности.\n' +
 			'Настройки приватности: https://www.bungie.net/ru/Profile/Settings/?category=Privacy';
