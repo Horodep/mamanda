@@ -1,25 +1,44 @@
 # mamanda
-clan discord bot for two clans
+This is a discord bot created to manage a clan in the game Destiny 2. In fact it is designed to managa two clans af it is one.
+The most important features are voice control and roles granting.
 
-## example config.json // redundant
+## Short list of commands:
+* show member voice statistics;
+* show clan voice summary statistics;
+* show member or top clan achievements;
+* show player or clan ingame statistics;
+* shedule and manage raids;
+* show game data: vendor sales, sector rotation;
+* change discord voice room cap;
+* grant guest role to a friend;
+* change discord region;
+* different roles management;
+* different notafications, public or in direct messages.
+
+## example config.json
 ```json
 {
-     "_comment": "This is an example file. Here should be your data.",
-    
     "credentials":{
-		"discordApiKey" : "000000000000000000000000000000000000000000000000000",
-        "BotName"       : "BotName",
-        "d2apiKey"      : "00000000000000000000000000000000",
-        "client_secret" : "0000000000000000000000000000000000000000000",
-        "client_id"     : "00000"
+        "discordApiKey" : "########################################################",
+        "BotName"       : "Gladd you here",
+        "d2apiKey"      : "#################################",
+        "client_secret" : "###########################################",
+        "client_id"     : "00000",
+        "directory"     : "/home/user/",
+        "game_defaults" : {
+            "membershipType" : "3",
+            "membershipId"   : "0000000000000000000",
+            "characterId"    : "0000000000000000000"
+        }
+
     },
         
     "sql"      :{
-		"host"          : "localhost",
-		"username"      : "username",
-		"password"      : "password",
-		"database"      : "database",
-		"charset"       : "utf8"
+        "host"          : "examplehostname",
+        "username"      : "username",
+        "password"      : "password",
+        "database"      : "database",
+        "charset"       : "utf8"
     },
  
     "minimal_light" : "1200",
@@ -27,15 +46,18 @@ clan discord bot for two clans
     "clans"         : [
         {
             "id"         : "0000000",
-            "name"       : "ClanName"
+            "name"       : "First"
         },
         {
             "id"         : "0000000",
-            "name"       : "ClanName"
+            "name"       : "Second"
         }
     ],
- 
-    "guild"         : "000000000000000000", 
+    
+    "guilds"        :{
+        "main"          : "000000000000000000", 
+        "emojis"        : "000000000000000000"
+    },
     "users"         :{
         "boss"          : "000000000000000000",
         "bot"           : "000000000000000000",
@@ -103,6 +125,7 @@ clan discord bot for two clans
         "deleted"       : "000000000000000000",
         "sandbox"       : "000000000000000000",
         "logging"       : "000000000000000000",
+        "clankick"      : "000000000000000000",
 
         "afk"           : "000000000000000000",
         
@@ -115,11 +138,11 @@ clan discord bot for two clans
         "raids"         : "000000000000000000",
         "lfg"           : "000000000000000000",
         "wishes"        : "000000000000000000"
-	},
+    },
     "categories"    :{
         "limited"       : "000000000000000000"
     }
-}
+ }
 ```
 
 ## Database
