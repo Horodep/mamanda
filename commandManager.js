@@ -44,7 +44,7 @@ export class CommandManager {
         var embed = new MessageEmbed()
             .setAuthor(nodePackage.name + " v" + nodePackage.version)
             .setColor(0x11de1b)//0x00AE86
-            .setDescription("[баг-трекер](https://github.com/Horodep/mamanda-issues-tracker/issues)")
+            .setDescription("[баг-трекер](https://github.com/Horodep/mamanda/issues)")
             .addField("Destiny API Status", apiAlerts.ErrorStatus, true)
             .addField("Uptime", Math.floor(uptime / 86400) + ' days ' + Math.floor((uptime / 3600) % 24) + ' hours', true)
             .addField("Git log", "```" + gitLog.replace(/'/g, '') + "```")
@@ -64,7 +64,7 @@ export class CommandManager {
     static GetHelp(title, constructorName) {
         var embed = new MessageEmbed()
             .setAuthor(title)
-            .setDescription("[Issues tracker](https://github.com/Horodep/mamanda-issues-tracker/issues)")
+            .setDescription("[Issues tracker](https://github.com/Horodep/mamanda/issues)")
             .setColor(0x00AE86)
             .setThumbnail('https://images-ext-1.discordapp.net/external/veZptUu_KDKmwtUJX5QT3QxESYCaRp4_k0XUwEQxubo/https/i.imgur.com/e9DIB8e.png')
             .setFooter("Horobot", "https://cdn.discordapp.com/avatars/543342030768832524/7da47eaca948d9874b66fc5884ca2d00.png")
