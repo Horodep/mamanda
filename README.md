@@ -1,5 +1,5 @@
 # mamanda
-This is a discord bot created to manage a clan in the game Destiny 2. In fact it is designed to managa two clans af it is one.
+This is a discord bot created to manage a clan in the game Destiny 2. In fact it is designed to manage two clans as if it is one.
 The most important features are voice control and roles granting.
 
 ## Short list of commands:
