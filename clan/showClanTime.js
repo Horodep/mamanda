@@ -1,5 +1,6 @@
 import config from "../config.json";
-import { ClanMember, AsyncGetAllActivities } from "./clanMember/clanMember.js";
+import { ClanMember } from "./clanMember/clanMember.js";
+import { AsyncGetAllActivities } from "./clanMember/getActivities.js";
 import { AsyncGetClanVoiceSummary } from "../http/sql.js";
 import { SendPrivateMessagesToArray } from "../discordFeatures/messaging.js";
 import { CreateEmbedForClanStatistics } from "../embeds/clanTimeEmbed.js";
@@ -14,9 +15,8 @@ export async function AsyncShowClanTime(channel, days, modificators) {
 		requestTimeout: 5,
 		updateFrequency: 20,
 		fetchDataPerMember: async (member) => {
-			var clanMember = new ClanMember(member);
+			var clanMember = new ClanMember(member, channel.guild);
 			await clanMember.FetchCharacterIds();
-			clanMember.FetchDiscordMember(channel.guild);
 			clanMember.AddToVoiceOnline(clanVoiceSummary[clanMember.discordMemberId]);
 			var activities = await AsyncGetAllActivities(clanMember, days);
 			activities.forEach(a => clanMember.AddToGameOnline(a.values.timePlayedSeconds.basic.value));
@@ -63,7 +63,7 @@ export function filterClanMembersData(clanMembers) {
 	var isAway = filteredMembers.filter(m => m.HasDiscordRole(config.roles.afk)).sort(byGameTime);
 	filteredMembers = filteredMembers.filter(e => !isAway.includes(e));
 
-	var noData = filteredMembers.filter(m => !m.access && !m.HasDiscordRole(config.roles.newbie)).sort(byVoiceTime);
+	var noData = filteredMembers.filter(m => !m.accessToGameOnline && !m.HasDiscordRole(config.roles.newbie)).sort(byVoiceTime);
 	filteredMembers = filteredMembers.filter(e => !noData.includes(e));
 
 	var zeroGame = filteredMembers.filter(m => m.isZeroGame).sort(byVoiceTime);

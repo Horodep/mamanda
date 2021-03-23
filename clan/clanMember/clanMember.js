@@ -1,118 +1,31 @@
 import { MessageEmbed } from "discord.js";
-import { AsyncGetActivitiesFromApi, AsyncGetCoreMemberData, AsyncGetProfileData } from "../../http/bungieApi.js";
-import { AsyncGetMemberByDiscordName } from "../clan.js";
-import { AsyncGetClanVoiceSummary, AsyncGetMemberDetailedVoice } from "../../http/sql.js"
-import config from "../../config.json";
+import { DiscordClanMember } from "./discordClanMember.js";
 
-//TODO@Horodep: #49 Refactor ClanMember ASAP
-export class ClanMember {
-    #destinyUserInfo;
-    #clanId;
-    discordMember;
-    #characterIds;
+export class ClanMember extends DiscordClanMember {
+    voiceOnline = 0;
+    gameOnline = 0;
+    accessToGameOnline = true;
 
-    #voiceOnline = 0;
-    #gameOnline = 0;
-    access = true;
-
-    #activeScore = 0;
-
-    constructor(member) {
-        this.#destinyUserInfo = member.destinyUserInfo ?? member.userInfo;
-        this.#clanId = member.groupId;
-    }
-
-    get membershipType() {
-        return this.#destinyUserInfo.membershipType;
-    }
-    get membershipId() {
-        return this.#destinyUserInfo.membershipId;
-    }
-    get displayName() {
-        if (this.#destinyUserInfo.LastSeenDisplayName != null) {
-            return this.#destinyUserInfo.LastSeenDisplayName;
-        }
-        return this.#destinyUserInfo.displayName;
-    }
-    get characterIds() {
-        return this.#characterIds;
-    }
-
-    get clanId() {
-        return this.#clanId;
-    }
-
-    get discordMemberExists() {
-        return this.discordMember != null;
-    }
-    get discordMemberId() {
-        return this.discordMember?.id;
-    }
-    get discordTag() {
-        return "<@" + this.discordMember?.id + ">";
-    }
-    get joined() {
-        return this.discordMember == null ? 0 :
-            Math.floor((Date.now() - this.discordMember.joinedTimestamp) / (1000 * 60 * 60 * 24))
-    }
-    HasDiscordRole(roleId) {
-        if (!this.discordMemberExists) return false;
-        return this.discordMember.roles.cache.find(role => role.id == roleId) != null;
-    }
-
-    get voiceOnline() {
-        return this.#voiceOnline;
-    }
-    get gameOnline() {
-        return this.#gameOnline;
-    }
     get percentage() {
-        return (this.#gameOnline == 0) ? 0 : Math.floor(100 * this.#voiceOnline / this.#gameOnline);
+        return (this.gameOnline == 0) ? 0 : Math.floor(100 * this.voiceOnline / this.gameOnline);
     }
     get isLowGame() {
-        return this.#gameOnline < 5 * 60 * 60;
+        return this.gameOnline < 5 * 60 * 60;
     }
     get isZeroGame() {
-        return this.#gameOnline == 0;
+        return this.gameOnline == 0;
     }
     get isZeroVoice() {
-        return this.#voiceOnline == 0;
-    }
-    get activeScore() {
-        return this.#activeScore;
-    }
-
-    async GetRecordDataState(triumphId) {
-        var coreData = await AsyncGetCoreMemberData(this.#destinyUserInfo.membershipType, this.#destinyUserInfo.membershipId);
-
-        return coreData?.profileRecords?.data?.records[triumphId]?.state % 2 == 1;
-    }
-
-    async FetchCharacterIds() {
-        var profileWithCharacters = await AsyncGetProfileData(this.#destinyUserInfo.membershipType, this.#destinyUserInfo.membershipId);
-        this.#characterIds = profileWithCharacters.data.characterIds;
-    }
-    async FetchActiveScore() {
-        var coreMemberData = await AsyncGetCoreMemberData(this.#destinyUserInfo.membershipType, this.#destinyUserInfo.membershipId);
-        this.#activeScore = coreMemberData?.profileRecords?.data?.activeScore ?? 0;
-    }
-
-    SetDiscordMember(_discordMember) {
-        this.discordMember = _discordMember;
-    }
-    FetchDiscordMember(guild) {
-        this.discordMember =
-            guild.members.cache.find(member => (member.displayName.startsWith(this.displayName + " ")
-                || member.displayName == this.displayName));
+        return this.voiceOnline == 0;
     }
 
     AddToVoiceOnline(deltaTime) {
         if (!deltaTime) return;
         var deltaSeconds = (((deltaTime.hours ?? 0) * 60) + (deltaTime.minutes ?? 0)) * 60 + (deltaTime.seconds ?? 0);
-        this.#voiceOnline += deltaSeconds;
+        this.voiceOnline += deltaSeconds;
     }
     AddToGameOnline(deltaTime) {
-        this.#gameOnline += deltaTime;
+        this.gameOnline += deltaTime;
     }
 
     GetPercentageLine() {
@@ -131,15 +44,15 @@ export class ClanMember {
     }
 
     GetGameTimeLine() {
-        return this.access ? this.GetTimeLine(this.#gameOnline) : "--:--";
+        return this.accessToGameOnline ? this.GetTimeLine(this.gameOnline) : "--:--";
     }
 
     GetVoiceTimeLine() {
-        return this.GetTimeLine(this.#voiceOnline);
+        return this.GetTimeLine(this.voiceOnline);
     }
 
     GetMemberTimeString() {
-        if (this.access == false)
+        if (this.accessToGameOnline == false)
             return "**" + this.displayName + "** :: профиль закрыт; в войсе — " + this.GetVoiceTimeLine();
         else
             return "**" + this.displayName + "** :: " +
@@ -171,27 +84,15 @@ export class ClanMember {
             .replace("$percent", this.GetPercentageLine())
     }
 
-    GetRoleMark() {
-        if (this.HasDiscordRole(config.roles.newbie)) return "📗" + this.joined + "d";
-        if (this.HasDiscordRole(config.roles.guardians[0])) return "📘";
-        if (this.HasDiscordRole(config.roles.guardians[1])) return "📒";
-        if (this.HasDiscordRole(config.roles.guardians[2])) return "📙";
-        if (this.HasDiscordRole(config.roles.guardians[3])) return "📕";
-        if (this.HasDiscordRole(config.roles.guildmaster)) return "👑";
-        if (this.HasDiscordRole(config.roles.afk)) return "💤";
-        if (this.HasDiscordRole(config.roles.raidleader)) return "🎓";
-        return "❌";
-    }
-
     GetMemberTimeEmbed(detailedLines) {
         const embed = new MessageEmbed()
             .setAuthor(this.displayName + " — " + this.percentage + "%")
             .setColor(0x00AE86)
             .setFooter("Horobot", "https://cdn.discordapp.com/avatars/543342030768832524/7da47eaca948d9874b66fc5884ca2d00.png")
             .setTimestamp()
-            .addField("Game online", this.access == false ? "Classified" : (this.GetTimeLine(this.#gameOnline) +
+            .addField("Game online", this.accessToGameOnline == false ? "Classified" : (this.GetTimeLine(this.gameOnline) +
                 " [(детальная статистика)](https://chrisfried.github.io/secret-scrublandeux/guardian/" + this.membershipType + "/" + this.membershipId + ")"))
-        var body = this.GetTimeLine(this.#voiceOnline) + "```";
+        var body = this.GetTimeLine(this.voiceOnline) + "```";
         detailedLines.forEach(line => {
             if ((body + line).length > 1010) {
                 embed.addField("Voice online", body + "\u200B```");
@@ -212,64 +113,4 @@ export function GetDiscordMemberByMention(guild, discordMention) {
     if (discordMember == null) throw 'Дискорд профиль не найден.';
     console.log(discordMember.displayName);
     return discordMember;
-}
-
-export async function AsyncGetClanMemberOnlineTime(message, days, discordMention, isDetailed) {
-    var discordName = discordMention == null
-        ? message.member.displayName
-        : GetDiscordMemberByMention(message.guild, discordMention).displayName;
-
-    var apiMember = await AsyncGetMemberByDiscordName(discordName);
-    var clanMember = new ClanMember(apiMember);
-    await clanMember.FetchCharacterIds();
-    clanMember.FetchDiscordMember(message.guild);
-
-    var clanVoiceSummary = await AsyncGetClanVoiceSummary(days);
-    clanMember.AddToVoiceOnline(clanVoiceSummary[clanMember.discordMemberId]);
-
-    var activities = await AsyncGetAllActivities(clanMember, days);
-    activities.forEach(a => clanMember.AddToGameOnline(a.values.timePlayedSeconds.basic.value))
-
-    if (isDetailed) {
-        var detailedVoiceResults = await AsyncGetMemberDetailedVoice(days, clanMember.discordMemberId);
-        var lines = clanMember.FormLinesForDetailedVoice(detailedVoiceResults)
-        message.channel.send(clanMember.GetMemberTimeEmbed(lines));
-    }
-    else message.channel.send(clanMember.GetMemberTimeString());
-}
-
-export async function AsyncGetAllActivities(clanMember, days) {
-    var deltaDate = new Date();
-    deltaDate.setDate(deltaDate.getDate() - days);
-
-    var activities = [];
-    var promises = clanMember.characterIds.map(async characterId => {
-        Array.prototype.push.apply(activities, await AsyncGetCharacterActivities(clanMember, characterId, 0, 'None', deltaDate));
-    });
-    await Promise.all(promises);
-    return activities;
-}
-
-async function AsyncGetCharacterActivities(clanMember, characterId, page, mode, deltaDate) {
-    var filteredActivities = [];
-    var responceActivities = await AsyncGetActivitiesFromApi(clanMember.membershipType, clanMember.membershipId, characterId, page, mode);
-
-    if (responceActivities.ErrorCode == 1665) {
-        clanMember.access = false;
-        return [];
-    }
-    if (!responceActivities.Response?.activities) {
-        return [];
-    }
-
-    var isLastPage = false;
-    responceActivities.Response.activities.forEach(function (activity) {
-        if (deltaDate < new Date(activity.period)) {
-            filteredActivities.push(activity);
-        } else {
-            isLastPage = true;
-        }
-    });
-    if (!isLastPage) Array.prototype.push.apply(filteredActivities, await AsyncGetCharacterActivities(clanMember, characterId, ++page, mode, deltaDate));
-    return filteredActivities;
 }

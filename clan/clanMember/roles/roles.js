@@ -1,37 +1,36 @@
-import config from "../../config.json";
-import { AsyncGetFullMemberData, AsyncGetProfileData } from "../../http/bungieApi.js";
-import { AsyncGetMemberByDiscordName } from "../clan.js";
+import config from "../../../config.json";
+import { AsyncGetFullMemberData, AsyncGetProfileData } from "../../../http/bungieApi.js";
+import { AsyncGetMemberByDiscordName } from "../../clan.js";
 import * as BungieApiLogic from "./fetchingBungieApiData.js";
 import { LogRolesGranting, CheckAndProcessRole, CheckAndProcessRoleBlock, SumMedals } from "./rolesManagement.js";
-import { ClanMember, GetDiscordMemberByMention } from "./clanMember.js";
-import { CreateMemberRolesEmbed } from "../../embeds/rolesEmbed.js";
+import { ClanMember, GetDiscordMemberByMention } from "../clanMember.js";
+import { CreateMemberRolesEmbed } from "./rolesEmbed.js";
 
 export async function AsyncRoles(message, args) {
+	var mentionData = args.length > 1 ? args[1] : null;
 	var clanMember = 
-		args[1]?.startsWith('id:') ?
-		await AsyncRolesByMembershipId(message.channel, args[1]) :
-		await AsyncRolesByDiscordMention(message.channel, args.length > 1 ? args[1] : message.member.id);
+		mentionData?.startsWith('id:') ?
+		await AsyncRolesByMembershipId(message, mentionData) :
+		await AsyncRolesByDiscordMention(message, mentionData);
 	await AsyncGetShowAndSetRoles(clanMember, message.channel);
 }
 
-async function AsyncRolesByDiscordMention(channel, discordMention) {
-	var discordMember = GetDiscordMemberByMention(channel.guild, discordMention);
-	var member = await AsyncGetMemberByDiscordName(discordMember.displayName);
-
-	var clanMember = new ClanMember(member);
-	clanMember.SetDiscordMember(discordMember);
-	return clanMember;
+async function AsyncRolesByDiscordMention(message, discordMention) {
+    var discordMember = discordMention == null
+        ? message.member
+        : GetDiscordMemberByMention(message.guild, discordMention);
+		
+	var apiMember = await AsyncGetMemberByDiscordName(discordMember.displayName);
+	return new ClanMember(apiMember, discordMember);
 }
 
-async function AsyncRolesByMembershipId(channel, membership) {
+async function AsyncRolesByMembershipId(message, membership) {
 	var membershipType = membership.replace('id:', '').split('/')[0];
 	var membershipId = membership.replace('id:', '').split('/')[1];
 	var member = await AsyncGetProfileData(membershipType, membershipId);
 	if (member == null) throw 'Игровой профиль не найден.';
 	
-	var clanMember = new ClanMember(member.data);
-	clanMember.FetchDiscordMember(channel.guild);
-	return clanMember;
+	return new ClanMember(member.data, message.guild);
 }
 
 export async function AsyncGetShowAndSetRoles(clanMember, channel) {

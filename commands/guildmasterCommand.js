@@ -5,7 +5,7 @@ import { CommandManager } from "../commandManager.js"
 import { AsyncShowClanSize, SetRolesToEveryMember } from "../clan/clan.js"
 import { AsyncCompareAndShowNicknames } from "../clan/checkAndShowNicknames.js";
 import { AsyncShowClanTime } from "../clan/showClanTime.js";
-import { AsyncGetClanMemberOnlineTime } from "../clan/clanMember/clanMember.js";
+import { AsyncGetClanMemberOnlineTime } from "../clan/clanMember/getOnlineTime.js";
 import { ChangeMaxTriumphsScore } from "../discordFeatures/change/changeMaxTriumphsScore.js";
 import { DropPvpRole } from "../discordFeatures/dropPvpRole.js";
 import { AsyncShowResetEnglish } from "../discordFeatures/show/showResetEnglish.js";
