@@ -1,10 +1,10 @@
-import config from "../../config.json";
-import { AsyncGetFullMemberData, AsyncGetProfileData } from "../../http/bungieApi.js";
-import { AsyncGetMemberByDiscordName } from "../clan.js";
+import config from "../../../config.json";
+import { AsyncGetFullMemberData, AsyncGetProfileData } from "../../../http/bungieApi.js";
+import { AsyncGetMemberByDiscordName } from "../../clan.js";
 import * as BungieApiLogic from "./fetchingBungieApiData.js";
 import { LogRolesGranting, CheckAndProcessRole, CheckAndProcessRoleBlock, SumMedals } from "./rolesManagement.js";
-import { ClanMember, GetDiscordMemberByMention } from "./clanMember.js";
-import { CreateMemberRolesEmbed } from "../../embeds/rolesEmbed.js";
+import { ClanMember, GetDiscordMemberByMention } from "../clanMember.js";
+import { CreateMemberRolesEmbed } from "./rolesEmbed.js";
 
 export async function AsyncRoles(message, args) {
 	var clanMember = 

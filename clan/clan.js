@@ -1,7 +1,7 @@
 import { MessageEmbed } from "discord.js";
 import config from "../config.json";
 import { AsyncGetClanMembers } from "../http/bungieApi.js";
-import { AsyncGetShowAndSetRoles } from "./clanMember/roles.js";
+import { AsyncGetShowAndSetRoles } from "./clanMember/roles/roles.js";
 import { ClanMember } from "./clanMember/clanMember.js";
 import { ManifestManager } from "../manifest.js";
 import { CreateEmbedForRecordStatistics } from "../embeds/recordStatEmbed.js";

@@ -3,7 +3,7 @@ import config from "../config.json";
 
 import { CommandManager } from "../commandManager.js"
 import { ShowRecordStatistics, ShowTopTriumphScore } from "../clan/clan.js"
-import { AsyncRoles } from "../clan/clanMember/roles.js"
+import { AsyncRoles } from "../clan/clanMember/roles/roles.js"
 import { AsyncGetClanMemberOnlineTime } from "../clan/clanMember/clanMember.js";
 import { ShowMedalsSummary } from "../discordFeatures/show/showMedalsSummary.js";
 import { ChangeChannelCap } from "../discordFeatures/change/changeChannelCap.js";

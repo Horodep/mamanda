@@ -1,5 +1,5 @@
 import { MessageEmbed } from "discord.js";
-import { SumMedals } from "../clan/clanMember/rolesManagement.js";
+import { SumMedals } from "./rolesManagement.js";
 
 export function CreateMemberRolesEmbed(clanMember, rolesData) {
 	if (rolesData == null || rolesData.medals == null) {
