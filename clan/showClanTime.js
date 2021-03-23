@@ -1,5 +1,6 @@
 import config from "../config.json";
-import { ClanMember, AsyncGetAllActivities } from "./clanMember/clanMember.js";
+import { ClanMember } from "./clanMember/clanMember.js";
+import { AsyncGetAllActivities } from "./clanMember/getActivities.js";
 import { AsyncGetClanVoiceSummary } from "../http/sql.js";
 import { SendPrivateMessagesToArray } from "../discordFeatures/messaging.js";
 import { CreateEmbedForClanStatistics } from "../embeds/clanTimeEmbed.js";
