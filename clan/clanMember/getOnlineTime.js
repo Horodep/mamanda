@@ -5,14 +5,13 @@ import { GetDiscordMemberByMention, ClanMember } from "./clanMember.js";
 
 
 export async function AsyncGetClanMemberOnlineTime(message, days, discordMention, isDetailed) {
-    var discordName = discordMention == null
-        ? message.member.displayName
-        : GetDiscordMemberByMention(message.guild, discordMention).displayName;
+    var discordMember = discordMention == null
+        ? message.member
+        : GetDiscordMemberByMention(message.guild, discordMention);
 
-    var apiMember = await AsyncGetMemberByDiscordName(discordName);
-    var clanMember = new ClanMember(apiMember);
+    var apiMember = await AsyncGetMemberByDiscordName(discordMember.displayName);
+    var clanMember = new ClanMember(apiMember, discordMember);
     await clanMember.FetchCharacterIds();
-    clanMember.FetchDiscordMember(message.guild);
 
     var clanVoiceSummary = await AsyncGetClanVoiceSummary(days);
     clanMember.AddToVoiceOnline(clanVoiceSummary[clanMember.discordMemberId]);

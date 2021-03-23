@@ -18,7 +18,7 @@ async function AsyncGetCharacterActivities(clanMember, characterId, page, mode, 
     var responceActivities = await AsyncGetActivitiesFromApi(clanMember.membershipType, clanMember.membershipId, characterId, page, mode);
 
     if (responceActivities.ErrorCode == 1665) {
-        clanMember.access = false;
+        clanMember.accessToGameOnline = false;
         return [];
     }
     if (!responceActivities.Response?.activities) {

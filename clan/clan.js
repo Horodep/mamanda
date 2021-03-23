@@ -72,8 +72,7 @@ export function SendAndUpdateEmbed({channel, requestTimeout, updateFrequency, fe
 
 export function SetRolesToEveryMember(guild) {
 	AsyncExecuteForEveryMember(5000, (member) => {
-		var clanMember = new ClanMember(member);
-		clanMember.FetchDiscordMember(guild);
+		var clanMember = new ClanMember(member, guild);
 		AsyncGetShowAndSetRoles(clanMember, null);
 	});
 }
