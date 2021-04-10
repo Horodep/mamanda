@@ -20,7 +20,7 @@
   "dependencies": {
     "adm-zip": "^0.5.1",
     "bufferutil": "^4.0.1",
-    "discord.js": "^12.5.1",
+    "discord.js": "^12.5.3",
     "ffmpeg-static": "^3.0.0",
     "jimp": "^0.16.1",
     "node-fetch": "^2.6.1",
