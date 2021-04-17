@@ -25,7 +25,7 @@ export function ShowLegendarySectors(channel) {
 		.setColor(0x00AE86)
 		.setTimestamp()
 		.addField(legend.displayProperties.name, legendReward.name + '\n\n' + legendModifiers.join('\n'), true)
-		.addField(master.displayProperties.name, masterReward.name + '\n\n' + masterModifiers.join('\n'), true);
+		.addField(master.displayProperties.name.replace("Legend", "Master"), masterReward.name + '\n\n' + masterModifiers.join('\n'), true);
 	channel.send(embed);
 }
 
