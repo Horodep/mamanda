@@ -15,6 +15,7 @@ import { SendCustomMessage, SendPrivateMessageByRole, SendPrivateMessage } from 
 import { ClearRaidList, ForcedAddRaidMember, ForcedRemoveRaidMember } from "../discordFeatures/raid/raid.js"
 import { AsyncDrawXur } from "../drawing/drawXur.js";
 import { AsyncDrawEververse } from "../drawing/drawEververse.js";
+import { GiveVyakbanAndCreateEmbed } from "../discordFeatures/vyakManager.js";
 
 class GuildmasterCommand extends Command {
     Run(args, message) {
@@ -108,6 +109,9 @@ export function GetGuildmasterCommandsArray() {
         await AsyncShowClanSize(message);
     }));
     array.push(new GuildmasterCommand("!sync", off, false, "_______________;", async function (args, message) { }));
+    array.push(new GuildmasterCommand("!vyakban @DiscrordTag 1m/2h/3d причина", on, false, "выдача мьюта на определенное время;", async function (args, message) { 
+        GiveVyakbanAndCreateEmbed(message, args);
+    }));
     array.push(new GuildmasterCommand("!watermelon @DiscrordTag", off, true, "проверка стража на абуз;", async function (args, message) { }));
     array.push(new GuildmasterCommand("!xur", on, true, "геренация изображения товаров Зура в текущий канал;", async function (args, message) {
         await AsyncDrawXur(message.channel);
