@@ -7,7 +7,7 @@ export function GiveVyakbanAndCreateEmbed(message, args) {
 
     var discordMember = GetDiscordMemberByMention(message.guild, args[1]);
     var delta = args[2];
-    var reason = args[3];
+    var reason = args.filter((_, i) => i > 2).join(" ");
 
     discordMember.roles.add(config.roles.vyakban);
 
