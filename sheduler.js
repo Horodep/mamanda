@@ -36,9 +36,9 @@ async function SaveRun(callback) {
 }
 
 function GetChannel(id) {
-	return this.client.channels.cache.get(id);
+	return client.channels.cache.get(id);
 }
 
 function GetGuild(id) {
-	return this.client.guilds.cache.get(id);
+	return client.guilds.cache.get(id);
 }
