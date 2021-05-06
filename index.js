@@ -17,7 +17,7 @@ export const client = new Discord.Client({ partials: ['MESSAGE', 'CHANNEL', 'REA
 client.login(config.credentials.discordApiKey);
 
 client.on("ready", () => {
-	client.user.setActivity("на Летописца 9 из 10", { type: 'WATCHING' });
+	client.user.setActivity("Тех. поддержка: Horodep#7585");
 
 	FetchDefaultCatchErrorChannel(client);
 	InitSheduler();
