@@ -12,7 +12,9 @@ export async function AsyncCompareAndShowNicknames(channel, isReminder) {
 	var gameList = [];
 
 	discordMembers.forEach(function (discordMember) {
-		if (gameMembers.filter(gameMember => discordMember.displayName.startsWith(gameMember.destinyUserInfo.LastSeenDisplayName)).length == 0) {
+		if (gameMembers.filter(
+				gameMember => (discordMember.displayName.startsWith(gameMember.destinyUserInfo.LastSeenDisplayName + " ")
+							|| discordMember.displayName == gameMember.destinyUserInfo.LastSeenDisplayName)).length == 0) {
 			if (discordMember.roles.cache.find(role => role.name === "PSN")) {
 				discordPsnList.push("<@" + discordMember.id + ">");
 			} else {
@@ -22,7 +24,8 @@ export async function AsyncCompareAndShowNicknames(channel, isReminder) {
 	});
 
 	gameMembers.forEach(function (gameMember) {
-		if (discordMembers.filter(discordMember => discordMember.displayName.startsWith(gameMember.destinyUserInfo.LastSeenDisplayName)).length == 0) {
+		if (discordMembers.filter(discordMember => (discordMember.displayName.startsWith(gameMember.destinyUserInfo.LastSeenDisplayName + " ")
+								|| discordMember.displayName == gameMember.destinyUserInfo.LastSeenDisplayName)).length == 0) {
 			gameList.push(gameMember.destinyUserInfo.LastSeenDisplayName);
 		}
 	});
