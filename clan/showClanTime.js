@@ -66,16 +66,16 @@ export function filterClanMembersData(clanMembers) {
 	var noData = filteredMembers.filter(m => !m.access && !m.HasDiscordRole(config.roles.newbie)).sort(byVoiceTime);
 	filteredMembers = filteredMembers.filter(e => !noData.includes(e));
 
-	var zeroGame = filteredMembers.filter(m => m.isZeroGame).sort(byVoiceTime);
+	var zeroGame = filteredMembers.filter(m => m.isZeroGame && m.access).sort(byVoiceTime);
 	filteredMembers = filteredMembers.filter(e => !zeroGame.includes(e));
 
 	var zeroVoice = filteredMembers.filter(m => m.isZeroVoice).sort(byGameTime);
 	filteredMembers = filteredMembers.filter(e => !zeroVoice.includes(e));
 
-	var lowVoice = filteredMembers.filter(m => m.percentage < 15).sort(byPercentage);
+	var lowVoice = filteredMembers.filter(m => m.percentage < 15 && m.access).sort(byPercentage);
 	filteredMembers = filteredMembers.filter(e => !lowVoice.includes(e));
 
-	var lowGame = filteredMembers.filter(m => m.isLowGame).sort(byGameTime);
+	var lowGame = filteredMembers.filter(m => m.isLowGame && m.access).sort(byGameTime);
 	filteredMembers = filteredMembers.filter(e => !lowGame.includes(e));
 
 	var goodNewbie = filteredMembers.filter(m => m.HasDiscordRole(config.roles.newbie) && m.joined >= 10).sort(byJoinDate);
