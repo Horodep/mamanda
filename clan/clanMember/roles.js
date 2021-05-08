@@ -95,7 +95,7 @@ async function AsyncGetRolesData(membershipType, membershipId) {
 			467599901, 1260338084, 3716806862, 3054857469, 632127367, 2363370539 // grandmasters
 		], "«Охота»", 57);
 	data.season.season13 = BungieApiLogic.GetNodeDataFiltered(records, 2580432868, [], [
-			94652195, // glory winstreak
+			1931624693, // glory winstreak
 			1664067591, 3805764118, 955580899, 2904638730, // osiris
 			1820446245, 1404404279, 2867134615, 4018693329, 8651357, 1451485767 // grandmasters
 		], "«Избранный»", 68);
