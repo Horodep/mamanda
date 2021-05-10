@@ -3,7 +3,7 @@ import { GetDiscordClanMemberList } from "../discordFeatures/getDiscordClanMembe
 import { filterClanMembersData } from "../clan/showClanTime.js";
 
 export function CreateEmbedForClanStatistics(clanMembers, modificators) {
-	var guild = clanMembers[0].discordMember.guild;
+	var guild = clanMembers.filter(m => m.discordMember)[0].discordMember.guild;
 	var embed = new MessageEmbed()
 		.setAuthor("Clankick " + (modificators.includes("final") ? "" : clanMembers.length))
 		.setColor(0x00AE86)
