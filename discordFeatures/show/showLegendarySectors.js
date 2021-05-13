@@ -70,26 +70,26 @@ function FillWithEmoji(line, emojiCache) {
 }
 
 // TODO@Horodep: #56 sector rotation is outdated
-const SECTOR_ROTATION_MAP = {    // legend				master
-	1: [912873277, 3911969238],  // Concealed Void		K1 Revelation
-	2: [1648125541, 912873274],  // Bunker E15			Concealed Void
-	3: [1070981430, 1648125538], // Perdition			Bunker E15
-	4: [3253890607, 1070981425], // The Quarry			Perdition
-	5: [1502633527, 3253890600], // ?????				The Quarry
-	6: [1502633527, 1502633527], // ?????				?????
-	7: [1502633527, 1502633527], // ?????				?????
-	8: [2936791996, 1502633527], // Exodus Garden 2A	?????
-	9: [3094493720, 2936791995], // Veles Labyrinth		Exodus Garden 2A
-	10: [567131512, 3094493727], // K1 Logistics		Veles Labyrinth
-	11: [2829206727, 567131519], // K1 Communion		K1 Logistics
-	12: [184186581, 2829206720], // K1 Crew Quarters	K1 Communion
-	0: [3911969233, 184186578]   // K1 Revelation		K1 Crew Quarters
+const SECTOR_ROTATION_MAP = {    // legend                master
+	1: [912873277, 3911969238],  // Concealed Void        K1 Revelation
+	2: [1648125541, 912873274],  // Bunker E15            Concealed Void
+	3: [1070981430, 1648125538], // Perdition             Bunker E15
+	4: [3253890607, 1070981425], // The Quarry            Perdition
+	5: [1502633527, 3253890600], // ?????                 The Quarry
+	6: [1502633527, 1502633527], // ?????                 ?????
+	7: [1502633527, 1502633527], // ?????                 ?????
+	8: [2936791996, 1502633527], // Exodus Garden 2A      ?????
+	9: [3094493720, 2936791995], // Veles Labyrinth       Exodus Garden 2A
+	10: [567131512, 3094493727], // K1 Logistics          Veles Labyrinth
+	11: [2829206727, 567131519], // K1 Communion          K1 Logistics
+	12: [184186581, 2829206720], // K1 Crew Quarters      K1 Communion
+	0: [3911969233, 184186578]   // K1 Revelation         K1 Crew Quarters
 };
-//							legend			master
-// The Quarry: 				3253890607		3253890600
-// Excavation Site XII:		548616650		548616653
-// The Empty Tank:			2019961998		2019961993
-// Scavenger's Den:			1905792149		1905792146
+//                            legend            master
+// The Quarry:                3253890607        3253890600
+// Excavation Site XII:       548616650         548616653
+// The Empty Tank:            2019961998        2019961993
+// Scavenger's Den:           1905792149        1905792146
 
 const SECTOR_REWARD_ROTATION_MAP = {
 	0: [1387420892, 2686128774],
@@ -99,23 +99,23 @@ const SECTOR_REWARD_ROTATION_MAP = {
 };
 
 const SHIELDS_MAP = {
-	912873277: "Void, Solar, Arc",  // Legend: Concealed Void
-	1648125541: "Void, Solar",    	// Legend: Bunker E15
-	1070981430: "Void, Arc", 		// Legend: Perdition
-	2936791996: "Void", 			// Legend: Exodus Garden 2A
-	3094493720: "Solar, Arc",		// Legend: Veles Labyrinth
-	567131512: "Solar, Arc",     	// Legend: K1 Logistics,
-	2829206727: "Void, Solar",   	// Legend: K1 Communion
-	184186581: "Solar",    			// Legend: K1 Crew Quarters
-	3911969233: "Arc",     			// Legend: K1 Revelation
+	912873277: "Void, Solar, Arc",   // Legend: Concealed Void
+	1648125541: "Void, Solar",       // Legend: Bunker E15
+	1070981430: "Void, Arc",         // Legend: Perdition
+	2936791996: "Void",              // Legend: Exodus Garden 2A
+	3094493720: "Solar, Arc",        // Legend: Veles Labyrinth
+	567131512: "Solar, Arc",         // Legend: K1 Logistics,
+	2829206727: "Void, Solar",       // Legend: K1 Communion
+	184186581: "Solar",              // Legend: K1 Crew Quarters
+	3911969233: "Arc",               // Legend: K1 Revelation
 
-	912873274: "Void, Solar",  		// Master: Concealed Void
-	1648125538: "Void",    			// Master: Bunker E15
-	1070981425: "Void, Arc", 		// Master: Perdition
-	2936791995: "Void", 			// Master: Exodus Garden 2A
-	3094493727: "Solar, Arc - ???", // Master: Veles Labyrinth
-	567131519: "Solar, Arc",     	// Master: K1 Logistics,
-	2829206720: "Solar",   			// Master: K1 Communion
-	184186578: "Solar",    			// Master: K1 Crew Quarters
-	3911969238: "Arc",     			// Master: K1 Revelation
+	912873274: "Void, Solar",        // Master: Concealed Void
+	1648125538: "Void",              // Master: Bunker E15
+	1070981425: "Void, Arc",         // Master: Perdition
+	2936791995: "Void",              // Master: Exodus Garden 2A
+	3094493727: "Solar, Arc - ???",  // Master: Veles Labyrinth
+	567131519: "Solar, Arc",         // Master: K1 Logistics,
+	2829206720: "Solar",             // Master: K1 Communion
+	184186578: "Solar",              // Master: K1 Crew Quarters
+	3911969238: "Arc",               // Master: K1 Revelation
 };
