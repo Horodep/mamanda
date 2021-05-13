@@ -75,8 +75,8 @@ const SECTOR_ROTATION_MAP = {    // legend                master
 	2: [1648125541, 912873274],  // Bunker E15            Concealed Void
 	3: [1070981430, 1648125538], // Perdition             Bunker E15
 	4: [3253890607, 1070981425], // The Quarry            Perdition
-	5: [1502633527, 3253890600], // ?????                 The Quarry
-	6: [1502633527, 1502633527], // ?????                 ?????
+	5: [1905792149, 3253890600], // Excavation Site XII   The Quarry
+	6: [1502633527, 1905792146], // ?????                 Excavation Site XII
 	7: [1502633527, 1502633527], // ?????                 ?????
 	8: [2936791996, 1502633527], // Exodus Garden 2A      ?????
 	9: [3094493720, 2936791995], // Veles Labyrinth       Exodus Garden 2A
