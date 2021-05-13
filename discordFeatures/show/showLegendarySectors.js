@@ -24,8 +24,9 @@ export function ShowLegendarySectors(channel) {
 		.setAuthor("Legendary sectors")
 		.setColor(0x00AE86)
 		.setTimestamp()
-		.addField(legend.displayProperties.name, legendReward.name + '\n\n' + legendModifiers.join('\n'), true)
-		.addField(master.displayProperties.name.replace("Legend", "Master"), masterReward.name + '\n\n' + masterModifiers.join('\n'), true);
+		.setDescription("Ротация изменилось, на данный момент еще не известна.")
+//		.addField(legend.displayProperties.name, legendReward.name + '\n\n' + legendModifiers.join('\n'), true)
+//		.addField(master.displayProperties.name.replace("Legend", "Master"), masterReward.name + '\n\n' + masterModifiers.join('\n'), true);
 	channel.send(embed);
 }
 
