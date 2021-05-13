@@ -18,6 +18,7 @@ export class ManifestManager {
 	    manifest.InventoryItem = await fetch(getFullUrl(urls.DestinyInventoryItemDefinition)).then(res => res.json());
 	    manifest.Activity = await fetch(getFullUrl(urls.DestinyActivityDefinition)).then(res => res.json());
 	    manifest.ActivityModifier = await fetch(getFullUrl(urls.DestinyActivityModifierDefinition)).then(res => res.json());
+	    manifest.Destination = await fetch(getFullUrl(urls.DestinyDestinationDefinition)).then(res => res.json());
 
         fs.writeFileSync(FetchFullPath('.data/destiny2.json'), JSON.stringify(manifest));
         console.log("Manifest refreshed!");
@@ -55,6 +56,12 @@ export class ManifestManager {
     static GetActivityData(hash, doNotClean) {
         return this.GetData(doNotClean, function(){
             return ManifestManager.manifest?.Activity[hash];
+        });
+    }
+
+    static GetDestinationData(hash, doNotClean) {
+        return this.GetData(doNotClean, function(){
+            return ManifestManager.manifest?.Destination[hash];
         });
     }
 
