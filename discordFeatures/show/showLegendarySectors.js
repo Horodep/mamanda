@@ -77,14 +77,16 @@ const SECTOR_ROTATION_MAP = {    // legend                master
 	4: [3253890607, 1070981425], // The Quarry            Perdition
 	5: [1905792149, 3253890600], // Scavenger's Den       The Quarry
 	6: [548616650, 1905792146],  // Excavation Site XII   Scavenger's Den
-	7: [2019961998, 548616653],  // The Empty Tank        Excavation Site XII
-	8: [2936791996, 2019961993], // Exodus Garden 2A      The Empty Tank
-	9: [3094493720, 2936791995], // Veles Labyrinth       Exodus Garden 2A
-	10: [567131512, 3094493727], // K1 Logistics          Veles Labyrinth
+	7: [2936791996, 548616653],  // Exodus Garden 2A      Excavation Site XII
+	8: [3094493720, 2936791995], // Veles Labyrinth       Exodus Garden 2A
+	9: [1502633527, 3094493727], // Tower                 Veles Labyrinth
+	10: [567131512, 1502633527], // K1 Logistics          Tower
 	11: [2829206727, 567131519], // K1 Communion          K1 Logistics
 	12: [184186581, 2829206720], // K1 Crew Quarters      K1 Communion
 	0: [3911969233, 184186578]   // K1 Revelation         K1 Crew Quarters
-};
+}; 
+// The Empty Tank       2019961998				2019961993
+// Tower 				1502633527
 
 const SECTOR_REWARD_ROTATION_MAP = {
 	0: [1387420892, 2686128774],
