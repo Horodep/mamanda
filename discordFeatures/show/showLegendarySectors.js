@@ -10,8 +10,8 @@ export function ShowLegendarySectors(channel) {
 	var emojiServer = channel.client.guilds.cache.get(config.guilds.emojis);
 	var emojiCache = emojiServer.emojis.cache;
 
-	var legend = ManifestManager.GetActivityData(SECTOR_ROTATION_MAP[counter % 9][0], true);
-	var master = ManifestManager.GetActivityData(SECTOR_ROTATION_MAP[counter % 9][1], true);
+	var legend = ManifestManager.GetActivityData(SECTOR_ROTATION_MAP[counter % 13][0], true);
+	var master = ManifestManager.GetActivityData(SECTOR_ROTATION_MAP[counter % 13][1], true);
 	var legendReward = ManifestManager.GetItemData(SECTOR_REWARD_ROTATION_MAP[counter % 4][0], true).displayProperties;
 	var masterReward = ManifestManager.GetItemData(SECTOR_REWARD_ROTATION_MAP[counter % 4][1], true).displayProperties;
 	var legendDestination = ManifestManager.GetDestinationData(legend.destinationHash)?.displayProperties?.name;
@@ -79,13 +79,12 @@ const SECTOR_ROTATION_MAP = {    // legend                master
 	6: [548616650, 1905792146],  // Excavation Site XII   Scavenger's Den
 	7: [2936791996, 548616653],  // Exodus Garden 2A      Excavation Site XII
 	8: [3094493720, 2936791995], // Veles Labyrinth       Exodus Garden 2A
-	9: [1502633527, 3094493727], // Tower                 Veles Labyrinth
-	10: [567131512, 1502633527], // K1 Logistics          Tower
+	9: [2019961998, 3094493727], // The Empty Tank        Veles Labyrinth
+	10: [567131512, 2019961993], // K1 Logistics          The Empty Tank
 	11: [2829206727, 567131519], // K1 Communion          K1 Logistics
 	12: [184186581, 2829206720], // K1 Crew Quarters      K1 Communion
 	0: [3911969233, 184186578]   // K1 Revelation         K1 Crew Quarters
 }; 
-// The Empty Tank       2019961998				2019961993
 // Tower 				1502633527
 
 const SECTOR_REWARD_ROTATION_MAP = {
