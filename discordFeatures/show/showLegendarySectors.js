@@ -28,7 +28,6 @@ export function ShowLegendarySectors(channel) {
 		.setAuthor("Legendary sectors")
 		.setColor(0x00AE86)
 		.setTimestamp()
-		.setDescription("Ротация изменилась, возможны ошибки. Если встретите, сообщите пожалуйста.")
 		.addField("Legend (1310)\n" + legend.displayProperties.name.split(":")[0] + " (" + legendDestination + ")", legendDescription, true)
 		.addField("Master (1340)\n" + master.displayProperties.name.split(":")[0] + " (" + masterDestination + ")", masterDescription, true);
 	channel.send(embed);
