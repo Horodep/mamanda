@@ -69,23 +69,21 @@ function FillWithEmoji(line, emojiCache) {
 		.replace("Unstoppable", `${emojiCache.find(e => e.name == 'unstoppable')} `);
 }
 
-// TODO@Horodep: #56 sector rotation is outdated
 const SECTOR_ROTATION_MAP = {    // legend                master
-	1: [912873277, 3911969238],  // Concealed Void        K1 Revelation
-	2: [1648125541, 912873274],  // Bunker E15            Concealed Void
-	3: [1070981430, 1648125538], // Perdition             Bunker E15
-	4: [3253890607, 1070981425], // The Quarry            Perdition
-	5: [1905792149, 3253890600], // Scavenger's Den       The Quarry
-	6: [548616650, 1905792146],  // Excavation Site XII   Scavenger's Den
-	7: [2936791996, 548616653],  // Exodus Garden 2A      Excavation Site XII
-	8: [3094493720, 2936791995], // Veles Labyrinth       Exodus Garden 2A
-	9: [2019961998, 3094493727], // The Empty Tank        Veles Labyrinth
-	10: [567131512, 2019961993], // K1 Logistics          The Empty Tank
-	11: [2829206727, 567131519], // K1 Communion          K1 Logistics
-	12: [184186581, 2829206720], // K1 Crew Quarters      K1 Communion
-	0: [3911969233, 184186578]   // K1 Revelation         K1 Crew Quarters
+	1: [3253890607, 1070981425], // The Quarry            Perdition
+	2: [1905792149, 3253890600], // Scavenger's Den       The Quarry
+	3: [548616650, 1905792146],  // Excavation Site XII   Scavenger's Den
+	4: [2936791996, 548616653],  // Exodus Garden 2A      Excavation Site XII
+	5: [3094493720, 2936791995], // Veles Labyrinth       Exodus Garden 2A
+	6: [2019961998, 3094493727], // The Empty Tank        Veles Labyrinth
+	7: [567131512, 2019961993],  // K1 Logistics          The Empty Tank
+	8: [2829206727, 567131519],  // K1 Communion          K1 Logistics
+	9: [184186581, 2829206720],  // K1 Crew Quarters      K1 Communion
+	10: [3911969233, 184186578], // K1 Revelation         K1 Crew Quarters
+	11: [912873277, 3911969238], // Concealed Void        K1 Revelation
+	12: [1648125541, 912873274], // Bunker E15            Concealed Void
+	0: [1070981430, 1648125538]  // Perdition             Bunker E15
 }; 
-// Tower 				1502633527
 
 const SECTOR_REWARD_ROTATION_MAP = {
 	0: [1387420892, 2686128774],
