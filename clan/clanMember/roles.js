@@ -99,7 +99,8 @@ async function AsyncGetRolesData(membershipType, membershipId) {
 			1664067591, 3805764118, 955580899, 2904638730, // osiris
 			1820446245, 1404404279, 2867134615, 4018693329, 8651357, 1451485767 // grandmasters
 		], "«Избранный»", 67);
-	data.season.season14 = { state: false, text: "[ЗАСЕКРЕЧЕНО]: 0/??" };
+	data.season.season14 = BungieApiLogic.GetNodeDataFiltered(records, 3032254529, [], [
+		], "«Сплайсер»");
 	data.season.season15 = { state: false, text: "[ЗАСЕКРЕЧЕНО]: 0/??" };
 	data.extra.poi = BungieApiLogic.GetIfPersonOfInterest(records);
 	data.extra.legacy.season8 = BungieApiLogic.GetNodeData(records, 955166374, "Undying");
