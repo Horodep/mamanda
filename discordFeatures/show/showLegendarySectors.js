@@ -26,6 +26,7 @@ export function ShowLegendarySectors(channel) {
 
 	var embed = new MessageEmbed()
 		.setAuthor("Legendary sectors")
+		.setFooter("Grind them for all that fancy brand new magnificent exotic stuff!")
 		.setColor(0x00AE86)
 		.setTimestamp()
 		.addField("Legend (1310)\n" + legend.displayProperties.name.split(":")[0] + " (" + legendDestination + ")", legendDescription, true)
