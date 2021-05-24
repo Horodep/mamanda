@@ -55,7 +55,8 @@ async function AsyncGetRolesData(membershipType, membershipId) {
 		legacy_triumphs: {},
 		season: {},
 		extra: {
-			legacy: {}
+			legacy: {},
+			day1: {}
 		}
 	};
 	var characterDetails = BungieApiLogic.FetchCharacterData(response);
@@ -65,6 +66,7 @@ async function AsyncGetRolesData(membershipType, membershipId) {
 	data.raids.lw = BungieApiLogic.GetNodeData(records, 1525933460, "ПЖ");
 	data.raids.gos = BungieApiLogic.GetNodeData(records, 615240848, "CC");
 	data.raids.dsc = BungieApiLogic.GetNodeDataFiltered(records, 1726708384, [3560923614], [], "СГК");
+	data.raids.vog = BungieApiLogic.GetNodeDataFiltered(records, 132375837, [2750088202], [], "ХЧ");
 	data.raids.day1 = BungieApiLogic.GetDayOneData(collectibles);
 	data.locations.dc = BungieApiLogic.GetNodeData(records, 3483405511, "Город Грез");
 	data.locations.moon = BungieApiLogic.GetNodeData(records, 1473265108, "Луна");
