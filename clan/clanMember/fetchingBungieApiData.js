@@ -88,6 +88,14 @@ export function GetProfileRecordsCore(response, dataname, neededValue, textprefi
 	}));
 }
 
+export function GetCollectiblesData(collectibles, hash, textprefix) {
+	return GetDataAndHandleErrors(textprefix, () => ({
+		state: collectibles.profileCollectibles[hash]?.state % 2 == 0 ||
+			   collectibles.characterCollectibles[hash]?.state % 2 == 0,
+		text: textprefix
+	}));
+}
+
 export function GetDayOneData(collectibles) {
 	return GetDataAndHandleErrors("Day 1: ", () => {
 		var completed = [];
