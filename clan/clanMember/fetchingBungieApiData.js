@@ -89,17 +89,25 @@ export function GetProfileRecordsCore(response, dataname, neededValue, textprefi
 }
 
 export function GetDayOneData(collectibles) {
-	return GetDataAndHandleErrors("Day 1: ", () => ({
-		state: collectibles.profileCollectibles[2273453972].state % 2 != 1 ||
-			collectibles.characterCollectibles[3938759711].state % 2 != 1 ||
-			collectibles.profileCollectibles[3171386140].state % 2 != 1 ||
-			collectibles.profileCollectibles[1171206947].state % 2 != 1,
-		text: "Day 1: " +
-			(collectibles.profileCollectibles[2273453972].state % 2 != 1 ? "СГК " : "") +
-			(collectibles.characterCollectibles[3938759711].state % 2 != 1 ? "СС " : "") +
-			(collectibles.profileCollectibles[3171386140].state % 2 != 1 ? "КС " : "") +
-			(collectibles.profileCollectibles[1171206947].state % 2 != 1 ? "ПЖ " : "")
-	}));
+	return GetDataAndHandleErrors("Day 1: ", () => {
+		var completed = [];
+		var raids = [
+			{ id: 2172413746, name: "ХЧ"},
+			{ id: 2273453972, name: "СГК"},
+			{ id: 3938759711, name: "СС"},
+			{ id: 3171386140, name: "КС"},
+			{ id: 1171206947, name: "ПЖ"}
+		];
+		for (var raid of raids) {
+			if (collectibles.profileCollectibles[raid.id]?.state % 2 == 0) completed.push(raid.name);
+			if (collectibles.characterCollectibles[raid.id]?.state % 2 == 0) completed.push(raid.name);
+		}
+
+		return {
+			state: completed.length > 0,
+			text: "Day 1: " + completed.join(", ")
+		}
+	});
 }
 
 export function GetIfPersonOfInterest(data) {
