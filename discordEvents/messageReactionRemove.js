@@ -28,5 +28,8 @@ function HandleWishes(reaction, user) {
 		case "Хочу Выжить (Склеп Глубокого Камня без смертей)":
 			member.roles.remove(config.roles.wishes.dsc);
 			break;
+		case "Хочу Хрустальный Сервиз (Хрустальный чертог без смертей)":
+			member.roles.remove(config.roles.wishes.vog);
+			break;
 	}
 }
