@@ -120,9 +120,10 @@ export function GetDayOneData(collectibles) {
 
 export function GetIfPersonOfInterest(data) {
 	return GetDataAndHandleErrors("", () => ({
-		state: ((data.profileRecords[3448775736].state == 67 ? 1 : 0) +
-			(data.profileRecords[3804486505].state == 67 ? 1 : 0) +
-			(data.profileRecords[3185876102].state == 67 ? 1 : 0)) < 3,
+		state: ((data.profileRecords[3448775736].state % 2) +
+			(data.profileRecords[3804486505].state % 2) +
+			(data.profileRecords[3185876102].state % 2) +
+			(data.profileRecords[3114569402].state % 2)) < 4,
 		text: ""
 	}));
 }
