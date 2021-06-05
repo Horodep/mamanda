@@ -34,7 +34,7 @@ export function GetGuildmasterCommandsArray() {
     const off = 2;
     var array = [];
 
-    array.push(new GuildmasterCommand("!eververse", on, true, "геренация изображения товаров Эверверс в текущий канал;", async function (args, message) {
+    array.push(new GuildmasterCommand("!eververse", on, true, "генерация изображения товаров Эверверс в текущий канал;", async function (args, message) {
         await AsyncDrawEververse(message.channel);
     }));
     array.push(new GuildmasterCommand("!checksync", off, false, "_______________;", async function (args, message) { }));
