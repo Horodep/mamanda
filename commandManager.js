@@ -69,9 +69,12 @@ export class CommandManager {
             .setThumbnail('https://images-ext-1.discordapp.net/external/veZptUu_KDKmwtUJX5QT3QxESYCaRp4_k0XUwEQxubo/https/i.imgur.com/e9DIB8e.png')
             .setFooter("Horobot", "https://cdn.discordapp.com/avatars/543342030768832524/7da47eaca948d9874b66fc5884ca2d00.png")
             .setTimestamp()
-        this.commandList.filter(c => (c.constructor.name === constructorName && c.status == 0 && c.description != '')).forEach(command => {
-            embed.addField(command.usage, command.description);
-        });
+        this.commandList
+            .filter(c => (c.constructor.name === constructorName && c.status == 0 && c.description != ''))
+            .sort((a, b) => a.name > b.name ? 1 : -1)
+            .forEach(command => {
+                embed.addField(command.usage, command.description);
+            });
         return embed;
     }
 
