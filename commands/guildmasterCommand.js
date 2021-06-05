@@ -16,6 +16,7 @@ import { ClearRaidList, ForcedAddRaidMember, ForcedRemoveRaidMember } from "../d
 import { AsyncDrawXur } from "../drawing/drawXur.js";
 import { AsyncDrawEververse } from "../drawing/drawEververse.js";
 import { GiveVyakbanAndCreateEmbed } from "../discordFeatures/vyakManager.js";
+import { ShowMembersByRole } from "../discordFeatures/show/showMembersByRole.js";
 
 class GuildmasterCommand extends Command {
     Run(args, message) {
@@ -107,6 +108,9 @@ export function GetGuildmasterCommandsArray() {
     }));
     array.push(new GuildmasterCommand("!size", on, true, "количество стражей в составах;", async function (args, message) {
         await AsyncShowClanSize(message);
+    }));
+    array.push(new GuildmasterCommand("!showRole @tagRole", wip, false, "отобразить людей с ролью;", async function (args, message) { 
+        ShowMembersByRole(message.channel, args);
     }));
     array.push(new GuildmasterCommand("!sync", off, false, "_______________;", async function (args, message) { }));
     array.push(new GuildmasterCommand("!vyakban @DiscrordTag 1m/2h/3d причина", on, false, "выдача мьюта на определенное время;", async function (args, message) { 
