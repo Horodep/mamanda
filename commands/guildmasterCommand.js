@@ -117,7 +117,7 @@ export function GetGuildmasterCommandsArray() {
         GiveVyakbanAndCreateEmbed(message, args);
     }));
     array.push(new GuildmasterCommand("!watermelon @DiscrordTag", off, true, "проверка стража на абуз;", async function (args, message) { }));
-    array.push(new GuildmasterCommand("!xur", on, true, "геренация изображения товаров Зура в текущий канал;", async function (args, message) {
+    array.push(new GuildmasterCommand("!xur", on, true, "генерация изображения товаров Зура в текущий канал;", async function (args, message) {
         await AsyncDrawXur(message.channel);
     }));
 
