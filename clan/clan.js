@@ -1,6 +1,6 @@
 import { MessageEmbed } from "discord.js";
 import config from "../config.json";
-import { AsyncGetClanMembers } from "../http/bungieApi.js";
+import { AsyncGetClanMembers, AsyncGetCredentialTypesForTargetAccount } from "../http/bungieApi.js";
 import { AsyncGetShowAndSetRoles } from "./clanMember/roles.js";
 import { ClanMember } from "./clanMember/clanMember.js";
 import { ManifestManager } from "../manifest.js";
@@ -13,7 +13,16 @@ export async function AsyncGetFullApiClanMemberList() {
 	var members = [];
 	Array.prototype.push.apply(members, await AsyncGetClanMembers(config.clans[0].id));
 	Array.prototype.push.apply(members, await AsyncGetClanMembers(config.clans[1].id));
-	return members;
+	return UncensorNicknames(members);
+}
+
+async function UncensorNicknames(members) {
+	for (var i = 0; i < members.length; i++) {
+		if (members[i].destinyUserInfo.LastSeenDisplayName.includes("★★★")) {
+			var credentialTypes = AsyncGetCredentialTypesForTargetAccount(members[i].destinyUserInfo.membershipId);
+			members[i].destinyUserInfo.LastSeenDisplayName = credentialTypes[0].credentialDisplayName;
+		}
+	};
 }
 
 export async function AsyncShowClanSize(message) {
