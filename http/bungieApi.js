@@ -10,6 +10,11 @@ export async function AsyncGetClanMembers(clanId) {
 	return result?.Response?.results;
 }
 
+export async function AsyncGetCredentialTypesForTargetAccount(membershipId) {
+	var result = await AsyncRequestWithPromise('GET', `/Platform/User/GetCredentialTypesForTargetAccount/${membershipId}/`);
+	return result?.Response;
+}
+
 async function AsyncGetMemberData(membershipType, membershipId, componentsArray) {
 	var components = componentsArray.join(",");
 	var result = await AsyncRequestWithPromise('GET',
