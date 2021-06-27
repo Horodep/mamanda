@@ -1,5 +1,6 @@
 import { MessageEmbed } from "discord.js";
 import config from "../config.json";
+import { AsyncRefreshAuthToken } from "../http/httpCore.js";
 import { AsyncGetClanMembers, AsyncGetCredentialTypesForTargetAccount } from "../http/bungieApi.js";
 import { AsyncGetShowAndSetRoles } from "./clanMember/roles.js";
 import { ClanMember } from "./clanMember/clanMember.js";
@@ -13,10 +14,18 @@ export async function AsyncGetFullApiClanMemberList() {
 	var members = [];
 	Array.prototype.push.apply(members, await AsyncGetClanMembers(config.clans[0].id));
 	Array.prototype.push.apply(members, await AsyncGetClanMembers(config.clans[1].id));
-	return UncensorNicknames(members);
+	return members;
+}
+
+export async function AsyncGetFullApiClanMemberListUncensored() {
+	var members = [];
+	Array.prototype.push.apply(members, await AsyncGetClanMembers(config.clans[0].id));
+	Array.prototype.push.apply(members, await AsyncGetClanMembers(config.clans[1].id));
+	return await UncensorNicknames(members);
 }
 
 async function UncensorNicknames(members) {
+    await AsyncRefreshAuthToken();
 	for (var i = 0; i < members.length; i++) {
 		if (members[i].destinyUserInfo.LastSeenDisplayName.includes("★★★")) {
 			var credentialTypes = await AsyncGetCredentialTypesForTargetAccount(members[i].destinyUserInfo.membershipId);
@@ -34,17 +43,27 @@ export async function AsyncShowClanSize(message) {
 
 export async function AsyncGetMemberByDiscordName(discordName) {
 	var members = await AsyncGetFullApiClanMemberList();
+	var member = GetMemberByDiscordNameCore(members, discordName);
+	if (member != null) return member;
+	
+	var member = GetMemberByDiscordNameCore(await UncensorNicknames(members), discordName);
+	if (member != null) return member;
+
+	throw 'Игровой профиль не найден.';
+}
+
+function GetMemberByDiscordNameCore(members, discordName) {
 	for (var i = 0; i < members.length; i++) {
 		if (discordName.startsWith(members[i].destinyUserInfo.LastSeenDisplayName + " ") ||
 			discordName == members[i].destinyUserInfo.LastSeenDisplayName) {
 			return members[i];
 		}
 	};
-	throw 'Игровой профиль не найден.';
+	return null;
 }
 
 async function AsyncExecuteForEveryMember(timeout, callback) {
-	var members = await AsyncGetFullApiClanMemberList();
+	var members = await AsyncGetFullApiClanMemberListUncensored();
 	var i = 0;
 	var iteration = function () {
 		if (i < members.length) {

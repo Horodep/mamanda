@@ -1,10 +1,10 @@
 import { GetDiscordClanMemberList } from "../discordFeatures/getDiscordClanMemberList.js";
 import { CreateNicknameComparisonEmbed } from "../embeds/nicknamesEmbed.js";
-import { AsyncGetFullApiClanMemberList } from "./clan.js";
+import { AsyncGetFullApiClanMemberListUncensored } from "./clan.js";
 
 
 export async function AsyncCompareAndShowNicknames(channel, isReminder) {
-	var gameMembers = await AsyncGetFullApiClanMemberList();
+	var gameMembers = await AsyncGetFullApiClanMemberListUncensored();
 	var discordMembers = GetDiscordClanMemberList(channel.guild);
 
 	var discordList = [];
