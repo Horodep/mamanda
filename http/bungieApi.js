@@ -6,12 +6,12 @@ export async function AsyncGetGlobalAlerts() {
 }
 
 export async function AsyncGetClanMembers(clanId) {
-	var result = await AsyncRequestWithPromise('GET', `https://www.bungie.net/Platform/GroupV2/${clanId}/Members/`, true);
+	var result = await AsyncRequestWithPromise('GET', `https://www.bungie.net/Platform/GroupV2/${clanId}/Members/`);
 	return result?.Response?.results;
 }
 
 export async function AsyncGetCredentialTypesForTargetAccount(membershipId) {
-	var result = await AsyncRequestWithPromise('GET', `https://www.bungie.net/Platform/User/GetCredentialTypesForTargetAccount/${membershipId}/`);
+	var result = await AsyncRequestWithPromise('GET', `https://www.bungie.net/Platform/User/GetCredentialTypesForTargetAccount/${membershipId}/`, true);
 	return result?.Response;
 }
 

@@ -19,10 +19,11 @@ export async function AsyncGetFullApiClanMemberList() {
 async function UncensorNicknames(members) {
 	for (var i = 0; i < members.length; i++) {
 		if (members[i].destinyUserInfo.LastSeenDisplayName.includes("★★★")) {
-			var credentialTypes = AsyncGetCredentialTypesForTargetAccount(members[i].destinyUserInfo.membershipId);
+			var credentialTypes = await AsyncGetCredentialTypesForTargetAccount(members[i].destinyUserInfo.membershipId);
 			members[i].destinyUserInfo.LastSeenDisplayName = credentialTypes[0].credentialDisplayName;
 		}
 	};
+	return members;
 }
 
 export async function AsyncShowClanSize(message) {
