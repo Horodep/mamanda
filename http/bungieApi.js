@@ -11,7 +11,7 @@ export async function AsyncGetClanMembers(clanId) {
 }
 
 export async function AsyncGetCredentialTypesForTargetAccount(membershipId) {
-	var result = await AsyncRequestWithPromise('GET', `/Platform/User/GetCredentialTypesForTargetAccount/${membershipId}/`);
+	var result = await AsyncRequestWithPromise('GET', `https://www.bungie.net/Platform/User/GetCredentialTypesForTargetAccount/${membershipId}/`, true);
 	return result?.Response;
 }
 
