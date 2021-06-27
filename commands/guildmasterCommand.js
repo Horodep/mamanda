@@ -109,7 +109,7 @@ export function GetGuildmasterCommandsArray() {
     array.push(new GuildmasterCommand("!size", on, true, "количество стражей в составах;", async function (args, message) {
         await AsyncShowClanSize(message);
     }));
-    array.push(new GuildmasterCommand("!showRole @tagRole", wip, false, "отобразить людей с ролью;", async function (args, message) { 
+    array.push(new GuildmasterCommand("!showRole @tagRole", on, false, "отобразить людей с ролью;", async function (args, message) { 
         ShowMembersByRole(message.channel, args);
     }));
     array.push(new GuildmasterCommand("!sync", off, false, "_______________;", async function (args, message) { }));

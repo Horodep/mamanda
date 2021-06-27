@@ -215,6 +215,8 @@ export function GetDiscordMemberByMention(guild, discordMention) {
 }
 
 export async function AsyncGetClanMemberOnlineTime(message, days, discordMention, isDetailed) {
+    if (days.includes("<")) throw 'Данной командой можно посмотреть только свою статистику.';
+
     var discordName = discordMention == null
         ? message.member.displayName
         : GetDiscordMemberByMention(message.guild, discordMention).displayName;
