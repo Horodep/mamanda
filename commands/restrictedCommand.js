@@ -41,7 +41,7 @@ export function GetRestrictedCommandsArray() {
         ShowMedalsSummary(message.channel);
     }));
     array.push(new RestrictedCommand("!mymt", on, true, "проверка активности стража в голосовом чате (только своей);", async function (args, message) {
-        await AsyncGetClanMemberOnlineTime(message, (args.length > 1 ? args[1] : 7));
+        await AsyncGetClanMemberOnlineTime(message, (args.length > 1 ? args[1] : "7"));
     }));
     array.push(new RestrictedCommand("!myraids", on, false, "список рейдов, в которые записался страж;", async function (args, message) {
         await AsyncGetPlannedRaids(message, args.length > 1 ? args[1] : message.author.id)

@@ -73,7 +73,7 @@ export function GetGuildmasterCommandsArray() {
         message.channel.send(await CommandManager.GetStatus(true));
     }));
     array.push(new GuildmasterCommand("!membertime @DiscrordTag %days%", on, true, "выборка активности стража;\n_по умолчанию — 7 дней_;", async function (args, message) {
-        await AsyncGetClanMemberOnlineTime(message, (args.length > 2 ? args[2] : 7), (args.length > 1 ? args[1] : message.member.id), true)
+        await AsyncGetClanMemberOnlineTime(message, (args.length > 2 ? args[2] : "7"), (args.length > 1 ? args[1] : message.member.id), true)
     }));
     array.push(new GuildmasterCommand("!message channel_id текст", on, false, "отправить сообщение в канал;", async function (args, message) {
         SendCustomMessage(message.client, args);
