@@ -37,7 +37,7 @@ export function ShowLegendarySectors(channel) {
 function ParceDescritpion(data, emojiCache) {
 	var array = data.displayProperties.description.split("\n\n");
 
-	var burn = array.find(s => s.startsWith("Burn"))?.split(" ")[1].replace("++", "**+50%** ");
+	var burn = array.find(s => s.startsWith("Burn"))?.split(":")[1] + "**+50%** ";
 	var champions = array.find(s => s.includes("Champions: "))?.split(":")[1].replace(",", "/ ");
 	var modifiers = array.find(s => s.includes("Modifier"))?.split(":")[1];
 	var modifiers_master = array.find(s => s.startsWith("Master Modifier"))?.split(":")[1];
