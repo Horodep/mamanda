@@ -29,8 +29,8 @@ export function ShowLegendarySectors(channel) {
 		.setFooter("Grind them for all that fancy brand new magnificent exotic stuff!")
 		.setColor(0x00AE86)
 		.setTimestamp()
-		.addField("Legend (1310)\n" + legend.displayProperties.name.split(":")[0] + " (" + legendDestination + ")", legendDescription, true)
-		.addField("Master (1340)\n" + master.displayProperties.name.split(":")[0] + " (" + masterDestination + ")", masterDescription, true);
+		.addField("Legend (1320)\n" + legend.displayProperties.name.split(":")[0] + " (" + legendDestination + ")", legendDescription, true)
+		.addField("Master (1350)\n" + master.displayProperties.name.split(":")[0] + " (" + masterDestination + ")", masterDescription, true);
 	channel.send(embed);
 }
 
@@ -38,15 +38,14 @@ function ParceDescritpion(data, emojiCache) {
 	var array = data.displayProperties.description.split("\n\n");
 
 	var burn = array.find(s => s.startsWith("Burn"))?.split(" ")[1].replace("++", "**+50%** ");
-	var enemies = array.find(s => s.includes("Champions: "))?.split(" ")[0];
 	var champions = array.find(s => s.includes("Champions: "))?.split(":")[1].replace(",", "/ ");
 	var modifiers = array.find(s => s.includes("Modifier"))?.split(":")[1];
 	var modifiers_master = array.find(s => s.startsWith("Master Modifier"))?.split(":")[1];
-	var shields = array.find(s => s.startsWith("Shields"))?.split(":")[1] ?? SHIELDS_MAP[data.hash];
+	var shields = array.find(s => s.startsWith("Shields"))?.split(":")[1];
 
 	return "" +
 		"> Burn: " + FillWithEmoji(burn, emojiCache) + "\n" +
-		"> Enemies: " + enemies + " / " + FillWithEmoji(champions, emojiCache) + "\n" +
+		"> Champions: " + FillWithEmoji(champions, emojiCache) + "\n" +
 		"> Modifiers: " + modifiers + (modifiers_master ? ", " + modifiers_master : "") + "\n" +
 		"> Sheilds: " + FillWithEmoji(shields, emojiCache);
 }
@@ -54,8 +53,7 @@ function ParceDescritpion(data, emojiCache) {
 function FillWithEmoji(line, emojiCache) {
 	if (!line) return "not known";
 	return line
-		.replace("[", "")
-		.replace("]", "")
+		.replace(/\[[\w-]*\]/g, "")
 		.replace("", `${emojiCache.find(e => e.name == 'arc')} `)
 		.replace("", `${emojiCache.find(e => e.name == 'void')} `)
 		.replace("", `${emojiCache.find(e => e.name == 'solar')} `)
@@ -69,47 +67,42 @@ function FillWithEmoji(line, emojiCache) {
 		.replace("Unstoppable", `${emojiCache.find(e => e.name == 'unstoppable')} `);
 }
 
-const SECTOR_ROTATION_MAP = {    // legend                master
-	1: [3253890607, 1070981425], // The Quarry            Perdition
-	2: [1905792149, 3253890600], // Scavenger's Den       The Quarry
-	3: [548616650, 1905792146],  // Excavation Site XII   Scavenger's Den
-	4: [2936791996, 548616653],  // Exodus Garden 2A      Excavation Site XII
-	5: [3094493720, 2936791995], // Veles Labyrinth       Exodus Garden 2A
-	6: [2019961998, 3094493727], // The Empty Tank        Veles Labyrinth
-	7: [567131512, 2019961993],  // K1 Logistics          The Empty Tank
-	8: [2829206727, 567131519],  // K1 Communion          K1 Logistics
-	9: [184186581, 2829206720],  // K1 Crew Quarters      K1 Communion
-	10: [3911969233, 184186578], // K1 Revelation         K1 Crew Quarters
-	11: [912873277, 3911969238], // Concealed Void        K1 Revelation
-	12: [1648125541, 912873274], // Bunker E15            Concealed Void
-	0: [1070981430, 1648125538]  // Perdition             Bunker E15
+const SECTORS = {
+	THE_QUARRY:             {  LEGEND: 3253890607,     MASTER: 3253890600	},
+	SCAVENGERS_DEN:         {  LEGEND: 1905792149,     MASTER: 1905792146   },
+	EXCAVATION_SITE_XII:    {  LEGEND: 548616650,      MASTER: 548616653    },
+	EXODUS_GARDEN_2A:       {  LEGEND: 2936791996,     MASTER: 2936791995   },
+	VELES_LABYRINTH:        {  LEGEND: 3094493720,     MASTER: 3094493727   },
+	THE_EMPTY_TANK:         {  LEGEND: 2019961998,     MASTER: 2019961993   },
+	K1_LOGISTICS:           {  LEGEND: 567131512,      MASTER: 567131519    },
+	K1_COMMUNION:           {  LEGEND: 2829206727,     MASTER: 2829206720   },
+	K1_CREW_QUARTERS:       {  LEGEND: 184186581,      MASTER: 184186578    },
+	K1_REVELATION:          {  LEGEND: 3911969233,     MASTER: 3911969238   },
+	CONCEALED_VOID:         {  LEGEND: 912873277,      MASTER: 912873274    },
+	BUNKER_E15:             {  LEGEND: 1648125541,     MASTER: 1648125538   },
+	PERDITION:              {  LEGEND: 1070981430,     MASTER: 1070981425   },
+	BAY_OF_DROWNED_WISHES:  {  LEGEND: 660710127,      MASTER: 660710120    },
+	CHAMBER_OF_STARLIGHT:   {  LEGEND: 4206916275,     MASTER: 4206916276   },
+	APHELIONS_REST:         {  LEGEND: 189861013,      MASTER: 1898610131   }
+};
+
+const SECTOR_ROTATION_MAP = {
+	1:  [SECTORS.BAY_OF_DROWNED_WISHES.LEGEND, SECTORS.PERDITION.MASTER],
+	2:  [SECTORS.CHAMBER_OF_STARLIGHT.LEGEND,  SECTORS.BAY_OF_DROWNED_WISHES.MASTER],
+	3:  [SECTORS.APHELIONS_REST.LEGEND,        SECTORS.CHAMBER_OF_STARLIGHT.MASTER],
+	4:  [SECTORS.THE_EMPTY_TANK.LEGEND,        SECTORS.APHELIONS_REST.MASTER],
+	5:  [SECTORS.K1_LOGISTICS.LEGEND,          SECTORS.THE_EMPTY_TANK.MASTER],
+	6:  [SECTORS.K1_COMMUNION.LEGEND,          SECTORS.K1_LOGISTICS.MASTER],
+	7:  [SECTORS.K1_CREW_QUARTERS.LEGEND,      SECTORS.K1_COMMUNION.MASTER],
+	8:  [SECTORS.K1_REVELATION.LEGEND,         SECTORS.K1_CREW_QUARTERS.MASTER],
+	9:  [SECTORS.CONCEALED_VOID.LEGEND,        SECTORS.K1_REVELATION.MASTER],
+	10: [SECTORS.BUNKER_E15.LEGEND,            SECTORS.CONCEALED_VOID.MASTER],
+	0:  [SECTORS.PERDITION.LEGEND,             SECTORS.BUNKER_E15.MASTER]
 }; 
 
 const SECTOR_REWARD_ROTATION_MAP = {
-	0: [1387420892, 2686128774],
-	1: [2850782006, 2679019194],
-	2: [1572351682, 247000308],
-	3: [176055472, 256080248]
-};
-
-const SHIELDS_MAP = {
-	912873277: "Void, Solar, Arc",   // Legend: Concealed Void
-	1648125541: "Void, Solar",       // Legend: Bunker E15
-	1070981430: "Void, Arc",         // Legend: Perdition
-	2936791996: "Void",              // Legend: Exodus Garden 2A
-	3094493720: "Solar, Arc",        // Legend: Veles Labyrinth
-	567131512: "Solar, Arc",         // Legend: K1 Logistics,
-	2829206727: "Void, Solar",       // Legend: K1 Communion
-	184186581: "Solar",              // Legend: K1 Crew Quarters
-	3911969233: "Arc",               // Legend: K1 Revelation
-
-	912873274: "Void, Solar",        // Master: Concealed Void
-	1648125538: "Void",              // Master: Bunker E15
-	1070981425: "Void, Arc",         // Master: Perdition
-	2936791995: "Void",              // Master: Exodus Garden 2A
-	3094493727: "Solar, Arc - ???",  // Master: Veles Labyrinth
-	567131519: "Solar, Arc",         // Master: K1 Logistics,
-	2829206720: "Solar",             // Master: K1 Communion
-	184186578: "Solar",              // Master: K1 Crew Quarters
-	3911969238: "Arc",               // Master: K1 Revelation
+	0: [176055472, 256080248],
+	1: [1387420892, 2686128774],
+	2: [2850782006, 2679019194],
+	3: [1572351682, 247000308]
 };
