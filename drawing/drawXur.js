@@ -36,7 +36,7 @@ export async function AsyncDrawXur(channel) {
     const line_spacing = 5;
 
     var image = await jimp.read(FetchFullPath('.data/templates/xur.png'));
-    for (var i = 0; i < vendorItemIndexes.length; i++) {
+    for (var i = 0; i < 4; i++) {
         var vendorItemIndex = vendorItemIndexes[i];
         var stats = allStats[vendorItemIndex].stats;
         var item = sales[vendorItemIndex];
