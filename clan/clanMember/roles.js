@@ -103,7 +103,8 @@ async function AsyncGetRolesData(membershipType, membershipId) {
 		], "«Избранный»", 67);
 	data.season.season14 = BungieApiLogic.GetNodeDataFiltered(records, 3032254529, [], [
 		], "«Сплайсер»");
-	data.season.season15 = { state: false, text: "[ЗАСЕКРЕЧЕНО]: 0/??" };
+	data.season.season15 = BungieApiLogic.GetNodeDataFiltered(records, 810154850, [], [
+		], "«Исчезновение»");
 	data.extra.poi = BungieApiLogic.GetIfPersonOfInterest(records);
 	data.extra.legacy.season8 = BungieApiLogic.GetNodeData(records, 955166374, "Undying");
 	data.extra.legacy.season9 = BungieApiLogic.GetNodeData(records, 955166375, "Dawn");
