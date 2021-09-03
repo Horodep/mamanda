@@ -10,8 +10,8 @@ export function ShowLegendarySectors(channel) {
 	var emojiServer = channel.client.guilds.cache.get(config.guilds.emojis);
 	var emojiCache = emojiServer.emojis.cache;
 
-	var legend = ManifestManager.GetActivityData(SECTOR_ROTATION_MAP[counter % 13][0], true);
-	var master = ManifestManager.GetActivityData(SECTOR_ROTATION_MAP[counter % 13][1], true);
+	var legend = ManifestManager.GetActivityData(SECTOR_ROTATION_MAP[counter % 11][0], true);
+	var master = ManifestManager.GetActivityData(SECTOR_ROTATION_MAP[counter % 11][1], true);
 	var legendReward = ManifestManager.GetItemData(SECTOR_REWARD_ROTATION_MAP[counter % 4][0], true).displayProperties;
 	var masterReward = ManifestManager.GetItemData(SECTOR_REWARD_ROTATION_MAP[counter % 4][1], true).displayProperties;
 	var legendDestination = ManifestManager.GetDestinationData(legend.destinationHash)?.displayProperties?.name;
