@@ -1,10 +1,10 @@
 import { GetDiscordClanMemberList } from "../discordFeatures/getDiscordClanMemberList.js";
 import { CreateNicknameComparisonEmbed } from "../embeds/nicknamesEmbed.js";
-import { AsyncGetFullApiClanMemberListUncensored } from "./clan.js";
+import { AsyncGetFullApiClanMemberList } from "./clan.js";
 
 
 export async function AsyncCompareAndShowNicknames(channel, isReminder) {
-	var gameMembers = await AsyncGetFullApiClanMemberListUncensored();
+	var gameMembers = await AsyncGetFullApiClanMemberList();
 	var discordMembers = GetDiscordClanMemberList(channel.guild);
 
 	var discordList = [];
@@ -13,8 +13,8 @@ export async function AsyncCompareAndShowNicknames(channel, isReminder) {
 
 	discordMembers.forEach(function (discordMember) {
 		if (gameMembers.filter(
-				gameMember => (discordMember.displayName.startsWith(gameMember.destinyUserInfo.LastSeenDisplayName + " ")
-							|| discordMember.displayName == gameMember.destinyUserInfo.LastSeenDisplayName)).length == 0) {
+				gameMember => (discordMember.displayName.startsWith(gameMember.destinyUserInfo.bungieGlobalDisplayName + " ")
+							|| discordMember.displayName == gameMember.destinyUserInfo.bungieGlobalDisplayName)).length == 0) {
 			if (discordMember.roles.cache.find(role => role.name === "PSN")) {
 				discordPsnList.push("<@" + discordMember.id + ">");
 			} else {
@@ -24,9 +24,11 @@ export async function AsyncCompareAndShowNicknames(channel, isReminder) {
 	});
 
 	gameMembers.forEach(function (gameMember) {
-		if (discordMembers.filter(discordMember => (discordMember.displayName.startsWith(gameMember.destinyUserInfo.LastSeenDisplayName + " ")
-								|| discordMember.displayName == gameMember.destinyUserInfo.LastSeenDisplayName)).length == 0) {
-			gameList.push(gameMember.destinyUserInfo.LastSeenDisplayName);
+		if (discordMembers.filter(discordMember => (discordMember.displayName.startsWith(gameMember.destinyUserInfo.bungieGlobalDisplayName + " ")
+								|| discordMember.displayName == gameMember.destinyUserInfo.bungieGlobalDisplayName)).length == 0) {
+			gameList.push(gameMember.destinyUserInfo.bungieGlobalDisplayName != "" 
+						? gameMember.destinyUserInfo.bungieGlobalDisplayName 
+						: "old: "+gameMember.destinyUserInfo.displayName);
 		}
 	});
 

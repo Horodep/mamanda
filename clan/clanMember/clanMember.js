@@ -29,10 +29,7 @@ export class ClanMember {
         return this.#destinyUserInfo.membershipId;
     }
     get displayName() {
-        if (this.#destinyUserInfo.LastSeenDisplayName != null) {
-            return this.#destinyUserInfo.LastSeenDisplayName;
-        }
-        return this.#destinyUserInfo.displayName;
+        return this.#destinyUserInfo.bungieGlobalDisplayName;
     }
     get characterIds() {
         return this.#characterIds;

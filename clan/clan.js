@@ -54,8 +54,8 @@ export async function AsyncGetMemberByDiscordName(discordName) {
 
 function GetMemberByDiscordNameCore(members, discordName) {
 	for (var i = 0; i < members.length; i++) {
-		if (discordName.startsWith(members[i].destinyUserInfo.LastSeenDisplayName + " ") ||
-			discordName == members[i].destinyUserInfo.LastSeenDisplayName) {
+		if (discordName.startsWith(members[i].destinyUserInfo.bungieGlobalDisplayName + " ") ||
+			discordName == members[i].destinyUserInfo.bungieGlobalDisplayName) {
 			return members[i];
 		}
 	};
@@ -63,7 +63,7 @@ function GetMemberByDiscordNameCore(members, discordName) {
 }
 
 async function AsyncExecuteForEveryMember(timeout, callback) {
-	var members = await AsyncGetFullApiClanMemberListUncensored();
+	var members = await AsyncGetFullApiClanMemberList();
 	var i = 0;
 	var iteration = function () {
 		if (i < members.length) {
