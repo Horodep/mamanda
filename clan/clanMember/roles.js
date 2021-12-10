@@ -139,13 +139,13 @@ function SetRoles(clanMember, characterDetails, medals) {
 	CheckAndProcessRole(discordMember, config.roles.medals.specific.day1, medals.raids.day1.state, false);
 	CheckAndProcessRole(discordMember, config.roles.medals.specific.poi, medals.extra.poi.state, false);
 
-	CheckAndProcessRoleBlock(discordMember, config.roles.medals.category_first_role.raids, 4, medals.raids);
+	CheckAndProcessRoleBlock(discordMember, config.roles.medals.category_first_role.raids, 5, medals.raids);
 	CheckAndProcessRoleBlock(discordMember, config.roles.medals.category_first_role.seals, 5, medals.seals);
 	CheckAndProcessRoleBlock(discordMember, config.roles.medals.category_first_role.legacy_seals, 4, medals.legacy_seals);
 	CheckAndProcessRoleBlock(discordMember, config.roles.medals.category_first_role.locations, 3, medals.locations);
 	CheckAndProcessRoleBlock(discordMember, config.roles.medals.category_first_role.triumphs, 3, medals.triumphs);
 	CheckAndProcessRoleBlock(discordMember, config.roles.medals.category_first_role.legacy_triumphs, 3, medals.legacy_triumphs);
-	CheckAndProcessRoleBlock(discordMember, config.roles.medals.category_first_role.season, 2, medals.season);
+	CheckAndProcessRoleBlock(discordMember, config.roles.medals.category_first_role.season, 4, medals.season);
 	CheckAndProcessRoleBlock(discordMember, config.roles.medals.category_first_role.extralegacy, 5, medals.extra.legacy);
 
 	if (discordMember.roles.cache.find(role => role.id == config.roles.guildleader) != null) return;
