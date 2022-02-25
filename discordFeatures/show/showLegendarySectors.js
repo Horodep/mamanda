@@ -16,21 +16,19 @@ export function ShowLegendarySectors(channel) {
 	var masterReward = ManifestManager.GetItemData(SECTOR_REWARD_ROTATION_MAP[counter % 4][1], true).displayProperties;
 	var legendDestination = ManifestManager.GetDestinationData(legend.destinationHash)?.displayProperties?.name;
 	var masterDestination = ManifestManager.GetDestinationData(master.destinationHash)?.displayProperties?.name;
-	var legendDescription =
-		legendReward.name.replace("IF SOLO - ", "Solo: ").replace(" (Rare)", "") + '\n' +
-		ParceDescritpion(legend, emojiCache);
-	var masterDescription =
-		masterReward.name.replace("IF SOLO - ", "Solo: ").replace(" (Common)", "") + '\n' +
-		ParceDescritpion(master, emojiCache);
+	var legendRewardText = legendReward.name.replace("IF SOLO - ", "Solo: ").replace(" (Rare)", "");
+	var legendDescription = ParceDescritpion(legend, emojiCache);
+	var masterDescription = ParceDescritpion(master, emojiCache);
 	ManifestManager.CleanCache();
 
 	var embed = new MessageEmbed()
-		.setAuthor("Legendary sectors")
+		.setAuthor(legend.displayProperties.name.split(":")[0] + " (" + legendDestination + ")")
+		.setDescription(legendRewardText)
 		.setFooter("Grind them for all that fancy brand new magnificent exotic stuff!")
 		.setColor(0x00AE86)
 		.setTimestamp()
-		.addField("Legend (1320)\n" + legend.displayProperties.name.split(":")[0] + " (" + legendDestination + ")", legendDescription, true)
-		.addField("Master (1350)\n" + master.displayProperties.name.split(":")[0] + " (" + masterDestination + ")", masterDescription, true);
+		.addField("Legend (1550)", legendDescription, true)
+		.addField("Master (1580)", masterDescription, true);
 	channel.send(embed);
 }
 
@@ -83,26 +81,30 @@ const SECTORS = {
 	PERDITION:              {  LEGEND: 1070981430,     MASTER: 1070981425   },
 	BAY_OF_DROWNED_WISHES:  {  LEGEND: 660710127,      MASTER: 660710120    },
 	CHAMBER_OF_STARLIGHT:   {  LEGEND: 4206916275,     MASTER: 4206916276   },
-	APHELIONS_REST:         {  LEGEND: 1898610132,     MASTER: 1898610131   }
+	APHELIONS_REST:         {  LEGEND: 1898610132,     MASTER: 1898610131   },
+	METAMORPHOSIS:          {  LEGEND: 3678847129,     MASTER: 3678847134   },
+	EXTRACTION:             {  LEGEND: 145221019,      MASTER: 145221020    },
+	SEPULCHER:              {  LEGEND: 480864726,      MASTER: 480864721    },
+	TOWER:                             1502633527
 };
 
 const SECTOR_ROTATION_MAP = {
-	10: [SECTORS.BAY_OF_DROWNED_WISHES.LEGEND, SECTORS.PERDITION.MASTER],
-	0:  [SECTORS.CHAMBER_OF_STARLIGHT.LEGEND,  SECTORS.BAY_OF_DROWNED_WISHES.MASTER],
-	1:  [SECTORS.APHELIONS_REST.LEGEND,        SECTORS.CHAMBER_OF_STARLIGHT.MASTER],
-	2:  [SECTORS.THE_EMPTY_TANK.LEGEND,        SECTORS.APHELIONS_REST.MASTER],
-	3:  [SECTORS.K1_LOGISTICS.LEGEND,          SECTORS.THE_EMPTY_TANK.MASTER],
-	4:  [SECTORS.K1_COMMUNION.LEGEND,          SECTORS.K1_LOGISTICS.MASTER],
-	5:  [SECTORS.K1_CREW_QUARTERS.LEGEND,      SECTORS.K1_COMMUNION.MASTER],
-	6:  [SECTORS.K1_REVELATION.LEGEND,         SECTORS.K1_CREW_QUARTERS.MASTER],
-	7:  [SECTORS.CONCEALED_VOID.LEGEND,        SECTORS.K1_REVELATION.MASTER],
-	8:  [SECTORS.BUNKER_E15.LEGEND,            SECTORS.CONCEALED_VOID.MASTER],
-	9:  [SECTORS.PERDITION.LEGEND,             SECTORS.BUNKER_E15.MASTER]
+	10: [SECTORS.TOWER,                        SECTORS.TOWER],
+	0:  [SECTORS.TOWER,                        SECTORS.TOWER],
+	1:  [SECTORS.TOWER,                        SECTORS.TOWER],
+	2:  [SECTORS.TOWER,                        SECTORS.TOWER],
+	3:  [SECTORS.TOWER,    	                   SECTORS.TOWER],
+	4:  [SECTORS.TOWER,                        SECTORS.TOWER],
+	5:  [SECTORS.VELES_LABYRINTH.LEGEND,       SECTORS.VELES_LABYRINTH.MASTER],
+	6:  [SECTORS.EXODUS_GARDEN_2A.LEGEND,      SECTORS.EXODUS_GARDEN_2A.MASTER],
+	7:  [SECTORS.APHELIONS_REST.LEGEND,        SECTORS.APHELIONS_REST.MASTER],
+	8:  [SECTORS.BAY_OF_DROWNED_WISHES.LEGEND, SECTORS.BAY_OF_DROWNED_WISHES.MASTER],
+	9:  [SECTORS.CHAMBER_OF_STARLIGHT.LEGEND,  SECTORS.CHAMBER_OF_STARLIGHT.MASTER]
 }; 
 
 const SECTOR_REWARD_ROTATION_MAP = {
-	0: [176055472, 256080248],
-	1: [1387420892, 2686128774],
-	2: [2850782006, 2679019194],
-	3: [1572351682, 247000308]
+	0: [2850782006, 247000308],
+	1: [1572351682, 256080248],
+	2: [176055472, 2686128774],
+	3: [1387420892, 2679019194]
 };
