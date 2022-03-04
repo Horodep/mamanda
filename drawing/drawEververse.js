@@ -1,5 +1,5 @@
 import jimp from "jimp";
-import config from "../config.json";
+import config from "../config.json" assert {type: "json"};
 import { AsyncGetEververseData, AsyncGetProfileData } from "../http/bungieApi.js";
 import { ManifestManager } from "../manifest.js";
 import { AsyncRefreshAuthToken } from "../http/httpCore.js";

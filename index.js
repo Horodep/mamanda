@@ -1,6 +1,6 @@
 // https://discordjs.guide/additional-info/changes-in-v12.html
 import Discord from "discord.js";
-import config from "./config.json";
+import config from "./config.json" assert {type: "json"};
 // events
 import { Message } from "./discordEvents/message.js";
 import { MessageDelete } from "./discordEvents/messageDelete.js";

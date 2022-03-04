@@ -1,5 +1,5 @@
-import config from "./config.json";
-import nodePackage from "./package.json";
+import config from "./config.json" assert {type: "json"};
+import nodePackage from "./package.json" assert {type: "json"};
 import { execSync } from "child_process";
 import { MessageEmbed } from "discord.js";
 import { AsyncGetGlobalAlerts } from "./http/bungieApi.js";

@@ -1,5 +1,5 @@
 import { Command } from "./command.js";
-import config from "../config.json";
+import config from "../config.json" assert {type: "json"};
 
 import { NewAuthToken } from "../http/httpCore.js"
 

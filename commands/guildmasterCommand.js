@@ -1,5 +1,5 @@
 import { Command } from "./command.js";
-import config from "../config.json";
+import config from "../config.json" assert {type: "json"};
 
 import { CommandManager } from "../commandManager.js"
 import { AsyncShowClanSize, SetRolesToEveryMember } from "../clan/clan.js"

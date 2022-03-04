@@ -1,5 +1,5 @@
 import { MessageEmbed } from "discord.js";
-import config from "../config.json";
+import config from "../config.json" assert {type: "json"};
 import { AsyncRefreshAuthToken } from "../http/httpCore.js";
 import { AsyncGetClanMembers, AsyncGetCredentialTypesForTargetAccount } from "../http/bungieApi.js";
 import { AsyncGetShowAndSetRoles } from "./clanMember/roles.js";

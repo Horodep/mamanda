@@ -1,4 +1,4 @@
-import config from "../../config.json";
+import config from "../../config.json" assert {type: "json"};
 
 export function LogRolesGranting(displayName, isDiscordMemberFound, medals) {
 	if (medals == null) {

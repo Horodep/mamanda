@@ -1,4 +1,4 @@
-import config from "../config.json";
+import config from "../config.json" assert {type: "json"};
 import { ClanMember, AsyncGetAllActivities } from "./clanMember/clanMember.js";
 import { AsyncGetClanVoiceSummary } from "../http/sql.js";
 import { SendPrivateMessagesToArray } from "../discordFeatures/messaging.js";

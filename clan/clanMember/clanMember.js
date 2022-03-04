@@ -2,7 +2,7 @@ import { MessageEmbed } from "discord.js";
 import { AsyncGetActivitiesFromApi, AsyncGetCoreMemberData, AsyncGetProfileData } from "../../http/bungieApi.js";
 import { AsyncGetMemberByDiscordName } from "../clan.js";
 import { AsyncGetClanVoiceSummary, AsyncGetMemberDetailedVoice } from "../../http/sql.js"
-import config from "../../config.json";
+import config from "../../config.json" assert {type: "json"};
 
 //TODO@Horodep: #49 Refactor ClanMember ASAP
 export class ClanMember {

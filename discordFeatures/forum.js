@@ -1,5 +1,5 @@
 import fs from "fs";
-import config from "../config.json";
+import config from "../config.json" assert {type: "json"};
 import { FetchFullPath } from "../directories.js";
 
 export function GiveForumRole(message) {

@@ -1,4 +1,4 @@
-import config from "../config.json";
+import config from "../config.json" assert {type: "json"};
 import { CatchError } from "../catcherror.js";
 
 export async function AsyncMessageReactionRemove(reaction, user) {

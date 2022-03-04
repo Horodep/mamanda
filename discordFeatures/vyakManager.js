@@ -1,6 +1,6 @@
 import { MessageEmbed } from "discord.js";
 import { GetDiscordMemberByMention } from "../clan/clanMember/clanMember.js";
-import config from "../config.json";
+import config from "../config.json" assert {type: "json"};
 
 export function GiveVyakbanAndCreateEmbed(message, args) {
     if (args.length < 4) throw "Указано недостаточно данных.";

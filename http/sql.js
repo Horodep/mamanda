@@ -1,6 +1,6 @@
 import pkg from 'pg';
 const { Pool } = pkg;
-import config from "../config.json";
+import config from "../config.json" assert {type: "json"};
 
 const pool = new Pool({
     host: config.sql.host,

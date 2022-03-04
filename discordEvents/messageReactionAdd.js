@@ -1,4 +1,4 @@
-import config from "../config.json";
+import config from "../config.json" assert {type: "json"};
 import { AddRaidMember, RemoveRaidMember, KickRaidMember, CancelRaid } from "../discordFeatures/raid/raid.js";
 import { CatchError } from "../catcherror.js";
 
