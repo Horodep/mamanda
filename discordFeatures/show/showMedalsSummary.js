@@ -23,7 +23,7 @@ export function ShowMedalsSummary(channel) {
 
 	for (let i = 35; i >= 6; i--) {
 		var text = sorted[i].map(m => "<@" + m + ">").join("\n");
-		var symbol = i < 7 ? "`📘`" : i < 16 ? "`📒`" : i < 24 ? "`📙`" : "`📕`";
+		var symbol = i < 8 ? "`📘`" : i < 17 ? "`📒`" : i < 26 ? "`📙`" : "`📕`";
 
 		if (text.length > 0)
 			embed.addField(symbol + " " + i + " " + symbol, text, true);

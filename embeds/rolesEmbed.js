@@ -10,7 +10,7 @@ export function CreateMemberRolesEmbed(clanMember, rolesData) {
 		const embed = new MessageEmbed()
 			.setAuthor(clanMember.displayName + " 💠" + medalsSum + "💠")
 			.setColor(0x00AE86)
-			.setFooter("ПВП медали выдают гм-ы; ранжирование ролей: 7/16/24 • id: " + clanMember.discordMemberId,
+			.setFooter("ПВП медали выдают гм-ы; ранжирование ролей: 8/17/26 • id: " + clanMember.discordMemberId,
 				"https://cdn.discordapp.com/avatars/543342030768832524/7da47eaca948d9874b66fc5884ca2d00.png")
 			.addField("Рейды", EmbedFormField(rolesData.medals.raids), true)
 			.addField("Печати", EmbedFormField(rolesData.medals.seals), true)
