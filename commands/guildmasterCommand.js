@@ -96,10 +96,10 @@ export function GetGuildmasterCommandsArray() {
     array.push(new GuildmasterCommand("!qq", on, false, "список анкет стражей в очереди;", async function (args, message) {
         await AsyncShowQueueReqestsList(message);
     }));
-    array.push(new GuildmasterCommand("!raidadd message_id member_id", on, false, "добавление в рейд стража;", async function (args, message) {
+    array.push(new GuildmasterCommand("!raidadd message_id member_id", on, false, "добавление в рейд стража; требуется писать в канал рейдов;", async function (args, message) {
         ForcedAddRaidMember(message, args);
     }));
-    array.push(new GuildmasterCommand("!raidkick message_id member_id", on, false, "исключение из рейда стража, пример: https://media.discordapp.net/attachments/515244455033438209/626795525710020638/unknown.png;", async function (args, message) {
+    array.push(new GuildmasterCommand("!raidkick message_id member_id", on, false, "исключение из рейда стража, требуется писать в канал рейдов; пример: https://media.discordapp.net/attachments/515244455033438209/626795525710020638/unknown.png;", async function (args, message) {
         ForcedRemoveRaidMember(message, args);
     }));
     array.push(new GuildmasterCommand("!reset", off, true, "генерация текстового еженедельного ресета в текущий канал;", async function (args, message) { }));
