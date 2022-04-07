@@ -32,7 +32,7 @@ function HandleWishes(reaction, user) {
 			member.roles.remove(config.roles.wishes.vog);
 			break;
 		case "Хочу Глубинное Возрождение (Клятва Послушника без смертей)":
-			member.roles.add(config.roles.wishes.vod);
+			member.roles.remove(config.roles.wishes.vod);
 			break;
 	}
 }
