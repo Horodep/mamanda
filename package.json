@@ -1,6 +1,6 @@
 {
   "name": "mamanda",
-  "version": "1.9.69",
+  "version": "1.9.70",
   "description": "Discord bot for clan Aurora in game Destiny 2",
   "main": "index.js",
   "type": "module",
