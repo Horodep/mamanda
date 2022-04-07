@@ -77,6 +77,9 @@ function HandleWishes(reaction, user) {
 		case "Хочу Хрустальный Сервиз (Хрустальный чертог без смертей)":
 			member.roles.add(config.roles.wishes.vog);
 			break;
+		case "Хочу Глубинное Возрождение (Клятва Послушника без смертей)":
+			member.roles.add(config.roles.wishes.vod);
+			break;	
 		case "Хочу быть ГМ-ом. ":
 			suggestionsChannel.send("<@" + user.id + "> хочет стать ГМ-ом.");
 			break;

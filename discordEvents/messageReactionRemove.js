@@ -31,5 +31,8 @@ function HandleWishes(reaction, user) {
 		case "Хочу Хрустальный Сервиз (Хрустальный чертог без смертей)":
 			member.roles.remove(config.roles.wishes.vog);
 			break;
+		case "Хочу Глубинное Возрождение (Клятва Послушника без смертей)":
+			member.roles.add(config.roles.wishes.vod);
+			break;
 	}
 }
