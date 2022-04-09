@@ -61,11 +61,11 @@ function SumCrucible(discord_member) {
 	if (discord_member == null)
 		return 0;
 	var pvp_top_role = discord_member.guild.roles.cache.find(role => role.id == config.roles.medals.category_first_role.crucible);
-	return (discord_member.roles.cache.find(role => role.position == (pvp_top_role.position - 0)) != null ? 3 : 0) +
-		(discord_member.roles.cache.find(role => role.position == (pvp_top_role.position - 1)) != null ? 1 : 0) +
-		(discord_member.roles.cache.find(role => role.position == (pvp_top_role.position - 2)) != null ? 2 : 0) +
-		(discord_member.roles.cache.find(role => role.position == (pvp_top_role.position - 3)) != null ? 3 : 0) +
-		(discord_member.roles.cache.find(role => role.position == (pvp_top_role.position - 4)) != null ? 2 : 0) +
-		(discord_member.roles.cache.find(role => role.position == (pvp_top_role.position - 5)) != null ? 3 : 0) +
-		(discord_member.roles.cache.find(role => role.position == (pvp_top_role.position - 6)) != null ? 4 : 0);
+
+	for (let i = 0; i < 9; i++) {
+		var role = discord_member.roles.cache.find(role => role.position == (pvp_top_role.position - i));
+		if (role != null)
+			return role.name.match(/💠/g)?.length ?? 0;
+	}
+	return 0;
 }
