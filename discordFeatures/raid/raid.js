@@ -76,7 +76,7 @@ export function ForcedAddRaidMember(message, args) {
         AddRaidMember(msg, { id: args[2] });
         var member = message.guild.members.cache.find(user => user.id == args[2]);
         setTimeout(() => { message.delete(); }, 5000);
-        var data = GetRaidDataFromEmbed(msg.embed[0]);
+        var data = GetRaidDataFromEmbed(msg.embeds[0]);
         SendPrivateMessageToMember(member, FormRaidInfoPrivateMessage(data, "Гильдмастер добавил вас в сбор активности."));
     });
 }
