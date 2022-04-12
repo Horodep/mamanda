@@ -14,6 +14,8 @@ export function Message(message){
 
 		if (!message.content.startsWith("!")) return;
 
+		if (config.credentials.is_production == (config.channels.development == message.channel.id)) return;
+
 		console.log((message.member != null ? message.member.displayName : message.author.username), message.content);
 		
 		var args = message.content.split(' ').filter(item => item);
