@@ -25,6 +25,7 @@ The most important features are voice control and roles granting.
         "client_secret" : "###########################################",
         "client_id"     : "00000",
         "directory"     : "/home/user/",
+        "is_production" : true,
         "game_defaults" : {
             "membershipType" : "3",
             "membershipId"   : "0000000000000000000",
@@ -126,6 +127,8 @@ The most important features are voice control and roles granting.
         "sandbox"       : "000000000000000000",
         "logging"       : "000000000000000000",
         "clankick"      : "000000000000000000",
+        "vyakbans"      : "000000000000000000",
+        "development"   : "000000000000000000",
 
         "afk"           : "000000000000000000",
         
