@@ -52,7 +52,7 @@ export function KickRaidMember(message, user, reaction) {
 
     if (userId?.length > 0) {
         var member = message.guild.members.cache.find(user => user.id == userId);
-        SendPrivateMessageToMember(member, FormCancelationMessage(data, "Рейд лидер отказался от вашего участия в рейде, в который вы записывались."));
+        SendPrivateMessageToMember(member, FormRaidInfoPrivateMessage(data, "Автор сбора отказался от вашего участия в активности, в которую вы записывались."));
     }
     message.edit(CreateRaidEmbed(data));
 }
@@ -65,7 +65,7 @@ export function CancelRaid(message, user) {
     }
     data.members.forEach(function (discord_id) {
         var member = message.guild.members.cache.find(user => user.id == discord_id);
-        SendPrivateMessageToMember(member, FormCancelationMessage(data, "Рейд на который вы записывались был отменен рейд лидером."));
+        SendPrivateMessageToMember(member, FormRaidInfoPrivateMessage(data, "Активность на которую вы записывались была отменена автором сбора."));
     });
     setTimeout(() => { message.delete(); }, 150);
 }
@@ -74,7 +74,10 @@ export function ForcedAddRaidMember(message, args) {
     if (args.length < 3) throw 'Указаны не все параметры';
     message.channel.messages.fetch(args[1]).then(msg => {
         AddRaidMember(msg, { id: args[2] });
+        var member = message.guild.members.cache.find(user => user.id == args[2]);
         setTimeout(() => { message.delete(); }, 5000);
+        var data = GetRaidDataFromEmbed(msg.embed[0]);
+        SendPrivateMessageToMember(member, FormRaidInfoPrivateMessage(data, "Гильдмастер добавил вас в сбор активности."));
     });
 }
 
@@ -85,7 +88,7 @@ export function ForcedRemoveRaidMember(message, args) {
         var member = message.guild.members.cache.find(user => user.id == args[2]);
         setTimeout(() => { message.delete(); }, 5000);
         var data = GetRaidDataFromEmbed(msg.embeds[0]);
-        SendPrivateMessageToMember(member, FormCancelationMessage(data, "Гильдмастер отказался от вашего участия в рейде, в который вы записывались."));
+        SendPrivateMessageToMember(member, FormRaidInfoPrivateMessage(data, "Гильдмастер отказался от вашего участия в активности, в которую вы записывались."));
     });
 }
 
@@ -220,10 +223,10 @@ function CreateRaidEmbed(data, customTimestamp) {
     return embed;
 }
 
-function FormCancelationMessage(data, message) {
+function FormRaidInfoPrivateMessage(data, message) {
     return `${message}
-> Рейд: **${data.raidName}**
+> Активность: **${data.raidName}**
 > Дата проведения: **${data.dateString}**
-> Рейд лидер: **${data.author.displayName}**`;
+> Автор сбора: **${data.author.displayName}**`;
 }
 
