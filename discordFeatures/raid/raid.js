@@ -100,7 +100,6 @@ export function ClearRaidList(client) {
     raid_channel.messages.fetch({ limit: 50 }).then(messages => {
         var today = new Date();
         console.log("now:", today);
-        var tagMessage;
         messages.sort((a, b) => a.id > b.id ? 1 : -1).forEach(message => {
             if (message.pinned) return;
             console.log(message.content, message.author.bot);
@@ -110,8 +109,7 @@ export function ClearRaidList(client) {
                 return;
             }
             if (message.content != "") {
-                if (tagMessage) tagMessage.delete();
-                tagMessage = message;
+                message.delete();
             } else {
                 var data = GetRaidDataFromEmbed(message.embeds[0]);
 
@@ -121,9 +119,6 @@ export function ClearRaidList(client) {
 
                     history_channel.send(CreateRaidEmbed(data, message.createdAt));
                     message.delete();
-                    tagMessage.delete();
-                } else {
-                    tagMessage = null;
                 }
             }
         });
