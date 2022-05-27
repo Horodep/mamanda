@@ -2,7 +2,7 @@ import config from "../config.json" assert {type: "json"};
 
 export function InviteFriend(message, discordMention) {
 	var topRole = message.member.roles.highest.position;
-	var minRole = message.guild.roles.cache.find(role => role.id == config.roles.guardians[1]).position;
+	var minRole = message.guild.roles.cache.find(role => role.id == config.roles.guardians[0]).position;
 	if (minRole > topRole)
 		throw 'У вас нет прав на это действие.';
 

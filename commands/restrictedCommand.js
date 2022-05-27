@@ -34,7 +34,7 @@ export function GetRestrictedCommandsArray() {
     array.push(new RestrictedCommand("!help", on, false, "список доступных команд;", async function (args, message) {
         if (args.length == 1) message.channel.send(CommandManager.GetRestrictedHelp());
     }));
-    array.push(new RestrictedCommand("!invitefriend @DiscordTag", on, false, "выдача роли 'Странник' вместо роли 'Очередь';\n_доступна опытным стражам_;", async function (args, message) {
+    array.push(new RestrictedCommand("!invitefriend @DiscordTag", on, false, "выдача роли 'Странник' вместо роли 'Очередь';\n_не доступна гостям сервера и недавно вступившим в клан стражам_;", async function (args, message) {
         InviteFriend(message, (args.length > 1 ? args[1] : ""));
     }));
     array.push(new RestrictedCommand("!medals", on, false, "стражи с большим количеством медалей;", async function (args, message) {
