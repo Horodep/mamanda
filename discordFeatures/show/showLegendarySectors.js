@@ -27,9 +27,9 @@ export function ShowLegendarySectors(channel) {
 		//.setFooter("Grind them for all that fancy brand new magnificent exotic stuff!")
 		.setFooter("В начале сезона информация может не соответствовать действительности!")
 		.setColor(0x00AE86)
-		//.setTimestamp()
-		.addField("Legend (1560)", legendDescription, true)
-		.addField("Master (1590)", masterDescription, true);
+		.setTimestamp()
+		.addField("Legend (1550)", legendDescription, true)
+		.addField("Master (1580)", masterDescription, true);
 	channel.send(embed);
 }
 
@@ -104,8 +104,8 @@ const SECTOR_ROTATION_MAP = {
 }; 
 
 const SECTOR_REWARD_ROTATION_MAP = {
-	0: [2850782006, 247000308],
-	1: [1572351682, 256080248],
-	2: [176055472, 2686128774],
-	3: [1387420892, 2679019194]
+	0: [1572351682, 256080248],
+	1: [176055472, 2686128774],
+	2: [1387420892, 2679019194],
+	3: [2850782006, 247000308]
 };
