@@ -27,9 +27,9 @@ export function ShowLegendarySectors(channel) {
 		//.setFooter("Grind them for all that fancy brand new magnificent exotic stuff!")
 		.setFooter("В начале сезона информация может не соответствовать действительности!")
 		.setColor(0x00AE86)
-		.setTimestamp()
-		.addField("Legend (1550)", legendDescription, true)
-		.addField("Master (1580)", masterDescription, true);
+		//.setTimestamp()
+		.addField("Legend (1560)", legendDescription, true)
+		.addField("Master (1590)", masterDescription, true);
 	channel.send(embed);
 }
 
