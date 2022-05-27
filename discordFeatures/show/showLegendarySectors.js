@@ -10,8 +10,8 @@ export function ShowLegendarySectors(channel) {
 	var emojiServer = channel.client.guilds.cache.get(config.guilds.emojis);
 	var emojiCache = emojiServer.emojis.cache;
 
-	var legend = ManifestManager.GetActivityData(SECTOR_ROTATION_MAP[counter % 11][0], true);
-	var master = ManifestManager.GetActivityData(SECTOR_ROTATION_MAP[counter % 11][1], true);
+	var legend = ManifestManager.GetActivityData(SECTOR_ROTATION_MAP[counter % 10][0], true);
+	var master = ManifestManager.GetActivityData(SECTOR_ROTATION_MAP[counter % 10][1], true);
 	var legendReward = ManifestManager.GetItemData(SECTOR_REWARD_ROTATION_MAP[counter % 4][0], true).displayProperties;
 	var masterReward = ManifestManager.GetItemData(SECTOR_REWARD_ROTATION_MAP[counter % 4][1], true).displayProperties;
 	var legendDestination = ManifestManager.GetDestinationData(legend.destinationHash)?.displayProperties?.name;
@@ -27,9 +27,9 @@ export function ShowLegendarySectors(channel) {
 		//.setFooter("Grind them for all that fancy brand new magnificent exotic stuff!")
 		.setFooter("В начале сезона информация может не соответствовать действительности!")
 		.setColor(0x00AE86)
-		.setTimestamp()
-		.addField("Legend (1550)", legendDescription, true)
-		.addField("Master (1580)", masterDescription, true);
+		//.setTimestamp()
+		.addField("Legend (1560)", legendDescription, true)
+		.addField("Master (1590)", masterDescription, true);
 	channel.send(embed);
 }
 
@@ -90,17 +90,16 @@ const SECTORS = {
 };
 
 const SECTOR_ROTATION_MAP = {
-	10: [SECTORS.K1_REVELATION.LEGEND,         SECTORS.K1_REVELATION.MASTER],
-	0:  [SECTORS.K1_CREW_QUARTERS.LEGEND,      SECTORS.K1_CREW_QUARTERS.MASTER],
-	1:  [SECTORS.K1_LOGISTICS.LEGEND,          SECTORS.K1_LOGISTICS.MASTER],
-	2:  [SECTORS.METAMORPHOSIS.LEGEND,         SECTORS.METAMORPHOSIS.MASTER],
-	3:  [SECTORS.SEPULCHER.LEGEND,    	       SECTORS.SEPULCHER.MASTER],
-	4:  [SECTORS.EXTRACTION.LEGEND,            SECTORS.EXTRACTION.MASTER],
-	5:  [SECTORS.VELES_LABYRINTH.LEGEND,       SECTORS.VELES_LABYRINTH.MASTER],
-	6:  [SECTORS.EXODUS_GARDEN_2A.LEGEND,      SECTORS.EXODUS_GARDEN_2A.MASTER],
-	7:  [SECTORS.APHELIONS_REST.LEGEND,        SECTORS.APHELIONS_REST.MASTER],
-	8:  [SECTORS.BAY_OF_DROWNED_WISHES.LEGEND, SECTORS.BAY_OF_DROWNED_WISHES.MASTER],
-	9:  [SECTORS.CHAMBER_OF_STARLIGHT.LEGEND,  SECTORS.CHAMBER_OF_STARLIGHT.MASTER]
+	7:  [SECTORS.K1_CREW_QUARTERS.LEGEND,      SECTORS.K1_CREW_QUARTERS.MASTER],
+	8:  [SECTORS.K1_LOGISTICS.LEGEND,          SECTORS.K1_LOGISTICS.MASTER],
+	9:  [SECTORS.K1_REVELATION.LEGEND,         SECTORS.K1_REVELATION.MASTER],
+	0:  [SECTORS.K1_COMMUNION.LEGEND,          SECTORS.K1_COMMUNION.MASTER],
+    1:  [SECTORS.METAMORPHOSIS.LEGEND,         SECTORS.METAMORPHOSIS.MASTER],
+	2:  [SECTORS.SEPULCHER.LEGEND,             SECTORS.SEPULCHER.MASTER],
+	3:  [SECTORS.EXTRACTION.LEGEND,            SECTORS.EXTRACTION.MASTER],
+	4:  [SECTORS.APHELIONS_REST.LEGEND,        SECTORS.APHELIONS_REST.MASTER],
+	5:  [SECTORS.BAY_OF_DROWNED_WISHES.LEGEND, SECTORS.BAY_OF_DROWNED_WISHES.MASTER],
+	6:  [SECTORS.CHAMBER_OF_STARLIGHT.LEGEND,  SECTORS.CHAMBER_OF_STARLIGHT.MASTER]
 }; 
 
 const SECTOR_REWARD_ROTATION_MAP = {
