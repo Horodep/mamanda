@@ -86,6 +86,8 @@ const SECTORS = {
 	METAMORPHOSIS:          {  LEGEND: 3678847129,     MASTER: 3678847134   },
 	EXTRACTION:             {  LEGEND: 145221019,      MASTER: 145221020    },
 	SEPULCHER:              {  LEGEND: 480864726,      MASTER: 480864721    },
+	THE_CONFLUX:            {  LEGEND: 1163502303,     MASTER: 1163502296   },
+	THE_RIFT:               {  LEGEND: 1551471969,     MASTER: 1551471974   },
 	TOWER:                             1502633527
 };
 
