@@ -16,14 +16,16 @@ import { FetchDefaultCatchErrorChannel } from "./catcherror.js";
 export const client = new Discord.Client(
 	{ 
 		partials: ['MESSAGE', 'CHANNEL', 'REACTION'], 
-		intents: ["GUILDS", "GUILD_VOICE_STATES", "GUILD_MESSAGES", "GUILD_MESSAGE_REACTIONS", "DIRECT_MESSAGES"] 
+		intents: ["GUILDS", "GUILD_VOICE_STATES", "GUILD_MESSAGES", "GUILD_MESSAGE_REACTIONS", "GUILD_MEMBERS", "DIRECT_MESSAGES"] 
 	});
 
 client.login(config.credentials.discordApiKey);
 
 client.on("ready", () => {
 	client.user.setActivity("Тех. поддержка: Horodep#2567");
-
+	var guild = client.guilds.cache.get(config.guilds.main);
+	guild.members.fetch();
+	
 	FetchDefaultCatchErrorChannel(client);
 	InitSheduler();
 	CommandManager.Init();
