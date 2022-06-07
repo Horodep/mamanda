@@ -13,7 +13,12 @@ import { InitSheduler } from "./sheduler.js";
 import { AsyncRefreshAuthToken } from "./http/httpCore.js";
 import { FetchDefaultCatchErrorChannel } from "./catcherror.js";
 
-export const client = new Discord.Client({ partials: ['MESSAGE', 'CHANNEL', 'REACTION'] });
+export const client = new Discord.Client(
+	{ 
+		partials: ['MESSAGE', 'CHANNEL', 'REACTION'], 
+		intents: ["GUILDS", "GUILD_VOICE_STATES", "GUILD_MESSAGES", "GUILD_MESSAGE_REACTIONS", "DIRECT_MESSAGES"] 
+	});
+
 client.login(config.credentials.discordApiKey);
 
 client.on("ready", () => {
@@ -28,7 +33,7 @@ client.on("ready", () => {
 	console.log("Discord client connected!");
 });
 client.on("guildMemberAdd", (member) => console.log("NEW MEMBER " + member.displayName));
-client.on("message", (_message) => Message(_message));
+client.on("messageCreate", (_message) => Message(_message));
 client.on("messageDelete", (message) => MessageDelete(message));
 client.on("messageReactionAdd", (reaction, user) => AsyncMessageReactionAdd(reaction, user));
 client.on("messageReactionRemove", (reaction, user) => AsyncMessageReactionRemove(reaction, user));
