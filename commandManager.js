@@ -42,7 +42,7 @@ export class CommandManager {
         var uptime = process.uptime()
 
         var embed = new MessageEmbed()
-            .setAuthor(nodePackage.name + " v" + nodePackage.version)
+            .setAuthor({ name: nodePackage.name + " v" + nodePackage.version })
             .setColor(0x11de1b)//0x00AE86
             .setDescription("[баг-трекер](https://github.com/Horodep/mamanda/issues)")
             .addField("Destiny API Status", apiAlerts.ErrorStatus, true)
@@ -52,7 +52,7 @@ export class CommandManager {
         this.AddFieldsWithCommands(embed, "Command list", "RestrictedCommand", apiAlerts);
         if (isGuildmaster) this.AddFieldsWithCommands(embed, "Guildmaster", "GuildmasterCommand", apiAlerts);
 
-        return embed;
+        return { embeds: [embed] };
     }
 
     static GetRestrictedHelp() {
@@ -63,11 +63,11 @@ export class CommandManager {
     }
     static GetHelp(title, constructorName) {
         var embed = new MessageEmbed()
-            .setAuthor(title)
+            .setAuthor({ name: title })
             .setDescription("[Issues tracker](https://github.com/Horodep/mamanda/issues)")
             .setColor(0x00AE86)
             .setThumbnail('https://images-ext-1.discordapp.net/external/veZptUu_KDKmwtUJX5QT3QxESYCaRp4_k0XUwEQxubo/https/i.imgur.com/e9DIB8e.png')
-            .setFooter("Horobot", "https://cdn.discordapp.com/avatars/543342030768832524/7da47eaca948d9874b66fc5884ca2d00.png")
+            .setFooter({ text: 'Horobot', iconURL: 'https://cdn.discordapp.com/avatars/564870880853753857/127385781e26e7dcfdbe312de1843ddf.png' })
             .setTimestamp()
         this.commandList
             .filter(c => (c.constructor.name === constructorName && c.status == 0 && c.description != ''))
@@ -75,7 +75,7 @@ export class CommandManager {
             .forEach(command => {
                 embed.addField(command.usage, command.description);
             });
-        return embed;
+        return { embeds: [embed] };
     }
 
     static Init() {

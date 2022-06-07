@@ -5,9 +5,9 @@ import { filterClanMembersData } from "../clan/showClanTime.js";
 export function CreateEmbedForClanStatistics(clanMembers, modificators) {
 	var guild = clanMembers.filter(m => m.discordMember)[0].discordMember.guild;
 	var embed = new MessageEmbed()
-		.setAuthor("Clankick " + (modificators.includes("final") ? "" : clanMembers.length))
+		.setAuthor({ name: "Clankick " + (modificators.includes("final") ? "" : clanMembers.length) })
 		.setColor(0x00AE86)
-		.setFooter("Horobot", "https://cdn.discordapp.com/avatars/543342030768832524/7da47eaca948d9874b66fc5884ca2d00.png")
+		.setFooter({ text: 'Horobot', iconURL: 'https://cdn.discordapp.com/avatars/564870880853753857/127385781e26e7dcfdbe312de1843ddf.png' })
 		.setTimestamp();
 
 	var { lowGame, lowVoice, zeroGame, zeroVoice, goodNewbie, isAway, noData, weForgotToKik, discordNotFound } = filterClanMembersData(clanMembers);
@@ -27,7 +27,7 @@ export function CreateEmbedForClanStatistics(clanMembers, modificators) {
 	AddField(embed, "Неверный ник [в игре]", discordNotFound, "$name ($game)", "\n", false, true, true);
 
 	if (!modificators.includes("final"))
-		return embed;
+		return { embeds: [embed] };
 
 	var discordMembers = GetDiscordClanMemberList(guild);
 	var left = "";
@@ -39,7 +39,7 @@ export function CreateEmbedForClanStatistics(clanMembers, modificators) {
 	if (left.length > 0)
 		embed.addField("Неверный ник [в дискорде]", left, true);
 
-	return embed;
+	return { embeds: [embed] };
 }
 
 function AddField(embed, embed_header, members, linePattern, separator, show_if_empty, semicolumn, show) {

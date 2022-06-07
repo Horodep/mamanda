@@ -78,7 +78,7 @@ async function AsyncExecuteForEveryMember(timeout, callback) {
 export function SendAndUpdateEmbed({channel, requestTimeout, updateFrequency, fetchDataPerMember, createEmbed, finalAction}) {
 	var iterator = 0;
 	var arrayWithData = [];
-	channel.send(new MessageEmbed().setDescription("Waiting for first data.")).then((msg) => {
+	channel.send( { embeds: [new MessageEmbed().setDescription("Waiting for first data.")] } ).then((msg) => {
 		var firstError = true;
 		AsyncExecuteForEveryMember(requestTimeout, async function (member, i, members) {
 			try {

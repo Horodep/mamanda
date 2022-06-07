@@ -8,10 +8,9 @@ export function CreateMemberRolesEmbed(clanMember, rolesData) {
 	} else {
 		var medalsSum = SumMedals(clanMember.discordMember, rolesData.medals);
 		const embed = new MessageEmbed()
-			.setAuthor(clanMember.displayName + " 💠" + medalsSum + "💠")
+			.setAuthor({ name: clanMember.displayName + " 💠" + medalsSum + "💠" })
 			.setColor(0x00AE86)
-			.setFooter("ПВП медали выдают гм-ы; ранжирование ролей: 8/17/26 • id: " + clanMember.discordMemberId,
-				"https://cdn.discordapp.com/avatars/543342030768832524/7da47eaca948d9874b66fc5884ca2d00.png")
+			.setFooter({ text: "ПВП медали выдают гм-ы; ранжирование ролей: 8/17/26 • id: " + clanMember.discordMemberId, iconURL: 'https://cdn.discordapp.com/avatars/564870880853753857/127385781e26e7dcfdbe312de1843ddf.png' })
 			.addField("Рейды", EmbedFormField(rolesData.medals.raids), true)
 			.addField("Печати", EmbedFormField(rolesData.medals.seals), true)
 			.addField("Наследные печати", EmbedFormField(rolesData.medals.legacy_seals), true)
@@ -25,7 +24,7 @@ export function CreateMemberRolesEmbed(clanMember, rolesData) {
 				+ " | [Braytech](https://braytech.org/" + clanMember.membershipType + "/" + clanMember.membershipId + "/" + rolesData.characterDetails.GetBestCharacterId() + "/)"
 				+ " | [D2 Checklist](https://www.d2checklist.com/" + clanMember.membershipType + "/" + clanMember.membershipId + "/triumphs)"
 				+ " | [Destiny Tracker](https://destinytracker.com/destiny-2/profile/steam/" + clanMember.membershipId + "/overview)");
-		return embed;
+		return { embeds: [embed] };
 	}
 }
 

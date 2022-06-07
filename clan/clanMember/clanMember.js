@@ -182,9 +182,9 @@ export class ClanMember {
 
     GetMemberTimeEmbed(detailedLines) {
         const embed = new MessageEmbed()
-            .setAuthor(this.displayName + " — " + this.percentage + "%")
+            .setAuthor({ name: this.displayName + " — " + this.percentage + "%" })
             .setColor(0x00AE86)
-            .setFooter("Horobot", "https://cdn.discordapp.com/avatars/543342030768832524/7da47eaca948d9874b66fc5884ca2d00.png")
+            .setFooter({ text: 'Horobot', iconURL: 'https://cdn.discordapp.com/avatars/564870880853753857/127385781e26e7dcfdbe312de1843ddf.png' })
             .setTimestamp()
             .addField("Game online", this.access == false ? "Classified" : (this.GetTimeLine(this.#gameOnline) +
                 " [(детальная статистика)](https://chrisfried.github.io/secret-scrublandeux/guardian/" + this.membershipType + "/" + this.membershipId + ")"))
@@ -199,7 +199,7 @@ export class ClanMember {
 
         });
         embed.addField("Voice online", body + "\u200B```");
-        return embed;
+        return { embeds: [embed] };
     }
 }
 

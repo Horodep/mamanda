@@ -205,17 +205,17 @@ function CreateRaidEmbed(data, customTimestamp) {
 
     var { field0, field1, left } = data.FormFields()
     var embed = new MessageEmbed()
-        .setAuthor(data.header)
+        .setAuthor({ name: data.header })
         .setColor(0x00AE86)
         .setThumbnail('https://images-ext-2.discordapp.net/external/SfRL0Sj2a3O9vtAYpaC2OUG0r0vDipe2h8LeeZnFdf4/https/i.imgur.com/KBiRw8F.png')
         .addField("Идут:", field0, true)
         .addField("Идут:", field1, true)
-        .setFooter(data.footer, data.icon)
+        .setFooter({ text: data.footer, iconURL: data.icon })
     if (customTimestamp != null) embed.setTimestamp(customTimestamp);
     if (data.description != null) embed.setDescription(data.description);
     if (left.length > 8) embed.addField("Отменили запись:", left)
 
-    return embed;
+    return { embeds: [embed] };
 }
 
 function FormRaidInfoPrivateMessage(data, message) {

@@ -22,15 +22,15 @@ export function ShowLegendarySectors(channel) {
 	ManifestManager.CleanCache();
 
 	var embed = new MessageEmbed()
-		.setAuthor(legend.displayProperties.name.split(":")[0] + " (" + legendDestination + ")")
+		.setAuthor({ name: legend.displayProperties.name.split(":")[0] + " (" + legendDestination + ")" })
 		.setDescription(legendRewardText)
-		//.setFooter("Grind them for all that fancy brand new magnificent exotic stuff!")
-		.setFooter("В начале сезона информация может не соответствовать действительности!")
+		//.setFooter({ text: "Grind them for all that fancy brand new magnificent exotic stuff!" })
+		.setFooter({ text: "В начале сезона информация может не соответствовать действительности!" })
 		.setColor(0x00AE86)
 		//.setTimestamp()
 		.addField("Legend (1560)", legendDescription, true)
 		.addField("Master (1590)", masterDescription, true);
-	channel.send(embed);
+	channel.send( { embeds: [embed] } );
 }
 
 function ParceDescritpion(data, emojiCache) {

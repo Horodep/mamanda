@@ -2,10 +2,10 @@ import { MessageEmbed } from "discord.js";
 
 export function CreateEmbedForRecordStatistics(membersSucceeded, i, size, recordData) {
 	const embed = new MessageEmbed()
-		.setAuthor(recordData.name + (i == size ? "" : " [" + i + "/" + size + "]"))
+		.setAuthor({ name: recordData.name + (i == size ? "" : " [" + i + "/" + size + "]") })
 		.setColor(0x00AE86)
 		.setThumbnail('https://www.bungie.net' + recordData.icon)
-		.setFooter(recordData.description, "https://cdn.discordapp.com/avatars/543342030768832524/7da47eaca948d9874b66fc5884ca2d00.png");
+		.setFooter({ text: recordData.description, iconURL: 'https://cdn.discordapp.com/avatars/564870880853753857/127385781e26e7dcfdbe312de1843ddf.png' });
 
 	if (membersSucceeded.length > 0)
 		embed.addField(
@@ -25,5 +25,5 @@ export function CreateEmbedForRecordStatistics(membersSucceeded, i, size, record
 				.map(member => member.displayName)
 				.join("\n")
 			, true);
-	return embed;
+	return { embeds: [embed] };
 }

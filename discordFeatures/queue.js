@@ -79,6 +79,6 @@ function FormGuildRequestEmbed(member, text, url, reactions) {
 		.addField(`Заявка`, text == "" ? "нет заявки" : text, true)
 		.addField(`Инфо`, dataField, true)
 		.setColor(color)
-		.setFooter(`дней на сервере: ${daysOnServer}`);
-	return embed;
+		.setFooter({ text: `дней на сервере: ${daysOnServer}` });
+	return { embeds: [embed] };
 }

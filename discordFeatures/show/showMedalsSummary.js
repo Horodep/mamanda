@@ -16,9 +16,9 @@ export function ShowMedalsSummary(channel) {
 	}
 
 	const embed = new MessageEmbed()
-		.setAuthor("Aurora's Tilt — " + members.length + " members // увожаемые:")
+		.setAuthor({ name: "Aurora's Tilt — " + members.length + " members // увожаемые:" })
 		.setColor(0x00AE86)
-		.setFooter("Horobot", "https://cdn.discordapp.com/avatars/543342030768832524/7da47eaca948d9874b66fc5884ca2d00.png")
+		.setFooter({ text: 'Horobot', iconURL: 'https://cdn.discordapp.com/avatars/564870880853753857/127385781e26e7dcfdbe312de1843ddf.png' })
 		.setTimestamp();
 
 	for (let i = 35; i >= 6; i--) {
@@ -28,6 +28,5 @@ export function ShowMedalsSummary(channel) {
 		if (text.length > 0)
 			embed.addField(symbol + " " + i + " " + symbol, text, true);
 	}
-
-	channel.send({ embed });
+	channel.send( { embeds: [embed] } );
 }
