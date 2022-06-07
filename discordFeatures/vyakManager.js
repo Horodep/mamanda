@@ -31,11 +31,12 @@ function CountDeltaTime(delta) {
 }
 
 function CreateVyakbanEmbed(member, now, limit, reason) {
-    return new MessageEmbed()
-        .setAuthor({ name: member.displayName })
-        .setColor(0xDE0C00)
-        .setDescription(":information_source: **" + reason + "**\n" + no + " " + now + "\n" + yes + " " + limit)
-        .setFooter({ text: member.id + " " + limit.getTime(), iconURL: 'https://cdn.discordapp.com/avatars/564870880853753857/127385781e26e7dcfdbe312de1843ddf.png' })
+    return { embeds: [ 
+        new MessageEmbed()
+            .setAuthor({ name: member.displayName })
+            .setColor(0xDE0C00)
+            .setDescription(":information_source: **" + reason + "**\n" + no + " " + now + "\n" + yes + " " + limit)        
+    ] };
 }
 
 export function CheckVyakbansLimitations(client) {
