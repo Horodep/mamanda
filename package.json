@@ -18,16 +18,17 @@
   },
   "homepage": "https://github.com/Horodep/mamanda#readme",
   "dependencies": {
-    "adm-zip": "^0.5.1",
-    "bufferutil": "^4.0.1",
-    "discord.js": "^12.5.3",
-    "ffmpeg-static": "^3.0.0",
+    "adm-zip": "^0.5.9",
+    "bufferutil": "^4.0.6",
+    "discord.js": "^13.8.0",
+    "ffmpeg-static": "^5.0.0",
     "jimp": "^0.16.1",
-    "node-fetch": "^2.6.1",
-    "node-schedule": "^2.0.0",
-    "opusscript": "0.0.6",
-    "pg": "^8.5.1",
-    "utf-8-validate": "^5.0.2",
+    "node-fetch": "^3.2.5",
+    "node-schedule": "^2.1.0",
+    "npm": "^8.12.1",
+    "opusscript": "0.0.8",
+    "pg": "^8.7.3",
+    "utf-8-validate": "^5.0.9",
     "xmlhttprequest": "^1.8.0"
   }
 }
