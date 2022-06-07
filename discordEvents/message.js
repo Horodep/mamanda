@@ -6,7 +6,7 @@ export function Message(message){
 	try {
 		if (message.author.bot) return;
 		
-		if (message.channel.type != "text") {
+		if (message.channel.type != "GUILD_TEXT") {
 			var channel_sandbox = message.client.channels.cache.get(config.channels.sandbox);
 			channel_sandbox.send("**" + message.author.username + "** написал в ЛС:\n" + message.content);
 			return;
