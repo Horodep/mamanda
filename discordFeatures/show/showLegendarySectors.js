@@ -10,8 +10,8 @@ export function ShowLegendarySectors(channel) {
 	var emojiServer = channel.client.guilds.cache.get(config.guilds.emojis);
 	var emojiCache = emojiServer.emojis.cache;
 
-	var legend = ManifestManager.GetActivityData(SECTOR_ROTATION_MAP[counter % 10][0], true);
-	var master = ManifestManager.GetActivityData(SECTOR_ROTATION_MAP[counter % 10][1], true);
+	var legend = ManifestManager.GetActivityData(SECTOR_ROTATION_MAP[counter % 11][0], true);
+	var master = ManifestManager.GetActivityData(SECTOR_ROTATION_MAP[counter % 11][1], true);
 	var legendReward = ManifestManager.GetItemData(SECTOR_REWARD_ROTATION_MAP[counter % 4][0], true).displayProperties;
 	var masterReward = ManifestManager.GetItemData(SECTOR_REWARD_ROTATION_MAP[counter % 4][1], true).displayProperties;
 	var legendDestination = ManifestManager.GetDestinationData(legend.destinationHash)?.displayProperties?.name;
@@ -70,6 +70,7 @@ const SECTORS = {
 	THE_QUARRY:             {  LEGEND: 3253890607,     MASTER: 3253890600	},
 	SCAVENGERS_DEN:         {  LEGEND: 1905792149,     MASTER: 1905792146   },
 	EXCAVATION_SITE_XII:    {  LEGEND: 548616650,      MASTER: 548616653    },
+	SKYDOCK_IV:             {  LEGEND: 55186263,       MASTER: 55186256     },
 	EXODUS_GARDEN_2A:       {  LEGEND: 2936791996,     MASTER: 2936791995   },
 	VELES_LABYRINTH:        {  LEGEND: 3094493720,     MASTER: 3094493727   },
 	THE_EMPTY_TANK:         {  LEGEND: 2019961998,     MASTER: 2019961993   },
@@ -92,16 +93,17 @@ const SECTORS = {
 };
 
 const SECTOR_ROTATION_MAP = {
-	7:  [SECTORS.K1_CREW_QUARTERS.LEGEND,      SECTORS.K1_CREW_QUARTERS.MASTER],
-	8:  [SECTORS.K1_LOGISTICS.LEGEND,          SECTORS.K1_LOGISTICS.MASTER],
-	9:  [SECTORS.K1_REVELATION.LEGEND,         SECTORS.K1_REVELATION.MASTER],
+	8:  [SECTORS.K1_CREW_QUARTERS.LEGEND,      SECTORS.K1_CREW_QUARTERS.MASTER],
+	9:  [SECTORS.K1_LOGISTICS.LEGEND,          SECTORS.K1_LOGISTICS.MASTER],
+	10: [SECTORS.K1_REVELATION.LEGEND,         SECTORS.K1_REVELATION.MASTER],
 	0:  [SECTORS.K1_COMMUNION.LEGEND,          SECTORS.K1_COMMUNION.MASTER],
 	1:  [SECTORS.THE_CONFLUX.LEGEND,           SECTORS.THE_CONFLUX.MASTER],
 	2:  [SECTORS.METAMORPHOSIS.LEGEND,         SECTORS.METAMORPHOSIS.MASTER],
 	3:  [SECTORS.SEPULCHER.LEGEND,             SECTORS.SEPULCHER.MASTER],
 	4:  [SECTORS.EXTRACTION.LEGEND,            SECTORS.EXTRACTION.MASTER],
-	5:  [SECTORS.TOWER,  SECTORS.TOWER],
-	6:  [SECTORS.TOWER,  SECTORS.TOWER]
+	5:  [SECTORS.EXCAVATION_SITE_XII.LEGEND,   SECTORS.EXCAVATION_SITE_XII.MASTER],
+	6:  [SECTORS.SKYDOCK_IV.LEGEND,            SECTORS.SKYDOCK_IV.MASTER],
+	7:  [SECTORS.THE_QUARRY.LEGEND,            SECTORS.THE_QUARRY.MASTER],
 }; 
 
 const SECTOR_REWARD_ROTATION_MAP = {
