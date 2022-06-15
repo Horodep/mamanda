@@ -3,6 +3,7 @@ import nodePackage from "./package.json" assert {type: "json"};
 import { execSync } from "child_process";
 import { MessageEmbed } from "discord.js";
 import { AsyncGetGlobalAlerts } from "./http/bungieApi.js";
+import { GetAuthorisationStatus } from "./http/httpCore.js";
 import { GetDeveloperCommandsArray } from "./commands/developerCommand.js";
 import { GetRestrictedCommandsArray } from "./commands/restrictedCommand.js";
 import { GetGuildmasterCommandsArray } from "./commands/guildmasterCommand.js";
@@ -45,7 +46,7 @@ export class CommandManager {
             .setAuthor({ name: nodePackage.name + " v" + nodePackage.version })
             .setColor(0x11de1b)//0x00AE86
             .setDescription("[баг-трекер](https://github.com/Horodep/mamanda/issues)")
-            .addField("Destiny API Status", apiAlerts.ErrorStatus, true)
+            .addField("Authorisation status", GetAuthorisationStatus(), true)
             .addField("Uptime", Math.floor(uptime / 86400) + ' days ' + Math.floor((uptime / 3600) % 24) + ' hours', true)
             .addField("Git log", "```" + gitLog.replace(/'/g, '') + "```")
 

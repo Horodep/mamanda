@@ -32,6 +32,10 @@ class AccessToken {
     }
 }
 
+export function GetAuthorisationStatus(){
+    return AccessToken.error ? "token error" : "authorised";
+}
+
 export async function AsyncRequestWithPromise(method, url, setAuth) {
     return new Promise(function (resolve, reject) {
         let xhr = new XMLHttpRequest();
@@ -61,7 +65,10 @@ async function AsyncAuthRequestWithPromise(body) {
         authpost.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
         authpost.onload = function () {
             console.log(`Auth HTTP Status: ${this.status}; Responce: ${this.responseText}`);
-            if (this.status != 200) reject(this.responseText);
+            if (this.status != 200) {
+                CatchError("Произошла ошибка авторизации: \n`" + this.responseText + '`');
+                reject(this.responseText);
+            }
 
             AccessToken.SetTokenJson(this.responseText);
             if (!AccessToken.token_exists) reject(this.responseText);
@@ -76,7 +83,7 @@ async function AsyncAuthRequestWithPromise(body) {
 export async function AsyncRefreshAuthToken() {
     AccessToken.ReadFile();
     if (AccessToken.error) {
-        CatchError("Произошла ошибка авторизации: \n`" + AccessToken.error + '`');
+        CatchError("Токен для авторизации утрачен: \n`" + AccessToken.error + '`');
         return;
     }
     var body = `grant_type=refresh_token&refresh_token=${AccessToken.refresh_token}&client_id=${config.credentials.client_id}&client_secret=${config.credentials.client_secret}`;
