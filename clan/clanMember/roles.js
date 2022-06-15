@@ -93,8 +93,8 @@ async function AsyncGetRolesData(membershipType, membershipId) {
 	data.legacy_triumphs.t80k = BungieApiLogic.GetProfileRecordsCore(response, "legacyScore", 80000, "");
 	data.legacy_triumphs.t100k = BungieApiLogic.GetProfileRecordsCore(response, "legacyScore", 100000, "");
 	data.legacy_triumphs.t120k = BungieApiLogic.GetProfileRecordsCore(response, "legacyScore", 120000, "");
-	data.season.season16 = BungieApiLogic.GetNodeDataFiltered(records, 741267279, [], [], "«Возрождение»", 42);
-	data.season.season17 = { state: false, text: "[ЗАСЕКРЕЧЕНО]: 0/??" };
+	data.season.season16 = BungieApiLogic.GetNodeDataFiltered(records, 741267279, [], [], "«Возрождение»", 107);
+	data.season.season17 = BungieApiLogic.GetNodeDataFiltered(records, 239187336, [], [], "«Видение»");
 	data.season.season18 = { state: false, text: "[ЗАСЕКРЕЧЕНО]: 0/??" };
 	data.season.season19 = { state: false, text: "[ЗАСЕКРЕЧЕНО]: 0/??" };
 	data.extra.poi = BungieApiLogic.GetIfPersonOfInterest(records);
