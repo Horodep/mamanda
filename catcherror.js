@@ -22,12 +22,12 @@ export function CatchShedulerError(e, client) {
 
 function ShowErrorWithStack(e, channel) {
 	console.error(e);
-	channel.send(`<@${config.users.developer}>\nОшибка ${e.name}: ${e.message}\n\n${e.stack}`, { code: 'elixir' });
+	channel.send(`<@${config.users.developers[0]}>\nОшибка ${e.name}: ${e.message}\n\n${e.stack}`, { code: 'elixir' });
 }
 
 function ShowInfoMessage(e, channel) {
 	console.error(e);
-	channel.send(`<@${config.users.developer}>\n${e}`);
+	channel.send(`<@${config.users.developers[0]}>\n${e}`);
 }
 
 function ShowHttpError(e, channel) {
@@ -35,7 +35,7 @@ function ShowHttpError(e, channel) {
 
 	console.error(e);
 	if (typeof (e.response) == 'string') {
-		channel.send(`<@${config.users.developer}>, API вернуло не JSON:\n\`endpoint: ${e.url}\``);
+		channel.send(`<@${config.users.developers[0]}>, API вернуло не JSON:\n\`endpoint: ${e.url}\``);
 		channel.send(`${e.response}`, { code: 'xml' });
 		channel.send(`${e.stack}`, { code: 'elixir' });
 	} else {
