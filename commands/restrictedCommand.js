@@ -14,7 +14,7 @@ import { CreateRaid, AsyncGetPlannedRaids } from "../discordFeatures/raid/raid.j
 
 class RestrictedCommand extends Command {
     Run(args, message) {
-        if (restrictedChannels.includes(message.channel.id) || message.author.id == config.users.boss) {
+        if (restrictedChannels.includes(message.channel.id) || config.users.developers.includes(message.author.id)) {
             Command.prototype.SaveRun.call(this, args, message);
         } else {
             message.channel.send(restrictedAnswers[Math.floor(Math.random() * restrictedAnswers.length)]);
