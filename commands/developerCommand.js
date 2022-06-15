@@ -5,7 +5,7 @@ import { NewAuthToken } from "../http/httpCore.js"
 
 class DeveloperCommand extends Command {
     Run(args, message) {
-        if (message.author.id != config.users.developer) return;
+        if (message.author.id in [config.users.developers]) return;
         Command.prototype.SaveRun.call(this, args, message);
     }
 }
