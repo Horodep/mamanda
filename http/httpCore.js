@@ -21,6 +21,9 @@ class AccessToken {
     static get refresh_token() {
         return this.#tokenObject.refresh_token;
     }
+    static get error() {
+        return this.#tokenObject.error_description;
+    }
     static ReadFile() {
         this.#tokenObject = JSON.parse(fs.readFileSync(FetchFullPath(accessTokenFileName)));
     }
@@ -72,6 +75,10 @@ async function AsyncAuthRequestWithPromise(body) {
 
 export async function AsyncRefreshAuthToken() {
     AccessToken.ReadFile();
+    if (AccessToken.error) {
+        CatchError("Произошла ошибка авторизации: \n`" + AccessToken.error + '`');
+        return;
+    }
     var body = `grant_type=refresh_token&refresh_token=${AccessToken.refresh_token}&client_id=${config.credentials.client_id}&client_secret=${config.credentials.client_secret}`;
     await AsyncAuthRequestWithPromise(body);
 }

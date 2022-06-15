@@ -22,13 +22,12 @@ export function CatchShedulerError(e, client) {
 
 function ShowErrorWithStack(e, channel) {
 	console.error(e);
-	channel.send(`<@${config.users.developer}>`);
-	channel.send(`Ошибка ${e.name}: ${e.message}\n\n${e.stack}`, { code: 'elixir' });
+	channel.send(`<@${config.users.developer}>\nОшибка ${e.name}: ${e.message}\n\n${e.stack}`, { code: 'elixir' });
 }
 
 function ShowInfoMessage(e, channel) {
-	console.log(e);
-	channel.send(e);
+	console.error(e);
+	channel.send(`<@${config.users.developer}>\n${e}`);
 }
 
 function ShowHttpError(e, channel) {
