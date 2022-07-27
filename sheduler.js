@@ -25,6 +25,7 @@ export function InitSheduler() {
 	schedule.scheduleJob('0 22 * * 2', () => SaveRun(async () => await AsyncShowResetEnglish(GetChannel(config.channels.gamenews))));
 	schedule.scheduleJob('2 20 * * 2', () => SaveRun(async () => await AsyncDrawEververse(GetChannel(config.channels.gamenews))));
 	schedule.scheduleJob('* * * * *', () => SaveRun(() => CheckVyakbansLimitations(client)));
+	schedule.scheduleJob('5 * * * *', () => SaveRun(() => client.guilds.cache.get(config.guilds.main).members.fetch()));
 }
 
 async function SaveRun(callback) {
