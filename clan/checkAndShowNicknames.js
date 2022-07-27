@@ -33,7 +33,7 @@ export async function AsyncCompareAndShowNicknames(channel, isReminder) {
 	});
 
 	if (!isReminder)
-		channel.send(CreateNicknameComparisonEmbed(discordPsnList, discordList, gameList, gameMembers.length));
+		channel.send(CreateNicknameComparisonEmbed(discordPsnList, discordList, gameList, gameMembers.length, discordMembers.length));
 	else if (discordList.length > 0)
 		channel.send(discordList.join(", ") + "\n\nОбращаю ваше внимание, что ваш никнейм в дискорде не соответствует игровому.");
 }
