@@ -27,7 +27,7 @@ function ShowErrorWithStack(e, channel) {
 
 function ShowInfoMessage(e, channel) {
 	console.error(e);
-	channel.send(`<@${config.users.developers[0]}>\n${e}`);
+	channel.send(e);
 }
 
 function ShowHttpError(e, channel) {
