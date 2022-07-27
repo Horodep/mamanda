@@ -5,7 +5,7 @@ import { CommandManager } from "../commandManager.js"
 import { ShowRecordStatistics, ShowTopTriumphScore } from "../clan/clan.js"
 import { AsyncRoles } from "../clan/clanMember/roles.js"
 import { AsyncGetClanMemberOnlineTime } from "../clan/clanMember/clanMember.js";
-import { ShowMedalsSummary } from "../discordFeatures/show/showMedalsSummary.js";
+import { AsyncShowMedalsSummary } from "../discordFeatures/show/showMedalsSummary.js";
 import { ChangeChannelCap } from "../discordFeatures/change/changeChannelCap.js";
 import { ChangeRegion } from "../discordFeatures/change/changeRegion.js";
 import { InviteFriend } from "../discordFeatures/inviteFriend.js";
@@ -38,7 +38,7 @@ export function GetRestrictedCommandsArray() {
         InviteFriend(message, (args.length > 1 ? args[1] : ""));
     }));
     array.push(new RestrictedCommand("!medals", on, false, "стражи с большим количеством медалей;", async function (args, message) {
-        ShowMedalsSummary(message.channel);
+        AsyncShowMedalsSummary(message.channel);
     }));
     array.push(new RestrictedCommand("!mymt", on, true, "проверка активности стража в голосовом чате (только своей);", async function (args, message) {
         await AsyncGetClanMemberOnlineTime(message, (args.length > 1 ? args[1] : "7"));

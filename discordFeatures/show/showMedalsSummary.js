@@ -1,8 +1,8 @@
 import { MessageEmbed } from "discord.js";
-import { GetDiscordClanMemberList } from "../getDiscordClanMemberList.js";
+import { AsyncGetDiscordClanMemberList, GetDiscordClanMemberList } from "../getDiscordClanMemberList.js";
 
-export function ShowMedalsSummary(channel) {
-	var members = GetDiscordClanMemberList(channel.guild);
+export async function AsyncShowMedalsSummary(channel) {
+	var members = await AsyncGetDiscordClanMemberList(channel.guild);
 
 	var sorted = [];
 	for (let i = 0; i < 36; i++) {
