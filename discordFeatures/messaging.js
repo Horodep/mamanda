@@ -40,13 +40,19 @@ export function SendPrivateMessage(guild, args){
 }
 
 export function SendPrivateMessageToMember(discordMember, text){
-    discordMember.send(text);
-    console.log("pm " + discordMember.displayName);
-    Logging(discordMember, text);
+    try {
+        discordMember.send(text);
+        console.log("pm " + discordMember.displayName);
+        Logging(discordMember, text);
+    } catch (e) {
+        console.error("pm " + discordMember.displayName + "NOT SENT");
+        Logging(discordMember, text, false);
+    }
 }
 
-function Logging (discordMember, text) {
+function Logging (discordMember, text, success = true) {
     var log_channel = discordMember.client.channels.cache.get(config.channels.logging);
-    var log_text = "__Игроку <@" + discordMember.id + "> [" + discordMember.displayName + "] отправлено сообщение:__\n" + text;
+    var log_text = "__Игроку <@" + discordMember.id + "> [" + discordMember.displayName + "] " +
+                    (success ?  " отправлено сообщение:__\n" + text : "**не удалось отправить сообщение**__");
 	log_channel.send(log_text);
 }
