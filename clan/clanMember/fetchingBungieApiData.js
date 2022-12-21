@@ -100,6 +100,7 @@ export function GetDayOneData(collectibles) {
 	return GetDataAndHandleErrors("Day 1: ", () => {
 		var completed = [];
 		var raids = [
+			{ id: 22123317, name: "ГК"},
 			{ id: 2561756670, name: "КП"},
 			{ id: 2172413746, name: "ХЧ"},
 			{ id: 2273453972, name: "СГК"},

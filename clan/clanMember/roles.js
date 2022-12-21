@@ -68,6 +68,7 @@ async function AsyncGetRolesData(membershipType, membershipId) {
 	data.raids.dsc = BungieApiLogic.GetNodeDataFiltered(records, 1726708384, [3560923614], [], "СГК");
 	data.raids.vog = BungieApiLogic.GetNodeDataFiltered(records, 132375837, [2750088202], [], "ХЧ");
 	data.raids.vod = BungieApiLogic.GetNodeDataFiltered(records, 3779087602, [4019717242], [], "КП");
+	data.raids.kf = BungieApiLogic.GetNodeDataFiltered(records, 3596566041, [1360511082], [], "ГК");
 	data.raids.day1 = BungieApiLogic.GetDayOneData(collectibles);
 	data.locations.dc = BungieApiLogic.GetNodeData(records, 3483405511, "Город Грез");
 	data.locations.moon = BungieApiLogic.GetNodeData(records, 1473265108, "Луна");
@@ -82,9 +83,9 @@ async function AsyncGetRolesData(membershipType, membershipId) {
 	data.seals.gumshoe = BungieApiLogic.GetNodeData(records, 3061040177, "Детектив");
 	data.seals.dredgen = BungieApiLogic.GetNodeData(records, 3665267419, "Дреджен");
 	data.seals.conqueror = BungieApiLogic.GetBestNode(records, [3212358005, 1376640684, 581214566, 3776992251], "Завоеватель");
-	data.crucible.glory2100 = BungieApiLogic.GetProgressionData(progressions, 1647151960, 2100, "Ранкед");
-	data.crucible.glory3500 = BungieApiLogic.GetProgressionData(progressions, 1647151960, 3500, "Ранкед");
-	data.crucible.glory5450 = BungieApiLogic.GetProgressionData(progressions, 1647151960, 5450, "Ранкед");
+	data.crucible.glory2100 = BungieApiLogic.GetProgressionData(progressions, 3696598664, 4500, "Ранкед");
+	data.crucible.glory3500 = BungieApiLogic.GetProgressionData(progressions, 3696598664, 6000, "Ранкед");
+	data.crucible.glory5450 = BungieApiLogic.GetProgressionData(progressions, 3696598664, 7500, "Ранкед");
 	data.crucible.flawless = BungieApiLogic.GetBestNode(records, [3251218484, 2086100423, 1276693937, 1733555826], "Безупречный");
 	data.legacy_seals.lore = BungieApiLogic.GetNodeData(records, 3680676656, "Летописец");
 	data.legacy_seals.blacksmith = BungieApiLogic.GetNodeData(records, 450166688, "Кузнец");
@@ -94,9 +95,9 @@ async function AsyncGetRolesData(membershipType, membershipId) {
 	data.legacy_triumphs.t100k = BungieApiLogic.GetProfileRecordsCore(response, "legacyScore", 100000, "");
 	data.legacy_triumphs.t120k = BungieApiLogic.GetProfileRecordsCore(response, "legacyScore", 120000, "");
 	data.season.season16 = BungieApiLogic.GetNodeDataFiltered(records, 741267279, [], [], "«Возрождение»", 107);
-	data.season.season17 = BungieApiLogic.GetNodeDataFiltered(records, 239187336, [], [], "«Видение»");
-	data.season.season18 = { state: false, text: "[ЗАСЕКРЕЧЕНО]: 0/??" };
-	data.season.season19 = { state: false, text: "[ЗАСЕКРЕЧЕНО]: 0/??" };
+	data.season.season17 = BungieApiLogic.GetNodeDataFiltered(records, 239187336, [], [], "«Видение»", 51);
+	data.season.season18 = BungieApiLogic.GetNodeDataFiltered(records, 1073993173, [], [], "«Добыча»", 77);
+	data.season.season19 = BungieApiLogic.GetNodeDataFiltered(records, 1440901814, [], [], "«Серафим»");
 	data.extra.poi = BungieApiLogic.GetIfPersonOfInterest(records);
 	data.extra.legacy.season8 = BungieApiLogic.GetNodeData(records, 955166374, "Undying");
 	data.extra.legacy.season9 = BungieApiLogic.GetNodeData(records, 955166375, "Dawn");
