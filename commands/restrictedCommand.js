@@ -43,7 +43,7 @@ export function GetRestrictedCommandsArray() {
     array.push(new RestrictedCommand("!mymt", on, true, "проверка активности стража в голосовом чате (только своей);", async function (args, message) {
         await AsyncGetClanMemberOnlineTime(message, (args.length > 1 ? args[1] : "7"));
     }));
-    array.push(new RestrictedCommand("!myraids", on, false, "список рейдов, в которые записался страж;", async function (args, message) {
+    array.push(new RestrictedCommand("!myraids", off, false, "список рейдов, в которые записался страж;", async function (args, message) {
         await AsyncGetPlannedRaids(message, args.length > 1 ? args[1] : message.author.id)
     }));
     array.push(new RestrictedCommand("!region", on, false, "смена региона сервера;", async function (args, message) {
@@ -69,10 +69,10 @@ export function GetRestrictedCommandsArray() {
         ShowTopTriumphScore(message.channel, args.length > 1 ? true : false);
     }));
     array.push(new RestrictedCommand("!toptriumphs gimmeimageplz", on, true, "топ 15 стражей клана по очкам триумфов графиком;", null));
-    array.push(new RestrictedCommand("!сбор ДД.ММ ЧЧ:ММ название активности, комментарии", on, false, "создание сбора на активность на 6 человек;", async function (args, message) {
+    array.push(new RestrictedCommand("!сбор ДД.ММ ЧЧ:ММ название активности, комментарии", off, false, "создание сбора на активность на 6 человек;", async function (args, message) {
         CreateRaid(message, args);
     }));
-    array.push(new RestrictedCommand("!сбор ДД.ММ ЧЧ:ММ [N] название активности, комментарии", on, false, "создание сбора на активность на N человек;", null));
+    array.push(new RestrictedCommand("!сбор ДД.ММ ЧЧ:ММ [N] название активности, комментарии", off, false, "создание сбора на активность на N человек;", null));
 
     return array;
 }
