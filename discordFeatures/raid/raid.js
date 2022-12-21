@@ -108,6 +108,8 @@ export function ClearRaidList(client) {
                 message.delete();
                 return;
             }
+            return;
+            //atm cleaned only user messages
             if (message.content != "") {
                 message.delete();
             } else {

@@ -16,7 +16,7 @@ import { CheckVyakbansLimitations } from "./discordFeatures/vyakManager.js";
 
 export function InitSheduler() {
 	schedule.scheduleJob('1 */4 * * *', () => SaveRun(() => ManifestManager.Refresh()));
-	//schedule.scheduleJob('0 3 * * *', () => SaveRun(() => ClearRaidList(client)));
+	schedule.scheduleJob('0 3 * * *', () => SaveRun(() => ClearRaidList(client)));
 	schedule.scheduleJob('0 4 * * *', () => SaveRun(() => SetRolesToEveryMember(GetGuild(config.guilds.main))));
 	schedule.scheduleJob('0 8 * * *', () => SaveRun(async () => await AsyncShowClanTime(GetChannel(config.channels.clankick), 7, 'pm')));
 	schedule.scheduleJob('0 20 * * *', () => SaveRun(() => PublishDailyMessage(client)));
