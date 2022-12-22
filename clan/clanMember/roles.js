@@ -83,9 +83,9 @@ async function AsyncGetRolesData(membershipType, membershipId) {
 	data.seals.gumshoe = BungieApiLogic.GetNodeData(records, 3061040177, "Детектив");
 	data.seals.dredgen = BungieApiLogic.GetNodeData(records, 3665267419, "Дреджен");
 	data.seals.conqueror = BungieApiLogic.GetBestNode(records, [3212358005, 1376640684, 581214566, 3776992251], "Завоеватель");
-	data.crucible.glory2100 = BungieApiLogic.GetProgressionData(progressions, 3696598664, 4500, "Ранкед");
-	data.crucible.glory3500 = BungieApiLogic.GetProgressionData(progressions, 3696598664, 6000, "Ранкед");
-	data.crucible.glory5450 = BungieApiLogic.GetProgressionData(progressions, 3696598664, 7500, "Ранкед");
+	data.crucible.glory2100 = BungieApiLogic.GetProgressionData(progressions, 3696598664, 3000, "Ранкед");
+	data.crucible.glory3500 = BungieApiLogic.GetProgressionData(progressions, 3696598664, 4500, "Ранкед");
+	data.crucible.glory5450 = BungieApiLogic.GetProgressionData(progressions, 3696598664, 6000, "Ранкед");
 	data.crucible.flawless = BungieApiLogic.GetBestNode(records, [3251218484, 2086100423, 1276693937, 1733555826], "Безупречный");
 	data.legacy_seals.lore = BungieApiLogic.GetNodeData(records, 3680676656, "Летописец");
 	data.legacy_seals.blacksmith = BungieApiLogic.GetNodeData(records, 450166688, "Кузнец");
