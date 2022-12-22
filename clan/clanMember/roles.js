@@ -135,7 +135,7 @@ function SetRoles(clanMember, characterDetails, medals) {
 	CheckAndProcessRole(discordMember, config.roles.medals.specific.day1, medals.raids.day1.state, false);
 	CheckAndProcessRole(discordMember, config.roles.medals.specific.poi, medals.extra.poi.state, false);
 
-	CheckAndProcessRoleBlock(discordMember, config.roles.medals.category_first_role.raids, 6, medals.raids);
+	CheckAndProcessRoleBlock(discordMember, config.roles.medals.category_first_role.raids, 7, medals.raids);
 	CheckAndProcessRoleBlock(discordMember, config.roles.medals.category_first_role.seals, 6, medals.seals);
 	CheckAndProcessRoleBlock(discordMember, config.roles.medals.category_first_role.legacy_seals, 4, medals.legacy_seals);
 	CheckAndProcessRoleBlock(discordMember, config.roles.medals.category_first_role.locations, 4, medals.locations);
