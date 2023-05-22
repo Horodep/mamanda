@@ -65,7 +65,7 @@ function SumCrucible(discord_member) {
 	for (let i = 0; i < 9; i++) {
 		var role = discord_member.roles.cache.find(role => role.position == (pvp_top_role.position - i));
 		if (role != null)
-			return (role.name.match(/💠/g)?.length*2 ?? 0) + (role.name.match(/🔷/g)?.length ?? 0);
+			return (role.name.match(/💠/g)?.length ?? 0)*2 + (role.name.match(/🔷/g)?.length ?? 0);
 	}
 	return 0;
 }
