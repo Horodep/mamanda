@@ -69,18 +69,22 @@ async function AsyncGetRolesData(membershipType, membershipId) {
 	data.raids.vog = BungieApiLogic.GetNodeDataFiltered(records, 132375837, [2750088202], [], "ХЧ");
 	data.raids.vod = BungieApiLogic.GetNodeDataFiltered(records, 3779087602, [4019717242], [], "КП");
 	data.raids.kf = BungieApiLogic.GetNodeDataFiltered(records, 3596566041, [1360511082], [], "ГК");
+	data.raids.ron = BungieApiLogic.GetNodeDataFiltered(records, 4114450368, [397062446], [], "ИК");
 	data.raids.day1 = BungieApiLogic.GetDayOneData(collectibles);
+	data.raids.lowman = { state: false, text: "3man: TBA" };
 	data.locations.dc = BungieApiLogic.GetNodeData(records, 3483405511, "Город Грез");
 	data.locations.moon = BungieApiLogic.GetNodeData(records, 1473265108, "Луна");
 	data.locations.euro = BungieApiLogic.GetNodeDataFiltered(records, 2647590440, [3560923614], [], "Европа");
 	data.locations.throne = BungieApiLogic.GetNodeData(records, 3324443328, "Тронный мир");
-	data.triumphs.tier1 = BungieApiLogic.GetProfileRecordsCore(response, "activeScore", 14000, "");
-	data.triumphs.tier2 = BungieApiLogic.GetProfileRecordsCore(response, "activeScore", 16000, "");
-	data.triumphs.tier3 = BungieApiLogic.GetProfileRecordsCore(response, "activeScore", 18000, "");
+	data.locations.neomuna = BungieApiLogic.GetNodeData(records, 1964693686, "Неомуна");
+	data.triumphs.tier1 = BungieApiLogic.GetProfileRecordsCore(response, "activeScore", 16000, "");
+	data.triumphs.tier2 = BungieApiLogic.GetProfileRecordsCore(response, "activeScore", 18000, "");
+	data.triumphs.tier3 = BungieApiLogic.GetProfileRecordsCore(response, "activeScore", 20000, "");
 	data.seals.cursebreaker = BungieApiLogic.GetNodeData(records, 560097044, "Гроза");
 	data.seals.harbinger = BungieApiLogic.GetNodeData(records, 379405979, "Посланник");
 	data.seals.splintered = BungieApiLogic.GetNodeData(records, 79180995, "Раскол");
 	data.seals.gumshoe = BungieApiLogic.GetNodeData(records, 3061040177, "Детектив");
+	data.seals.virtualfighter = BungieApiLogic.GetNodeData(records, 4186496383, "Виртуальный боец");
 	data.seals.dredgen = BungieApiLogic.GetNodeData(records, 3665267419, "Дреджен");
 	data.seals.conqueror = BungieApiLogic.GetBestNode(records, [3212358005, 1376640684, 581214566, 3776992251], "Завоеватель");
 	data.crucible.glory2100 = BungieApiLogic.GetProgressionData(progressions, 3696598664, 3000, "Ранкед");
@@ -94,10 +98,11 @@ async function AsyncGetRolesData(membershipType, membershipId) {
 	data.legacy_triumphs.t80k = BungieApiLogic.GetProfileRecordsCore(response, "legacyScore", 80000, "");
 	data.legacy_triumphs.t100k = BungieApiLogic.GetProfileRecordsCore(response, "legacyScore", 100000, "");
 	data.legacy_triumphs.t120k = BungieApiLogic.GetProfileRecordsCore(response, "legacyScore", 120000, "");
-	data.season.season16 = BungieApiLogic.GetNodeDataFiltered(records, 741267279, [], [], "«Возрождение»", 107);
-	data.season.season17 = BungieApiLogic.GetNodeDataFiltered(records, 239187336, [], [], "«Видение»", 51);
-	data.season.season18 = BungieApiLogic.GetNodeDataFiltered(records, 1073993173, [], [], "«Добыча»", 77);
-	data.season.season19 = BungieApiLogic.GetNodeDataFiltered(records, 1440901814, [], [], "«Серафим»");
+	data.season.season20 = BungieApiLogic.GetNodeDataFiltered(records, 741267279, [], [], "«Сопротивление»", 117);
+	//data.season.season21 = BungieApiLogic.GetNodeDataFiltered(records, 239187336, [], [], "«Глубина»", 51);
+	data.season.season21 = { state: false, text: "[ЗАСЕКРЕЧЕНО]: 0/??" };
+	data.season.season22 = { state: false, text: "[ЗАСЕКРЕЧЕНО]: 0/??" };
+	data.season.season23 = { state: false, text: "[ЗАСЕКРЕЧЕНО]: 0/??" };
 	data.extra.poi = BungieApiLogic.GetIfPersonOfInterest(records);
 	data.extra.legacy.season8 = BungieApiLogic.GetNodeData(records, 955166374, "Undying");
 	data.extra.legacy.season9 = BungieApiLogic.GetNodeData(records, 955166375, "Dawn");
@@ -107,7 +112,10 @@ async function AsyncGetRolesData(membershipType, membershipId) {
 	data.extra.legacy.season13 = BungieApiLogic.GetNodeData(records, 1321008462, "Chosen");
 	data.extra.legacy.season14 = BungieApiLogic.GetNodeData(records, 1321008457, "Splicer");
 	data.extra.legacy.season15 = BungieApiLogic.GetNodeData(records, 1321008456, "Realmwalker");
-
+	data.extra.legacy.season16 = BungieApiLogic.GetNodeData(records, 1321008459, "Risen");
+	data.extra.legacy.season17 = BungieApiLogic.GetNodeData(records, 1321008458, "Haunted");
+	data.extra.legacy.season18 = BungieApiLogic.GetNodeData(records, 1321008453, "Scallywag");
+	data.extra.legacy.season19 = BungieApiLogic.GetNodeData(records, 1321008452, "Seraph");
 	return { characterDetails: characterDetails, medals: data };
 }
 
@@ -135,14 +143,14 @@ function SetRoles(clanMember, characterDetails, medals) {
 	CheckAndProcessRole(discordMember, config.roles.medals.specific.day1, medals.raids.day1.state, false);
 	CheckAndProcessRole(discordMember, config.roles.medals.specific.poi, medals.extra.poi.state, false);
 
-	CheckAndProcessRoleBlock(discordMember, config.roles.medals.category_first_role.raids, 7, medals.raids);
-	CheckAndProcessRoleBlock(discordMember, config.roles.medals.category_first_role.seals, 6, medals.seals);
+	CheckAndProcessRoleBlock(discordMember, config.roles.medals.category_first_role.raids, 8, medals.raids);
+	CheckAndProcessRoleBlock(discordMember, config.roles.medals.category_first_role.seals, 7, medals.seals);
 	CheckAndProcessRoleBlock(discordMember, config.roles.medals.category_first_role.legacy_seals, 4, medals.legacy_seals);
-	CheckAndProcessRoleBlock(discordMember, config.roles.medals.category_first_role.locations, 4, medals.locations);
+	CheckAndProcessRoleBlock(discordMember, config.roles.medals.category_first_role.locations, 5, medals.locations);
 	CheckAndProcessRoleBlock(discordMember, config.roles.medals.category_first_role.triumphs, 3, medals.triumphs);
 	CheckAndProcessRoleBlock(discordMember, config.roles.medals.category_first_role.legacy_triumphs, 3, medals.legacy_triumphs);
 	CheckAndProcessRoleBlock(discordMember, config.roles.medals.category_first_role.season, 4, medals.season);
-	CheckAndProcessRoleBlock(discordMember, config.roles.medals.category_first_role.extralegacy, 8, medals.extra.legacy);
+	CheckAndProcessRoleBlock(discordMember, config.roles.medals.category_first_role.extralegacy, 12, medals.extra.legacy);
 
 	if (discordMember.roles.cache.find(role => role.id == config.roles.guildleader) != null) return;
 	if (discordMember.roles.cache.find(role => role.id == config.roles.guildmaster) != null) return;
@@ -151,8 +159,8 @@ function SetRoles(clanMember, characterDetails, medals) {
 	if (discordMember.roles.cache.find(role => role.id == config.roles.guest) != null) return;
 
 	var sum = SumMedals(discordMember, medals);
-	CheckAndProcessRole(discordMember, config.roles.guardians[0], sum >= 0, sum >= 8);
-	CheckAndProcessRole(discordMember, config.roles.guardians[1], sum >= 8, sum >= 17);
-	CheckAndProcessRole(discordMember, config.roles.guardians[2], sum >= 17, sum >= 26);
-	CheckAndProcessRole(discordMember, config.roles.guardians[3], sum >= 26, false);
+	CheckAndProcessRole(discordMember, config.roles.guardians[0], sum >= 0, sum >= 9);
+	CheckAndProcessRole(discordMember, config.roles.guardians[1], sum >= 9, sum >= 20);
+	CheckAndProcessRole(discordMember, config.roles.guardians[2], sum >= 20, sum >= 30);
+	CheckAndProcessRole(discordMember, config.roles.guardians[3], sum >= 30, false);
 }
